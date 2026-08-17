@@ -177,6 +177,28 @@
       "igdbId": 357181
     },
     {
+      "id": "game-bassmasters-2000",
+      "title": "BassMasters 2000",
+      "platform": "Nintendo 64",
+      "year": 1999,
+      "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co47fe.jpg",
+      "description": "BassMasters 2000 is a fishing simulation game which counts a total of 4 modes and has a variety of customizable options. You can create and save up to 7 anglers through the “Create Angler” option, customising characteristics such as sex, hair, face, clothes, etc. Other customisable options include “Lake Conditions” (lake location, season, weather, time, etc.), “Boat” (boat model, engine, etc.) and “Tackle” (rod/reel, line, lure, etc.).",
+      "genres": [
+        "Simulator",
+        "Sport"
+      ],
+      "developer": "Mass Media Inc",
+      "publisher": "THQ",
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-17",
+      "igdbId": 3420
+    },
+    {
       "id": "nintendo-64-bio-freaks",
       "title": "Bio Freaks",
       "platform": "Nintendo 64",
@@ -634,7 +656,7 @@
       "platform": "Sony PlayStation 4",
       "year": 2016,
       "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co1nc7.jpg",
-      "description": "Developed by id software, the studio that pioneered the first-person shooter genre and created multiplayer Deathmatch, Doom returns as a brutally fun and challenging modern-day shooter experience. Relentless demons, impossibly destructive guns, and fast, fluid movement provide the foundation for intense, first-person combat - whether you’re obliterating demon hordes through the depths of Hell in the single-player campaign, or competing against your friends in numerous multiplayer modes.",
+      "description": "Developed by id software, the studio that pioneered the first-person shooter genre and created multiplayer Deathmatch, Doom returns as a brutally fun and challenging modern-day shooter experience. Relentless demons, impossibly destructive guns, and fast, fluid movement provide the foundation for intense, first-person combat – whether you’re obliterating demon hordes through the depths of Hell in the single-player campaign, or competing against your friends in numerous multiplayer modes.",
       "genres": [
         "Action",
         "First-person shooter",
@@ -671,6 +693,27 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 4248
+    },
+    {
+      "id": "game-dreamworks-shark-tale",
+      "title": "Dreamworks' Shark Tale",
+      "platform": "Nintendo GameCube",
+      "year": 2004,
+      "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co99kp.jpg",
+      "description": "Shark Tale is a 2004 video game based on the film of the same name that was released on PlayStation 2, Microsoft Windows, Game Boy Advance, GameCube and Xbox. The player is the role of Oscar, the fast-talking little fish, who becomes an unlikely hero after he decides to take the easy road to fame and fortune by fighting with his shark friend.",
+      "genres": [
+        "Adventure"
+      ],
+      "developer": "KnowWonder, Edge of Reality",
+      "publisher": "Activision",
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-17",
+      "igdbId": 4148
     },
     {
       "id": "snes-super-famicom-espn-baseball-tonight",
@@ -937,7 +980,7 @@
       "platform": "Sony PlayStation 5",
       "year": 2022,
       "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co2g84.jpg",
-      "description": "Gran Turismo 7 brings together the very best features of the Real Driving Simulator. Whether you’re a competitive or casual racer, collector, tuner, livery designer or photographer - find your line with a staggering collection of game modes including fan-favorites like GT Campaign, Arcade and Driving School. With the reintroduction of the legendary GT Simulation Mode, buy, tune, race and sell your way through a rewarding solo campaign as you unlock new cars and challenges. And if you love going head-to-head with others, hone your skills and compete in the GT Sport Mode.",
+      "description": "Gran Turismo 7 brings together the very best features of the Real Driving Simulator. Whether you’re a competitive or casual racer, collector, tuner, livery designer or photographer – find your line with a staggering collection of game modes including fan-favorites like GT Campaign, Arcade and Driving School. With the reintroduction of the legendary GT Simulation Mode, buy, tune, race and sell your way through a rewarding solo campaign as you unlock new cars and challenges. And if you love going head-to-head with others, hone your skills and compete in the GT Sport Mode.",
       "genres": [
         "Racing",
         "Vehicle Sim"
@@ -1089,7 +1132,7 @@
       "platform": "Sony PlayStation 4",
       "year": 2017,
       "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co2una.jpg",
-      "description": "Welcome to a vibrant world rich with the beauty of nature - but inhabited by awe-inspiring, highly advanced machines. As a young machine hunter named Aloy, you must unravel the mysteries of this world and find your own destiny.",
+      "description": "Welcome to a vibrant world rich with the beauty of nature – but inhabited by awe-inspiring, highly advanced machines. As a young machine hunter named Aloy, you must unravel the mysteries of this world and find your own destiny.",
       "genres": [
         "Action",
         "Adventure",
@@ -1282,7 +1325,7 @@
       "platform": "Nintendo Switch",
       "year": 2018,
       "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co25sm.jpg",
-      "description": "When the King of All Cosmos accidentally destroys all the stars in the sky, he orders you, his pint-sized princely son, to put the twinkle back in the heavens above. Join the King and Prince of Cosmos on their wacky adventure to restore the stars at home or on the go - now in full HD!",
+      "description": "When the King of All Cosmos accidentally destroys all the stars in the sky, he orders you, his pint-sized princely son, to put the twinkle back in the heavens above. Join the King and Prince of Cosmos on their wacky adventure to restore the stars at home or on the go – now in full HD!",
       "genres": [
         "Action",
         "Puzzle"
@@ -2053,7 +2096,7 @@
       "platform": "Nintendo 64",
       "year": 1998,
       "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co6xqx.jpg",
-      "description": "An Action-adventure game based on the 1996 film Mission: Impossible. It was for Nintendo 64. It was later ported to the PlayStation, with minor additions such as voice acting. A sequel, Mission: Impossible - Operation Surma, was released in 2003.",
+      "description": "An Action-adventure game based on the 1996 film Mission: Impossible. It was for Nintendo 64. It was later ported to the PlayStation, with minor additions such as voice acting. A sequel, Mission: Impossible – Operation Surma, was released in 2003.",
       "genres": [
         "Action",
         "Adventure"
@@ -3203,6 +3246,28 @@
       "igdbId": 3760
     },
     {
+      "id": "game-starcraft-64",
+      "title": "StarCraft 64",
+      "platform": "Nintendo 64",
+      "year": 2000,
+      "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co2euj.jpg",
+      "description": "The game itself is split into three episodes, one for the player to command each race. In the first segment of the game, the player and Jim Raynor are attempting to control the colony of Mar Sara in the wake of the Zerg attacks on other Terran worlds. The second campaign reveals that Kerrigan was not killed by the Zerg, but rather is captured and infested in an effort to incorporate her psionic traits into the Zerg gene pool. The final episode of the game sees Aldaris and the Protoss government branding Tassadar a traitor and a heretic for conspiring with the dark templar.",
+      "genres": [
+        "Real Time Strategy (RTS)",
+        "Strategy"
+      ],
+      "developer": "Mass Media Inc",
+      "publisher": "Nintendo",
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-17",
+      "igdbId": 9067
+    },
+    {
       "id": "nintendo-switch-stardew-valley",
       "title": "Stardew Valley",
       "platform": "Nintendo Switch",
@@ -3274,7 +3339,7 @@
       "platform": "Nintendo 64",
       "year": 1996,
       "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co721v.jpg",
-      "description": "Mario is super in a whole new way! Combining the finest 3-D graphics ever developed for a video game and an explosive soundtrack, Super Mario 64 becomes a new standard for video games. It's packed with bruising battles, daunting obstacle courses, and underwater adventures. Retrieve the Power Stars from their hidden locations and confront your arch-nemesis- Bowser, King of the Koopas! • Run freely in a grassy meadow, tip-toe through a gloomy dungeon, climb to the top of a mountain, or take a swim in the moat!",
+      "description": "Mario is super in a whole new way! Combining the finest 3-D graphics ever developed for a video game and an explosive soundtrack, Super Mario 64 becomes a new standard for video games. It's packed with bruising battles, daunting obstacle courses, and underwater adventures. Retrieve the Power Stars from their hidden locations and confront your arch-nemesis— Bowser, King of the Koopas! • Run freely in a grassy meadow, tip-toe through a gloomy dungeon, climb to the top of a mountain, or take a swim in the moat!",
       "genres": [
         "Action",
         "Adventure",
@@ -3984,6 +4049,30 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3647
+    },
+    {
+      "id": "game-yu-gi-oh-the-falsebound-kingdom",
+      "title": "Yu-Gi-Oh! The Falsebound Kingdom",
+      "platform": "Nintendo GameCube",
+      "year": 2002,
+      "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co75a6.jpg",
+      "description": "Yugi and his friends are trapped in a virtual reality world gone crazy. As Yugi or Kaiba, you must form a team of three monsters to occupy towns across two different scenarios and take part in strategic team battles. Delegate commands to your team to conquer each mission. During battle, your team can perform devastating group attacks and combos. Over 175 monsters from the Yu-Gi-Oh! animated TV series appear in the game--and all of them will fight to the finish for control of each map.",
+      "genres": [
+        "Real Time Strategy (RTS)",
+        "Role-playing (RPG)",
+        "Strategy",
+        "Turn-based strategy (TBS)"
+      ],
+      "developer": "Konami",
+      "publisher": "Konami",
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-17",
+      "igdbId": 4582
     },
     {
       "id": "microsoft-xbox-zapper-one-wicked-cricket",
