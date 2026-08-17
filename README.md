@@ -5,10 +5,10 @@ it by console, sort it, click any cover for the details. Host it free on GitHub
 Pages.
 
 No framework, no build step, no dependencies. The repo *is* the site: a page, a
-stylesheet, a script, and one JSON file holding your collection. The helper
-scripts that fetch cover art are optional and run on your own machine.
+stylesheet, a script, and one JSON file holding your collection. Edit it through
+a local UI (`npm run manage`), a CLI, or a text editor — whichever you prefer.
 
-**Four views:**
+**Five views:**
 
 - **Shelf** — the cover grid, with search, platform filters and sorting.
 - **Timeline** — your collection by release year, gaps and all.
@@ -53,8 +53,11 @@ That's the only setting to change. From now on every push publishes the site to
 
 ### 3. Put your own games in
 
-Empty out `data/collection.json` and start adding. There are three ways, and
-they all write to the same file — mix and match freely.
+Empty out `data/collection.json` and start adding. There are four ways, and they
+all write to the same file — mix and match freely.
+
+**Use the manager.** `npm run manage` opens an editor in your browser, which is
+the easiest way in. The rest of these work just as well.
 
 **Type them in by hand.** Every field except `title` and `platform` is optional:
 
@@ -134,6 +137,52 @@ npm run add "Chrono Trigger" -- --platform "SNES/Super Famicom" --condition CIB
 ```
 
 ---
+
+## The manager
+
+Editing JSON by hand is fine until it isn't. There's a UI:
+
+```bash
+npm run manage
+```
+
+Open the address it prints and you get a proper editor:
+
+- **Lists** — make them, rename them, drag entries up and down, add notes.
+- **Games** — edit any field on any game, or add one by searching IGDB.
+- **Hardware** — your consoles.
+- **Site** — title, tagline, accent colour (with a colour picker), and the
+  shelves you follow.
+
+Adding a game searches your own collection *and* IGDB at once. Pick something
+you own and it links to it; pick something you don't and it's saved as a wanted
+entry with its cover art. Results that are ROM hacks or ports are labelled, so
+you don't accidentally add *Chrono Trigger+* instead of *Chrono Trigger*.
+
+Changes are held in memory until you press **Save** (or ⌘/Ctrl+S), so a mis-click
+is undone by reloading the page. Saving writes `data/*.json` and nothing else —
+edits produce small, readable diffs, so you can see exactly what changed before
+committing:
+
+```bash
+git add data && git commit -m "Update collection" && git push
+```
+
+### It's local-only, on purpose
+
+The manager needs a server that can write files, and that server only exists
+while `npm run manage` is running on your machine. Your published site is static
+files on someone else's host — there's nothing there to save to, which is
+precisely why nobody visiting your site can edit it. Open `manage.html` on the
+published copy and it just tells you to run it locally.
+
+The write endpoints are deliberately hard to reach from anywhere but the manager
+page itself: the server binds to `127.0.0.1` only, writes require a custom
+header that a foreign page can't send without a CORS preflight the server
+refuses, a mismatched `Origin` is rejected, only three known filenames can ever
+be written, every payload is shape-checked before it replaces a real file, and
+writes go via a temp file and a rename so an interrupted save can't leave a
+half-written collection behind.
 
 ## Lists
 
@@ -250,6 +299,8 @@ npm run serve
 Then open <http://localhost:4321>. You need this rather than double-clicking
 `index.html`, because browsers block the page's JSON fetch on `file://` urls.
 
+`npm run serve` is read-only. Use `npm run manage` when you want to edit.
+
 To catch mistakes before they go live:
 
 ```bash
@@ -294,6 +345,8 @@ assets/js/lib.js         helpers shared by every view
 assets/js/stats.js       the stats view and its charts
 assets/js/timeline.js    the by-year view
 assets/js/lists.js       lists, and resolving entries against the collection
+assets/js/manage.js      the local manager UI
+manage.html              the manager page (local use only)
 assets/js/compare.js     fetching and diffing another collection
 assets/js/platforms.mjs  the platform registry — names, colours, IGDB ids
 data/collection.json     your games and hardware

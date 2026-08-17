@@ -10,7 +10,8 @@
     "enrich": "node scripts/enrich.mjs",
     "import:gameye": "node scripts/import-gameye.mjs",
     "check": "node scripts/check.mjs",
-    "serve": "node scripts/serve.mjs"
+    "serve": "node scripts/serve.mjs",
+    "manage": "node scripts/manage.mjs"
   },
   "engines": {
     "node": ">=18"
