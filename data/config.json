@@ -1,0 +1,8 @@
+{
+  "title": "GameLog",
+  "tagline": "A shelf of everything I've collected.",
+  "accent": "#f0a04b",
+  "defaultSort": "title",
+  "showHardware": true,
+  "footer": "Built with [GameLog](https://github.com/AnnabelleChimpton/GameLog). Cover art and descriptions from [IGDB](https://www.igdb.com)."
+}

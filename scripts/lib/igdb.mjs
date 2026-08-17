@@ -1,0 +1,235 @@
+// A small IGDB client.
+//
+// IGDB authenticates through Twitch: you exchange a client id + secret for an
+// app access token, then send both on every request. Tokens last ~60 days but
+// we just fetch a fresh one per run -- it's a single extra request.
+//
+// Rate limit is 4 requests/second, so every call goes through a throttle.
+
+import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { ROOT, searchableTitle } from './collection.mjs';
+import { platformInfo } from '../../assets/js/platforms.mjs';
+
+const API = 'https://api.igdb.com/v4';
+const MIN_REQUEST_GAP_MS = 260; // ~3.8 req/s, just under the documented limit
+
+let lastRequestAt = 0;
+
+async function throttle() {
+  const wait = lastRequestAt + MIN_REQUEST_GAP_MS - Date.now();
+  if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+  lastRequestAt = Date.now();
+}
+
+/** Read .env without pulling in a dependency. Real env vars win. */
+export async function loadEnv() {
+  const envPath = join(ROOT, '.env');
+  if (existsSync(envPath)) {
+    const raw = await readFile(envPath, 'utf8');
+    for (const line of raw.split('\n')) {
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/i);
+      if (!m) continue;
+      const [, key, rawValue] = m;
+      if (process.env[key]) continue;
+      process.env[key] = rawValue.replace(/^["']|["']$/g, '').trim();
+    }
+  }
+  const id = process.env.IGDB_CLIENT_ID;
+  const secret = process.env.IGDB_CLIENT_SECRET;
+  if (!id || !secret) {
+    throw new Error(
+      'Missing IGDB credentials.\n\n' +
+        '  1. cp .env.example .env\n' +
+        '  2. Fill in IGDB_CLIENT_ID and IGDB_CLIENT_SECRET\n' +
+        '     (free, ~2 minutes: https://dev.twitch.tv/console/apps)\n'
+    );
+  }
+  return { id, secret };
+}
+
+export async function getToken({ id, secret }) {
+  const url = new URL('https://id.twitch.tv/oauth2/token');
+  url.searchParams.set('client_id', id);
+  url.searchParams.set('client_secret', secret);
+  url.searchParams.set('grant_type', 'client_credentials');
+
+  const res = await fetch(url, { method: 'POST' });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(
+      `Could not get a Twitch access token (HTTP ${res.status}).\n` +
+        `Check IGDB_CLIENT_ID / IGDB_CLIENT_SECRET in your .env.\n${body}`
+    );
+  }
+  const json = await res.json();
+  return json.access_token;
+}
+
+export function createClient({ id, token }) {
+  return async function query(endpoint, body) {
+    await throttle();
+    const res = await fetch(`${API}/${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Client-ID': id,
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+      },
+      body,
+    });
+    if (res.status === 429) {
+      // Backed off harder than the throttle expected; wait and retry once.
+      await new Promise((r) => setTimeout(r, 1500));
+      return query(endpoint, body);
+    }
+    if (!res.ok) {
+      throw new Error(`IGDB ${endpoint} failed (HTTP ${res.status}): ${await res.text()}`);
+    }
+    return res.json();
+  };
+}
+
+const FIELDS =
+  'fields name, summary, storyline, first_release_date, cover.image_id, ' +
+  'platforms, platforms.name, genres.name, total_rating, category, parent_game, ' +
+  'version_parent, involved_companies.developer, involved_companies.publisher, ' +
+  'involved_companies.company.name;';
+
+/** Pull developer / publisher names out of IGDB's involved_companies join. */
+export function companies(game) {
+  const involved = game?.involved_companies || [];
+  const pick = (role) =>
+    involved
+      .filter((c) => c[role] && c.company?.name)
+      .map((c) => c.company.name);
+  return {
+    developer: pick('developer').join(', ') || null,
+    publisher: pick('publisher').join(', ') || null,
+  };
+}
+
+function escapeQuotes(s) {
+  return String(s).replace(/"/g, '\\"');
+}
+
+/**
+ * Find the best IGDB match for a title on a given platform.
+ *
+ * Strategy, most trustworthy first:
+ *   1. search the cleaned title, filtered to the platform
+ *   2. search the cleaned title with no platform filter
+ *   3. search the title with any leading article restored ("Legend of Zelda"
+ *      is how Gameye writes "The Legend of Zelda")
+ *
+ * Returns null rather than guessing wildly when nothing scores well.
+ */
+export async function findGame(query, { title, platform }) {
+  const clean = searchableTitle(title);
+  const igdbPlatform = platformInfo(platform).igdb;
+
+  const attempts = [];
+  if (igdbPlatform) {
+    attempts.push({
+      body: `${FIELDS} search "${escapeQuotes(clean)}"; where platforms = (${igdbPlatform}); limit 20;`,
+      platformFiltered: true,
+    });
+  }
+  attempts.push({
+    body: `${FIELDS} search "${escapeQuotes(clean)}"; limit 20;`,
+    platformFiltered: false,
+  });
+  if (/^(Legend of|Lord of the|Last of Us|Incredible|Perfect General|Daedalus)/i.test(clean)) {
+    attempts.push({
+      body: `${FIELDS} search "The ${escapeQuotes(clean)}"; limit 20;`,
+      platformFiltered: false,
+    });
+  }
+
+  let best = null;
+  for (const attempt of attempts) {
+    const results = await query('games', attempt.body);
+    if (!results.length) continue;
+    const scored = results
+      .map((g) => ({ game: g, score: scoreMatch(g, clean, igdbPlatform, attempt.platformFiltered) }))
+      .filter((s) => s.score > 0)
+      .sort((a, b) => b.score - a.score);
+    if (scored.length && (!best || scored[0].score > best.score)) best = scored[0];
+    // A confident, platform-confirmed hit is good enough; stop early.
+    if (best && best.score >= 90) break;
+  }
+
+  return best ? { ...best.game, _matchScore: best.score } : null;
+}
+
+/** Free-text search returning several candidates, for the interactive adder. */
+export async function searchGames(query, term, { platform = null, limit = 8 } = {}) {
+  const igdbPlatform = platform ? platformInfo(platform).igdb : null;
+  const where = igdbPlatform ? ` where platforms = (${igdbPlatform});` : '';
+  const results = await query(
+    'games',
+    `${FIELDS} search "${escapeQuotes(term)}";${where} limit ${limit * 3};`
+  );
+  // Games with cover art first -- they're what you actually want to pick.
+  return results
+    .sort((a, b) => (b.cover?.image_id ? 1 : 0) - (a.cover?.image_id ? 1 : 0))
+    .slice(0, limit);
+}
+
+function normalizeForCompare(s) {
+  return String(s)
+    .toLowerCase()
+    .replace(/^the\s+/, '')
+    .replace(/[^a-z0-9]+/g, '');
+}
+
+function scoreMatch(game, wantedTitle, igdbPlatform, platformFiltered) {
+  const want = normalizeForCompare(wantedTitle);
+  const got = normalizeForCompare(game.name || '');
+  if (!got) return 0;
+
+  let score;
+  if (got === want) score = 100;
+  else if (got.startsWith(want) || want.startsWith(got)) score = 75;
+  else if (got.includes(want) || want.includes(got)) score = 55;
+  else return 0; // no meaningful overlap -- don't guess
+
+  // Confirm the platform when we know it.
+  if (igdbPlatform) {
+    if (platformFiltered) score += 10;
+    else if (Array.isArray(game.platforms) && game.platforms.includes(igdbPlatform)) score += 10;
+    else score -= 15;
+  }
+
+  // Prefer main games over DLC/bundles/ports (IGDB category 0 = main_game).
+  if (game.category !== undefined && game.category !== 0) score -= 8;
+  if (game.version_parent) score -= 12;
+
+  // A cover is the whole point of the lookup.
+  if (!game.cover?.image_id) score -= 20;
+
+  return score;
+}
+
+/** IGDB image ids become CDN urls. t_cover_big is 264x374; t_720p is larger. */
+export function coverUrl(imageId, size = 't_cover_big_2x') {
+  return `https://images.igdb.com/igdb/image/upload/${size}/${imageId}.jpg`;
+}
+
+/** Trim IGDB's summary to something that reads well on a card. */
+export function tidySummary(summary, storyline) {
+  const text = (summary || storyline || '').trim();
+  if (!text) return null;
+  const collapsed = text.replace(/\s*\n\s*/g, ' ').replace(/\s{2,}/g, ' ');
+  if (collapsed.length <= 600) return collapsed;
+  // Cut at the last sentence boundary that fits.
+  const cut = collapsed.slice(0, 600);
+  const lastStop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '));
+  return (lastStop > 300 ? cut.slice(0, lastStop + 1) : cut.trimEnd() + '…');
+}
+
+export function releaseYear(unixSeconds) {
+  if (!unixSeconds) return null;
+  return new Date(unixSeconds * 1000).getUTCFullYear();
+}
