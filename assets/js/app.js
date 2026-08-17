@@ -16,6 +16,7 @@ import { renderStats } from './stats.js';
 import { renderTimeline } from './timeline.js';
 import * as compare from './compare.js';
 import { renderLists } from './lists.js';
+import { renderProfile, hasProfile } from './profile.js';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -43,6 +44,9 @@ const el = {
   viewTimeline: $('#view-timeline'),
   viewLists: $('#view-lists'),
   viewStats: $('#view-stats'),
+  viewAbout: $('#view-about'),
+  avatarButton: $('#avatar-button'),
+  avatarImage: $('#avatar-image'),
   viewCompare: $('#view-compare'),
   cmpForm: $('#cmp-form'),
   cmpUrl: $('#cmp-url'),
@@ -63,7 +67,7 @@ const el = {
   dClose: $('.detail__close'),
 };
 
-const VIEWS = ['shelf', 'timeline', 'lists', 'stats', 'compare'];
+const VIEWS = ['shelf', 'timeline', 'lists', 'stats', 'compare', 'about'];
 
 const state = {
   games: [],
@@ -264,6 +268,7 @@ function render() {
   el.viewTimeline.hidden = state.view !== 'timeline';
   el.viewLists.hidden = state.view !== 'lists';
   el.viewStats.hidden = state.view !== 'stats';
+  el.viewAbout.hidden = state.view !== 'about';
   el.viewCompare.hidden = state.view !== 'compare';
 
   // Platform chips and the count line only mean something where a shelf of
@@ -293,6 +298,10 @@ function render() {
     }));
   } else if (state.view === 'stats') {
     el.viewStats.replaceChildren(renderStats(state.games, state.hardware));
+  } else if (state.view === 'about') {
+    el.viewAbout.replaceChildren(renderProfile(state.config.profile || {}, {
+      games: state.games, hardware: state.hardware, config: state.config,
+    }));
   }
 
   for (const chip of el.chips.children) {
@@ -511,6 +520,34 @@ async function runComparison(input) {
     cmpStatus(err.message || String(err), 'error');
   } finally {
     comparing = false;
+  }
+}
+
+/**
+ * The About tab and the masthead avatar only exist when there is a profile to
+ * show. A fork that wants a plain catalogue never sees either.
+ */
+function setupProfile() {
+  const profile = state.config.profile;
+  const tab = el.views.querySelector('[data-view="about"]');
+
+  if (!hasProfile(profile)) {
+    tab?.remove();
+    if (state.view === 'about') state.view = 'shelf';
+    return;
+  }
+  if (tab) tab.hidden = false;
+
+  const photo = safeImageUrl(profile.photo);
+  if (photo) {
+    el.avatarImage.src = photo;
+    el.avatarImage.alt = profile.name ? `${profile.name}'s photo` : '';
+    el.avatarButton.hidden = false;
+    // A broken photo url should leave the header tidy, not gap-toothed.
+    el.avatarImage.addEventListener('error', () => {
+      el.avatarButton.hidden = true;
+    }, { once: true });
+    el.avatarButton.addEventListener('click', () => setView('about'));
   }
 }
 
@@ -750,6 +787,7 @@ async function boot() {
   syncControls();
   renderChips();
   renderFriends();
+  setupProfile();
   render();
   attachEvents();
 

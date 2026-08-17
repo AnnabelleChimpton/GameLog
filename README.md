@@ -8,15 +8,16 @@ No framework, no build step, no dependencies. The repo *is* the site: a page, a
 stylesheet, a script, and one JSON file holding your collection. Edit it through
 a local UI (`npm run manage`), a CLI, or a text editor — whichever you prefer.
 
-**Five views:**
+**Views:**
 
 - **Shelf** — the cover grid, with search, platform filters and sorting.
 - **Timeline** — your collection by release year, gaps and all.
 - **Lists** — backlogs, wishlists, favourites; owned games and hunted ones.
 - **Stats** — decades, platforms, genres, scores and condition at a glance.
 - **Compare** — point it at *somebody else's* GameLog and see what you share.
+- **About** — optional: your photo, a few words, and where else to find you.
 
-That last one is the reason this is a static site rather than an app. Every
+**Compare** is the reason this is a static site rather than an app. Every
 GameLog publishes its `collection.json` openly, and GitHub Pages serves it with
 `access-control-allow-origin: *`, so any GameLog can read any other one straight
 from the browser — no server, no accounts, no API in between. Paste a friend's
@@ -151,6 +152,7 @@ Open the address it prints and you get a proper editor:
 - **Lists** — make them, rename them, drag entries up and down, add notes.
 - **Games** — edit any field on any game, or add one by searching IGDB.
 - **Hardware** — your consoles.
+- **Profile** — your photo, bio and links.
 - **Site** — title, tagline, accent colour (with a colour picker), and the
   shelves you follow.
 
@@ -179,10 +181,47 @@ published copy and it just tells you to run it locally.
 The write endpoints are deliberately hard to reach from anywhere but the manager
 page itself: the server binds to `127.0.0.1` only, writes require a custom
 header that a foreign page can't send without a CORS preflight the server
-refuses, a mismatched `Origin` is rejected, only three known filenames can ever
-be written, every payload is shape-checked before it replaces a real file, and
-writes go via a temp file and a rename so an interrupted save can't leave a
+refuses, a mismatched `Origin` is rejected, the only writable paths are the
+three `data/*.json` files and a profile photo under `assets/profile/` (never a
+path taken from the request), every payload is shape-checked before it replaces
+a real file, uploads must be a real image type and are size-capped, and writes
+go via a temp file and a rename so an interrupted save can't leave a
 half-written collection behind.
+
+## About you
+
+A collection is more interesting when you know whose it is. Add a photo, a few
+paragraphs and some links, and an **About** tab appears on your site with a
+round avatar beside your title.
+
+The manager's **Profile** tab is the easy way — "Choose a photo…" resizes the
+image to 512px in your browser before saving it, so a 4 MB phone photo lands in
+your repo as about 30 KB instead of sitting in git history forever at full size.
+
+By hand, it's a `profile` block in `data/config.json`:
+
+```json
+"profile": {
+  "name": "Annabelle",
+  "photo": "assets/profile/avatar.jpg",
+  "about": "I collect mostly fifth and sixth generation consoles.\n\nBlank lines make paragraphs. [Links](https://example.com) and **bold** work.",
+  "links": [
+    { "label": "GitHub", "url": "https://github.com/you" },
+    { "url": "https://twitch.tv/you" }
+  ]
+}
+```
+
+`photo` takes a local path or any image url. Links to GitHub, Twitch, Bluesky,
+Mastodon, YouTube and `mailto:` addresses get their own icon; everything else
+gets a globe. Leave `label` out and the address is used instead.
+
+The About page also works out a few things on its own — how many games across
+how many platforms, the years they span, and which console you're deepest on —
+so it stays accurate as the collection grows.
+
+**Every part is optional.** Leave `profile` empty and the About tab and the
+avatar never appear at all, which is the default for a fresh fork.
 
 ## Lists
 
@@ -345,6 +384,7 @@ assets/js/lib.js         helpers shared by every view
 assets/js/stats.js       the stats view and its charts
 assets/js/timeline.js    the by-year view
 assets/js/lists.js       lists, and resolving entries against the collection
+assets/js/profile.js     the About view
 assets/js/manage.js      the local manager UI
 manage.html              the manager page (local use only)
 assets/js/compare.js     fetching and diffing another collection

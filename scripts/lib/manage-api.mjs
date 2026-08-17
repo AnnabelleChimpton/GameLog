@@ -14,7 +14,8 @@
 //   * writes go to a temp file and are renamed, so an interrupted save cannot
 //     leave a half-written collection behind
 
-import { writeFile, rename, readFile } from 'node:fs/promises';
+import { writeFile, rename, readFile, mkdir, rm } from 'node:fs/promises';
+import { join } from 'node:path';
 import {
   ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH,
 } from './collection.mjs';
@@ -28,6 +29,20 @@ const WRITABLE = {
 };
 
 const MAX_BODY_BYTES = 12 * 1024 * 1024;
+
+/**
+ * Profile photos land here, under a fixed name per type. The extension comes
+ * from an allowlist keyed off the data url's declared type, never from anything
+ * the request chooses to call the file.
+ */
+const PHOTO_DIR = join(ROOT, 'assets', 'profile');
+const PHOTO_TYPES = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+};
+const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
 
 function validateCollection(data) {
   if (!data || typeof data !== 'object') throw new Error('Expected an object.');
@@ -206,6 +221,37 @@ export async function handleApi(req, res, { port }) {
           };
         }),
       });
+      return true;
+    }
+
+    if (route === 'photo' && req.method === 'PUT') {
+      const { dataUrl } = await readJsonBody(req);
+      const match = /^data:([a-z]+\/[a-z+]+);base64,(.+)$/i.exec(String(dataUrl || ''));
+      if (!match) throw new Error('Expected a base64 image data url.');
+
+      const ext = PHOTO_TYPES[match[1].toLowerCase()];
+      if (!ext) {
+        throw new Error(`${match[1]} isn't an image type this accepts (jpg, png, webp, gif).`);
+      }
+
+      const bytes = Buffer.from(match[2], 'base64');
+      if (!bytes.length) throw new Error('That image is empty.');
+      if (bytes.length > MAX_PHOTO_BYTES) {
+        throw new Error('That image is larger than 3 MB even after resizing.');
+      }
+
+      await mkdir(PHOTO_DIR, { recursive: true });
+      // Drop the other extensions, or an old avatar.png would linger in the
+      // repo forever after switching to a jpg.
+      await Promise.all(Object.values(PHOTO_TYPES)
+        .filter((other) => other !== ext)
+        .map((other) => rm(join(PHOTO_DIR, `avatar.${other}`), { force: true })));
+
+      const tmp = join(PHOTO_DIR, `avatar.${ext}.tmp`);
+      await writeFile(tmp, bytes);
+      await rename(tmp, join(PHOTO_DIR, `avatar.${ext}`));
+
+      send(res, 200, { ok: true, path: `assets/profile/avatar.${ext}`, bytes: bytes.length });
       return true;
     }
 

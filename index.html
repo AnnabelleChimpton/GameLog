@@ -16,8 +16,14 @@
 <header class="masthead">
   <div class="masthead__bar">
     <div class="masthead__identity">
+      <button id="avatar-button" class="masthead__avatar" type="button" hidden
+              aria-label="About the collector">
+        <img id="avatar-image" alt="">
+      </button>
+      <div>
       <h1 class="masthead__title" id="site-title">GameLog</h1>
       <p class="masthead__tagline" id="site-tagline"></p>
+      </div>
     </div>
 
     <div class="masthead__tools">
@@ -85,6 +91,7 @@
       <button class="viewtab" type="button" data-view="lists">Lists</button>
       <button class="viewtab" type="button" data-view="stats">Stats</button>
       <button class="viewtab" type="button" data-view="compare">Compare</button>
+      <button class="viewtab" type="button" data-view="about" hidden>About</button>
     </nav>
 
     <div class="quickacts">
@@ -140,6 +147,9 @@
 
   <!-- Stats -->
   <section id="view-stats" class="view" hidden></section>
+
+  <!-- About -->
+  <section id="view-about" class="view" hidden></section>
 
   <!-- Compare -->
   <section id="view-compare" class="view" hidden>

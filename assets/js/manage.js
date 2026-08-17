@@ -9,6 +9,7 @@
 
 import { PLATFORMS } from './platforms.mjs';
 import { h, coverImage, titleKey, plural } from './lib.js';
+import { labelFor } from './profile.js';
 import { resolveList } from './lists.js';
 
 const $ = (s) => document.querySelector(s);
@@ -564,7 +565,136 @@ function renderSite() {
       }, h('span', { text: '+ Add a shelf' }))));
 }
 
+
+/* --- Profile tab ---------------------------------------------------------- */
+
+/**
+ * Shrink a chosen photo in the browser before it is ever uploaded.
+ *
+ * A phone photo is several megabytes and would sit in the git history forever
+ * at full size, for something rendered at 120px. 512px on the long edge is
+ * plenty for both the header avatar and the About page.
+ */
+function downscaleImage(file, max = 512) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Could not read that file.'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('That file is not an image this can read.'));
+      img.onload = () => {
+        const scale = Math.min(1, max / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, w, h);
+        // PNG keeps transparency; everything else is smaller as JPEG.
+        const type = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+        resolve(canvas.toDataURL(type, 0.85));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderProfileTab() {
+  const wrap = $('#tab-profile');
+  const profile = state.config.profile || (state.config.profile = {});
+  const links = Array.isArray(profile.links) ? profile.links : (profile.links = []);
+  const set = (key) => (v) => { profile[key] = v === '' ? null : v; markDirty('config'); };
+
+  const preview = h('div', { class: 'mg-avatar' });
+  const paint = () => {
+    if (profile.photo) {
+      const img = h('img', { src: `${profile.photo}?t=${Date.now()}`, alt: '' });
+      img.addEventListener('error', () => {
+        preview.replaceChildren(h('span', { class: 'mg-avatar__none', text: 'not found' }));
+      }, { once: true });
+      preview.replaceChildren(img);
+    } else {
+      preview.replaceChildren(h('span', { class: 'mg-avatar__none', text: 'no photo' }));
+    }
+  };
+  paint();
+
+  const fileInput = h('input', { type: 'file', accept: 'image/*', class: 'mg-file' });
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+    try {
+      status('Resizing…');
+      const dataUrl = await downscaleImage(file);
+      const res = await fetch('/api/photo', {
+        method: 'PUT', headers: API.headers, body: JSON.stringify({ dataUrl }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Upload failed.');
+      profile.photo = json.path;
+      markDirty('config');
+      paint();
+      status(`Photo saved to ${json.path} (${Math.round(json.bytes / 1024)} KB). `
+        + 'Press Save to point your profile at it.');
+    } catch (err) {
+      status(err.message, 'error');
+    } finally {
+      fileInput.value = '';
+    }
+  });
+
+  wrap.replaceChildren(
+    h('div', { class: 'mg-card' },
+      h('h2', { class: 'mg-card__title', text: 'About you' }),
+      h('p', { class: 'mg-hint',
+        text: 'All optional. Leave it empty and the About tab never appears on your site.' }),
+      h('div', { class: 'mg-profilehead' },
+        preview,
+        h('div', { class: 'mg-grow' },
+          field('Your name', profile.name, set('name'),
+            { placeholder: 'Shown at the top of the About page' }),
+          h('div', { class: 'mg-row mg-row--tight' },
+            h('label', { class: 'mg-mini mg-file__label' },
+              h('span', { text: 'Choose a photo…' }), fileInput),
+            profile.photo
+              ? iconButton('Remove photo', () => {
+                  profile.photo = null; markDirty('config'); paint(); renderProfileTab();
+                }, { danger: true })
+              : null),
+          h('p', { class: 'mg-hint',
+            text: 'Resized to 512px before saving, so it stays small in your repo.' }))),
+      field('About', profile.about, set('about'),
+        { rows: 6,
+          placeholder: 'A few lines about you and what you collect. Blank lines make '
+            + 'paragraphs; [links](https://example.com) and **bold** work.' }),
+      field('Photo path or url', profile.photo, set('photo'),
+        { placeholder: 'assets/profile/avatar.jpg — or paste any image url' })),
+
+    h('div', { class: 'mg-card' },
+      h('h2', { class: 'mg-card__title', text: 'Links' }),
+      h('p', { class: 'mg-hint',
+        text: 'GitHub, Twitch, Bluesky, Mastodon, YouTube and mailto: get their own icon. '
+          + 'Anything else gets a globe. Leave the label blank to use the address.' }),
+      h('div', { class: 'mg-items' },
+        links.map((link, i) => h('div', { class: 'mg-row mg-row--tight' },
+          field('Label', link.label, (v) => { link.label = v || null; markDirty('config'); },
+            { placeholder: labelFor(link.url || '') || 'Optional' }),
+          field('Address', link.url, (v) => { link.url = v; markDirty('config'); },
+            { placeholder: 'https://…  or  mailto:you@example.com' }),
+          iconButton('Remove', () => {
+            links.splice(i, 1); markDirty('config'); renderProfileTab();
+          }, { danger: true })))),
+      h('button', {
+        type: 'button', class: 'pillbutton',
+        onclick: () => { links.push({ label: '', url: '' }); markDirty('config'); renderProfileTab(); },
+      }, h('span', { text: '+ Add a link' }))));
+}
+
 /* --- Tabs and boot -------------------------------------------------------- */
+
 
 function renderTab() {
   for (const tab of $('#mg-tabs').children) {
@@ -573,11 +703,13 @@ function renderTab() {
   $('#tab-lists').hidden = state.tab !== 'lists';
   $('#tab-games').hidden = state.tab !== 'games';
   $('#tab-hardware').hidden = state.tab !== 'hardware';
+  $('#tab-profile').hidden = state.tab !== 'profile';
   $('#tab-site').hidden = state.tab !== 'site';
 
   if (state.tab === 'lists') renderLists();
   else if (state.tab === 'games') renderGames();
   else if (state.tab === 'hardware') renderHardware();
+  else if (state.tab === 'profile') renderProfileTab();
   else renderSite();
 }
 

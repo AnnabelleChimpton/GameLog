@@ -4,6 +4,12 @@
   "accent": "#f0a04b",
   "defaultSort": "title",
   "showHardware": true,
+  "profile": {
+    "name": null,
+    "photo": null,
+    "about": null,
+    "links": []
+  },
   "friends": [],
   "footer": "Built with [GameLog](https://github.com/AnnabelleChimpton/GameLog). Cover art and descriptions from [IGDB](https://www.igdb.com)."
 }
