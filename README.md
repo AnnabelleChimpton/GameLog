@@ -8,6 +8,28 @@ No framework, no build step, no dependencies. The repo *is* the site: a page, a
 stylesheet, a script, and one JSON file holding your collection. The helper
 scripts that fetch cover art are optional and run on your own machine.
 
+**Four views:**
+
+- **Shelf** — the cover grid, with search, platform filters and sorting.
+- **Timeline** — your collection by release year, gaps and all.
+- **Stats** — decades, platforms, genres, scores and condition at a glance.
+- **Compare** — point it at *somebody else's* GameLog and see what you share.
+
+That last one is the reason this is a static site rather than an app. Every
+GameLog publishes its `collection.json` openly, and GitHub Pages serves it with
+`access-control-allow-origin: *`, so any GameLog can read any other one straight
+from the browser — no server, no accounts, no API in between. Paste a friend's
+address and you get three lists: what they have that you don't, what you both
+have, and what's yours alone.
+
+Add the ones you follow to `data/config.json` and they become one-click buttons:
+
+```json
+"friends": [
+  { "name": "Sam", "url": "https://sam.github.io/GameLog/" }
+]
+```
+
 ---
 
 ## Make it yours
@@ -206,10 +228,14 @@ works everywhere.
 ```
 index.html               the page
 assets/css/styles.css    all the styling; colours are CSS variables at the top
-assets/js/app.js         search, filter, sort, the detail dialog
+assets/js/app.js         state, routing, the shelf, the detail dialog
+assets/js/lib.js         helpers shared by every view
+assets/js/stats.js       the stats view and its charts
+assets/js/timeline.js    the by-year view
+assets/js/compare.js     fetching and diffing another collection
 assets/js/platforms.mjs  the platform registry — names, colours, IGDB ids
 data/collection.json     your games and hardware
-data/config.json         site title, tagline, accent colour
+data/config.json         site title, tagline, accent colour, friends
 scripts/                 the optional Node helpers
 ```
 
@@ -253,8 +279,19 @@ repo small. If you'd rather host them yourself, download them into
 `assets/covers/` and point the `cover` fields at the local paths — the site
 treats any url the same way.
 
-Keyboard: `/` focuses search, `Esc` clears it or closes the dialog, `←` and `→`
-step through games while a detail view is open.
+Keyboard: `/` focuses search, `r` picks a game at random from whatever is
+showing, `Esc` clears the search or closes the dialog, and `←` / `→` step
+through games while a detail view is open.
+
+Controls hide themselves when they'd be lying. "Recently added" only appears if
+your `added` dates actually differ — a bulk import stamps every row with the
+same day, and sorting by it would just reproduce the alphabetical order. Same
+for "Highest rated" without scores, and the condition filter with only one
+condition in use.
+
+Condition is grouped for filtering (New / CIB / Boxed / Loose / Other) but
+displayed exactly as you wrote it, so `CIB+` and `B+` still say `CIB+` and `B+`
+on the game itself.
 
 ---
 

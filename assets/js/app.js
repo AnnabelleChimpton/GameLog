@@ -1,11 +1,20 @@
-// GameLog — the whole front end.
+// GameLog — the front end.
 //
 // No build step and no dependencies: this reads data/collection.json and
 // data/config.json at load, then renders and filters entirely in the browser.
-// A few hundred games is small enough that re-rendering the grid on every
-// keystroke is imperceptible, so there is no virtualisation to reason about.
+// A few hundred games is small enough that re-rendering on every keystroke is
+// imperceptible, so there is no virtualisation to reason about.
+//
+// Four views share one filter state: shelf, timeline, stats, compare.
 
 import { platformInfo, platformSortIndex } from './platforms.mjs';
+import {
+  fold, sortKey, conditionGroup, CONDITION_ORDER, coverImage, placeholderCover,
+  safeImageUrl, h, plural,
+} from './lib.js';
+import { renderStats } from './stats.js';
+import { renderTimeline } from './timeline.js';
+import * as compare from './compare.js';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -14,15 +23,30 @@ const el = {
   tagline: $('#site-tagline'),
   search: $('#search'),
   sort: $('#sort'),
+  condition: $('#condition'),
   chips: $('#platform-chips'),
+  filters: $('#filters'),
+  views: $('#views'),
+  statline: $('#statline'),
   grid: $('#grid'),
   count: $('#count'),
   clear: $('#clear'),
   empty: $('#empty'),
+  notesToggle: $('#notes-toggle'),
+  dice: $('#dice'),
   hardwareSection: $('#hardware-section'),
   hardwareGrid: $('#hardware-grid'),
   colophon: $('#colophon-text'),
   themeToggle: $('#theme-toggle'),
+  viewShelf: $('#view-shelf'),
+  viewTimeline: $('#view-timeline'),
+  viewStats: $('#view-stats'),
+  viewCompare: $('#view-compare'),
+  cmpForm: $('#cmp-form'),
+  cmpUrl: $('#cmp-url'),
+  cmpStatus: $('#cmp-status'),
+  cmpOutput: $('#cmp-output'),
+  cmpFriends: $('#cmp-friends'),
   dialog: $('#detail'),
   dCover: $('#detail-cover'),
   dPlatform: $('#detail-platform'),
@@ -37,74 +61,21 @@ const el = {
   dClose: $('.detail__close'),
 };
 
+const VIEWS = ['shelf', 'timeline', 'stats', 'compare'];
+
 const state = {
   games: [],
   hardware: [],
   config: {},
+  view: 'shelf',
   query: '',
   platform: 'all',
+  condition: 'all',
+  notesOnly: false,
   sort: 'title',
   visible: [],
   openIndex: -1,
 };
-
-/* --- Helpers -------------------------------------------------------------- */
-
-/** Lowercase, strip accents and punctuation, so "Pokémon" matches "pokemon". */
-function fold(value) {
-  return String(value ?? '')
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9 ]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-/** Sortable title: ignores a leading article so "A Link" files under L… */
-function sortKey(title) {
-  return fold(title).replace(/^(the|a|an) /, '');
-}
-
-/**
- * A generated cover for games with no art: a wash of the platform colour with
- * the platform label. It carries no title, because tiles without real art keep
- * their title plate permanently visible -- printing it twice looked like a bug.
- *
- * Built as an inline SVG data URI, so it costs no request and always renders.
- */
-function placeholderCover(platform) {
-  const { short, color } = platformInfo(platform);
-  const label = short.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  // The font family has to be named inline: an SVG loaded into an <img> is an
-  // isolated document and inherits nothing from the page.
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 264 352" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
-<defs>
-  <linearGradient id="g" x1="0" y1="0" x2="0.35" y2="1">
-    <stop offset="0" stop-color="${color}" stop-opacity="0.92"/>
-    <stop offset="1" stop-color="#0b0c10" stop-opacity="0.97"/>
-  </linearGradient>
-</defs>
-<rect width="264" height="352" fill="#15161c"/>
-<rect width="264" height="352" fill="url(#g)"/>
-<text x="132" y="168" text-anchor="middle" font-size="52" font-weight="800" fill="#ffffff" fill-opacity="0.34" letter-spacing="1">${label}</text>
-</svg>`;
-
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg.replace(/\n\s*/g, ''))}`;
-}
-
-/** Minimal, deliberately limited markdown: links and bold only. */
-function miniMarkdown(text) {
-  const escaped = String(text ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-  return escaped
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
-      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-}
 
 /* --- Filtering and sorting ------------------------------------------------ */
 
@@ -117,14 +88,17 @@ function buildSearchIndex(game) {
     game.publisher,
     (game.genres || []).join(' '),
     game.year,
+    game.notes,
   ].filter(Boolean).join(' '));
 }
 
 function compute() {
   const terms = fold(state.query).split(' ').filter(Boolean);
 
-  let list = state.games.filter((game) => {
+  const list = state.games.filter((game) => {
     if (state.platform !== 'all' && game.platform !== state.platform) return false;
+    if (state.condition !== 'all' && game._condition !== state.condition) return false;
+    if (state.notesOnly && !game.notes) return false;
     // Every term must appear somewhere, so "zelda n64" narrows as you'd expect.
     return terms.every((t) => game._index.includes(t));
   });
@@ -132,7 +106,7 @@ function compute() {
   const dir = state.sort.startsWith('-') ? -1 : 1;
   const field = state.sort.replace(/^-/, '');
 
-  list = list.sort((a, b) => {
+  list.sort((a, b) => {
     if (field === 'title') return dir * a._sortKey.localeCompare(b._sortKey, 'en');
     // Missing numbers and dates always sink to the bottom, whichever way we sort.
     const av = a[field];
@@ -147,49 +121,10 @@ function compute() {
   state.visible = list;
 }
 
-/* --- Rendering ------------------------------------------------------------ */
+const isFiltered = () =>
+  Boolean(state.query) || state.platform !== 'all' || state.condition !== 'all' || state.notesOnly;
 
-function renderChips() {
-  const counts = new Map();
-  for (const game of state.games) {
-    counts.set(game.platform, (counts.get(game.platform) || 0) + 1);
-  }
-
-  const platforms = [...counts.keys()].sort(
-    (a, b) => platformSortIndex(a) - platformSortIndex(b) || a.localeCompare(b)
-  );
-
-  const chip = (key, label, count, color) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'chip';
-    button.dataset.platform = key;
-    button.setAttribute('role', 'tab');
-    button.setAttribute('aria-selected', String(state.platform === key));
-    if (color) {
-      button.innerHTML =
-        `<span class="chip__dot" style="--chip-color:${color}"></span>` +
-        `<span>${label}</span><span class="chip__count">${count}</span>`;
-    } else {
-      button.innerHTML = `<span>${label}</span><span class="chip__count">${count}</span>`;
-    }
-    return button;
-  };
-
-  el.chips.replaceChildren(
-    chip('all', 'All', state.games.length, null),
-    ...platforms.map((p) => {
-      const info = platformInfo(p);
-      return chip(p, info.key === p ? shortLabel(p) : p, counts.get(p), info.color);
-    })
-  );
-}
-
-/** Prefer the full platform name, but fall back to the short one when long. */
-function shortLabel(platform) {
-  const info = platformInfo(platform);
-  return platform.length > 20 ? info.short : platform;
-}
+/* --- Shelf ---------------------------------------------------------------- */
 
 function renderGrid() {
   const fragment = document.createDocumentFragment();
@@ -208,16 +143,8 @@ function renderGrid() {
     // Stagger only the first screenful; beyond that it's just delay.
     if (i < 24) tile.style.animationDelay = `${Math.min(i * 14, 340)}ms`;
 
-    const img = document.createElement('img');
+    const img = coverImage(game, { eager: i < 12 });
     img.className = 'tile__cover';
-    img.loading = i < 12 ? 'eager' : 'lazy';
-    img.decoding = 'async';
-    img.alt = '';
-    img.src = game.cover || placeholderCover(game.platform);
-    // A dead cover url should never leave a broken image on the shelf.
-    img.addEventListener('error', () => {
-      img.src = placeholderCover(game.platform);
-    }, { once: true });
 
     const badge = document.createElement('span');
     badge.className = 'tile__badge';
@@ -239,6 +166,13 @@ function renderGrid() {
 
     tile.append(img, badge, plate);
 
+    if (game.notes) {
+      const dot = document.createElement('span');
+      dot.className = 'tile__note';
+      dot.title = 'Has a note';
+      tile.append(dot);
+    }
+
     if (game.copies > 1) {
       const copies = document.createElement('span');
       copies.className = 'tile__copies';
@@ -256,93 +190,183 @@ function renderGrid() {
 function renderCount() {
   const total = state.games.length;
   const shown = state.visible.length;
-  const filtered = state.query || state.platform !== 'all';
 
-  const platforms = new Set(state.games.map((g) => g.platform)).size;
-  const copies = state.games.reduce((sum, g) => sum + (g.copies || 1), 0);
-
-  if (filtered) {
+  if (isFiltered()) {
     el.count.textContent = `${shown} of ${total} game${total === 1 ? '' : 's'}`;
   } else {
+    const platforms = new Set(state.games.map((g) => g.platform)).size;
+    const copies = state.games.reduce((sum, g) => sum + (g.copies || 1), 0);
     const extra = copies > total ? ` · ${copies} copies` : '';
     el.count.textContent =
-      `${total} game${total === 1 ? '' : 's'} · ${platforms} platform${platforms === 1 ? '' : 's'}${extra}`;
+      `${total} game${total === 1 ? '' : 's'} · ${plural(platforms, 'platform')}${extra}`;
   }
 
-  el.clear.hidden = !filtered;
+  el.clear.hidden = !isFiltered();
   el.empty.hidden = shown > 0;
   el.grid.hidden = shown === 0;
+  el.dice.disabled = shown === 0;
 }
 
 function renderHardware() {
-  if (!state.hardware.length || state.config.showHardware === false) {
+  if (!state.hardware.length || state.config.showHardware === false || state.query
+      || state.notesOnly || state.condition !== 'all') {
     el.hardwareSection.hidden = true;
     return;
   }
-  // Hardware follows the platform filter, but a text search is about games --
-  // leaving a console shelf under "no results for zelda" just reads as noise.
-  if (state.query) { el.hardwareSection.hidden = true; return; }
-
   const list = state.platform === 'all'
     ? state.hardware
-    : state.hardware.filter((h) => h.platform === state.platform);
+    : state.hardware.filter((item) => item.platform === state.platform);
 
   if (!list.length) { el.hardwareSection.hidden = true; return; }
   el.hardwareSection.hidden = false;
 
-  el.hardwareGrid.replaceChildren(
-    ...list.map((item) => {
-      const info = platformInfo(item.platform);
+  el.hardwareGrid.replaceChildren(...list.map((item) => {
+    const info = platformInfo(item.platform);
+    const card = h('div', { class: 'hw-card' });
+    const art = h('div', { class: 'hw-card__art' });
 
-      const card = document.createElement('div');
-      card.className = 'hw-card';
-
-      const art = document.createElement('div');
-      art.className = 'hw-card__art';
-      if (item.image) {
-        const img = document.createElement('img');
-        img.src = item.image;
-        img.alt = '';
-        img.loading = 'lazy';
-        img.addEventListener('error', () => {
-          art.style.background = info.color;
-          art.replaceChildren(initials(info.short));
-        }, { once: true });
-        art.append(img);
-      } else {
+    const src = safeImageUrl(item.image);
+    if (src) {
+      const img = h('img', { src, alt: '', loading: 'lazy' });
+      img.addEventListener('error', () => {
         art.style.background = info.color;
-        art.append(initials(info.short));
-      }
+        art.replaceChildren(h('span', { class: 'hw-card__initials', text: info.short }));
+      }, { once: true });
+      art.append(img);
+    } else {
+      art.style.background = info.color;
+      art.append(h('span', { class: 'hw-card__initials', text: info.short }));
+    }
 
-      const body = document.createElement('div');
-      const name = document.createElement('p');
-      name.className = 'hw-card__name';
-      name.textContent = item.name;
-      const meta = document.createElement('p');
-      meta.className = 'hw-card__meta';
-      meta.textContent = [item.platform, item.condition].filter(Boolean).join(' · ');
-      body.append(name, meta);
-
-      card.append(art, body);
-      return card;
-    })
-  );
+    card.append(art, h('div', {},
+      h('p', { class: 'hw-card__name', text: item.name }),
+      h('p', { class: 'hw-card__meta',
+        text: [item.platform, item.condition].filter(Boolean).join(' · ') })));
+    return card;
+  }));
 }
 
-function initials(text) {
-  const span = document.createElement('span');
-  span.className = 'hw-card__initials';
-  span.textContent = text;
-  return span;
-}
+/* --- View switching ------------------------------------------------------- */
 
 function render() {
   compute();
-  renderGrid();
-  renderCount();
-  renderHardware();
+
+  for (const tab of el.views.children) {
+    const active = tab.dataset.view === state.view;
+    tab.setAttribute('aria-current', String(active));
+  }
+
+  el.viewShelf.hidden = state.view !== 'shelf';
+  el.viewTimeline.hidden = state.view !== 'timeline';
+  el.viewStats.hidden = state.view !== 'stats';
+  el.viewCompare.hidden = state.view !== 'compare';
+
+  // Platform chips and the count line only mean something where a shelf of
+  // games is on screen. Stats always describes the whole collection.
+  const listy = state.view === 'shelf' || state.view === 'timeline';
+  el.filters.hidden = !listy;
+  el.statline.hidden = !listy;
+  el.dice.hidden = !listy;
+  el.notesToggle.hidden = !listy;
+  el.search.closest('.search').hidden = state.view === 'stats' || state.view === 'compare';
+  el.sort.closest('.select').hidden = state.view !== 'shelf';
+  el.condition.closest('.select').hidden = !listy;
+
+  if (state.view === 'shelf') {
+    renderGrid();
+    renderCount();
+    renderHardware();
+  } else if (state.view === 'timeline') {
+    renderCount();
+    el.viewTimeline.replaceChildren(
+      renderTimeline(state.visible, { onOpen: openByGame }));
+  } else if (state.view === 'stats') {
+    el.viewStats.replaceChildren(renderStats(state.games, state.hardware));
+  }
+
   for (const chip of el.chips.children) {
     chip.setAttribute('aria-selected', String(chip.dataset.platform === state.platform));
+  }
+}
+
+function setView(view) {
+  if (!VIEWS.includes(view)) view = 'shelf';
+  state.view = view;
+  writeUrl();
+  render();
+}
+
+/* --- Chips and selects ---------------------------------------------------- */
+
+function renderChips() {
+  const counts = new Map();
+  for (const game of state.games) {
+    counts.set(game.platform, (counts.get(game.platform) || 0) + 1);
+  }
+
+  const platforms = [...counts.keys()].sort(
+    (a, b) => platformSortIndex(a) - platformSortIndex(b) || a.localeCompare(b)
+  );
+
+  const chip = (key, label, count, color) => h('button', {
+    type: 'button', class: 'chip', role: 'tab',
+    dataset: { platform: key },
+    'aria-selected': String(state.platform === key),
+  },
+    color ? h('span', { class: 'chip__dot', style: `--chip-color:${color}` }) : null,
+    h('span', { text: label }),
+    h('span', { class: 'chip__count', text: String(count) }));
+
+  el.chips.replaceChildren(
+    chip('all', 'All', state.games.length, null),
+    ...platforms.map((p) => chip(p, p.length > 20 ? platformInfo(p).short : p,
+      counts.get(p), platformInfo(p).color))
+  );
+}
+
+function renderConditionOptions() {
+  const present = new Set(state.games.map((g) => g._condition).filter(Boolean));
+  const ordered = CONDITION_ORDER.filter((c) => present.has(c));
+
+  // One condition (or none) is not a filter, it's a label.
+  if (ordered.length < 2) {
+    el.condition.closest('.select').dataset.unavailable = 'true';
+    return;
+  }
+  delete el.condition.closest('.select').dataset.unavailable;
+
+  el.condition.replaceChildren(
+    h('option', { value: 'all', text: 'Any condition' }),
+    ...ordered.map((c) => h('option', { value: c, text: c })));
+}
+
+/**
+ * "Recently added" is only a sort if the dates actually differ. A CSV import
+ * stamps every row with the same day -- here that was 143 of 184 games -- and
+ * the option then just reproduces the alphabetical order while claiming not to.
+ */
+function pruneDeadSorts() {
+  const dates = state.games.map((g) => g.added).filter(Boolean);
+  const distinct = new Set(dates);
+  let dominant = 0;
+  for (const d of distinct) {
+    dominant = Math.max(dominant, dates.filter((x) => x === d).length);
+  }
+  const useful = dates.length >= 4 && distinct.size >= 3 && dominant / dates.length < 0.6;
+
+  if (!useful) {
+    el.sort.querySelector('option[value="-added"]')?.remove();
+    if (state.sort === '-added') state.sort = 'title';
+  }
+
+  // Same idea for ratings: no scores, no "highest rated".
+  if (!state.games.some((g) => typeof g.metacritic === 'number')) {
+    el.sort.querySelector('option[value="-metacritic"]')?.remove();
+    if (state.sort === '-metacritic') state.sort = 'title';
+  }
+  if (!state.games.some((g) => g.year)) {
+    for (const v of ['year', '-year']) el.sort.querySelector(`option[value="${v}"]`)?.remove();
+    if (state.sort.replace('-', '') === 'year') state.sort = 'title';
   }
 }
 
@@ -350,11 +374,7 @@ function render() {
 
 function metaRow(term, value) {
   if (!value) return [];
-  const dt = document.createElement('dt');
-  dt.textContent = term;
-  const dd = document.createElement('dd');
-  dd.textContent = value;
-  return [dt, dd];
+  return [h('dt', { text: term }), h('dd', { text: value })];
 }
 
 function openDetail(index) {
@@ -362,7 +382,8 @@ function openDetail(index) {
   if (!game) return;
   state.openIndex = index;
 
-  el.dCover.src = game.cover || placeholderCover(game.platform);
+  const src = safeImageUrl(game.cover);
+  el.dCover.src = src || placeholderCover(game.platform);
   el.dCover.alt = `${game.title} cover art`;
   el.dCover.onerror = () => {
     el.dCover.onerror = null;
@@ -374,12 +395,7 @@ function openDetail(index) {
   el.dTitle.textContent = game.title;
 
   el.dGenres.replaceChildren(
-    ...(game.genres || []).map((g) => {
-      const li = document.createElement('li');
-      li.textContent = g;
-      return li;
-    })
-  );
+    ...(game.genres || []).map((g) => h('li', { text: g })));
 
   el.dDescription.textContent = game.description || '';
 
@@ -407,6 +423,14 @@ function openDetail(index) {
   el.dialog.querySelector('.detail__inner').scrollTop = 0;
 }
 
+/** Open a game by identity rather than by position in the current list. */
+function openByGame(game) {
+  const index = state.visible.indexOf(game);
+  if (index !== -1) return openDetail(index);
+  const byId = state.visible.findIndex((g) => g.id === game.id);
+  if (byId !== -1) openDetail(byId);
+}
+
 function closeDetail() {
   if (el.dialog.open) el.dialog.close();
 }
@@ -416,23 +440,105 @@ function step(delta) {
   if (next >= 0 && next < state.visible.length) openDetail(next);
 }
 
+/** Pick something at random from whatever is currently showing. */
+function surpriseMe() {
+  if (!state.visible.length) return;
+  // Never hand back the game already open -- that reads as a broken button.
+  let index = Math.floor(Math.random() * state.visible.length);
+  if (state.visible.length > 1 && index === state.openIndex) {
+    index = (index + 1) % state.visible.length;
+  }
+  openDetail(index);
+}
+
+/* --- Compare -------------------------------------------------------------- */
+
+let comparing = false;
+
+function cmpStatus(message, kind = 'info') {
+  el.cmpStatus.hidden = !message;
+  el.cmpStatus.textContent = message || '';
+  el.cmpStatus.dataset.kind = kind;
+}
+
+async function runComparison(input) {
+  if (comparing) return;
+  comparing = true;
+  el.cmpOutput.replaceChildren();
+  cmpStatus('Fetching that collection…');
+
+  try {
+    const theirs = await compare.loadCollection(input);
+    const result = compare.diff(state.games, theirs.games);
+    const label = new URL(theirs.url).host;
+
+    cmpStatus('');
+    el.cmpOutput.replaceChildren(
+      compare.renderComparison(result, label, { onOpen: (game) => {
+        setView('shelf');
+        // Clear filters first, or the game may not be in the visible list.
+        state.query = ''; state.platform = 'all'; state.condition = 'all';
+        state.notesOnly = false;
+        syncControls();
+        render();
+        openByGame(game);
+      } }));
+
+    el.cmpUrl.value = input;
+    writeUrl();
+  } catch (err) {
+    cmpStatus(err.message || String(err), 'error');
+  } finally {
+    comparing = false;
+  }
+}
+
+function renderFriends() {
+  const friends = Array.isArray(state.config.friends) ? state.config.friends : [];
+  if (!friends.length) { el.cmpFriends.hidden = true; return; }
+  el.cmpFriends.hidden = false;
+  el.cmpFriends.replaceChildren(
+    h('span', { class: 'cmp__friendlabel', text: 'Shelves you follow' }),
+    ...friends
+      .filter((f) => f && typeof f.url === 'string')
+      .map((f) => h('button', {
+        type: 'button', class: 'chip',
+        onclick: () => { el.cmpUrl.value = f.url; runComparison(f.url); },
+      }, h('span', { text: f.name || f.url }))));
+}
+
 /* --- URL and theme -------------------------------------------------------- */
 
 function readUrl() {
   const params = new URLSearchParams(location.search);
+  state.view = VIEWS.includes(params.get('view')) ? params.get('view') : 'shelf';
   state.query = params.get('q') || '';
   state.platform = params.get('platform') || 'all';
+  state.condition = params.get('condition') || 'all';
+  state.notesOnly = params.get('notes') === '1';
   state.sort = params.get('sort') || state.config.defaultSort || 'title';
-  if (!Array.from(el.sort.options).some((o) => o.value === state.sort)) state.sort = 'title';
 }
 
 function writeUrl() {
   const params = new URLSearchParams();
+  if (state.view !== 'shelf') params.set('view', state.view);
   if (state.query) params.set('q', state.query);
   if (state.platform !== 'all') params.set('platform', state.platform);
+  if (state.condition !== 'all') params.set('condition', state.condition);
+  if (state.notesOnly) params.set('notes', '1');
   if (state.sort !== (state.config.defaultSort || 'title')) params.set('sort', state.sort);
+  if (state.view === 'compare' && el.cmpUrl.value.trim()) {
+    params.set('with', el.cmpUrl.value.trim());
+  }
   const qs = params.toString();
   history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+}
+
+function syncControls() {
+  el.search.value = state.query;
+  el.sort.value = state.sort;
+  el.condition.value = state.condition;
+  el.notesToggle.setAttribute('aria-pressed', String(state.notesOnly));
 }
 
 function applyTheme(theme) {
@@ -467,6 +573,26 @@ function attachEvents() {
     render();
   });
 
+  el.condition.addEventListener('change', () => {
+    state.condition = el.condition.value;
+    writeUrl();
+    render();
+  });
+
+  el.notesToggle.addEventListener('click', () => {
+    state.notesOnly = !state.notesOnly;
+    syncControls();
+    writeUrl();
+    render();
+  });
+
+  el.dice.addEventListener('click', surpriseMe);
+
+  el.views.addEventListener('click', (event) => {
+    const tab = event.target.closest('.viewtab');
+    if (tab) setView(tab.dataset.view);
+  });
+
   el.chips.addEventListener('click', (event) => {
     const chip = event.target.closest('.chip');
     if (!chip) return;
@@ -484,10 +610,17 @@ function attachEvents() {
   el.clear.addEventListener('click', () => {
     state.query = '';
     state.platform = 'all';
-    el.search.value = '';
+    state.condition = 'all';
+    state.notesOnly = false;
+    syncControls();
     writeUrl();
     render();
     el.search.focus();
+  });
+
+  el.cmpForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    runComparison(el.cmpUrl.value);
   });
 
   el.dClose.addEventListener('click', closeDetail);
@@ -522,6 +655,9 @@ function attachEvents() {
       el.search.focus();
       el.search.select();
     }
+    if (event.key.toLowerCase() === 'r' && !typing && !event.metaKey && !event.ctrlKey) {
+      surpriseMe();
+    }
     if (event.key === 'Escape' && typing && event.target === el.search) {
       el.search.value = '';
       state.query = '';
@@ -550,10 +686,9 @@ async function boot() {
   } catch (err) {
     el.grid.hidden = true;
     el.empty.hidden = false;
-    el.empty.innerHTML =
-      '<strong>Could not load the collection.</strong>' +
-      '<span>data/collection.json is missing or unreadable. ' +
-      'If you opened this file directly, serve it instead: <code>npm run serve</code></span>';
+    el.empty.replaceChildren(
+      h('strong', { text: 'Could not load the collection.' }),
+      h('span', { text: 'data/collection.json is missing or unreadable. If you opened this file directly, serve it instead: npm run serve' }));
     console.error('GameLog:', err);
     return;
   }
@@ -564,6 +699,7 @@ async function boot() {
     copies: g.copies || 1,
     _index: buildSearchIndex(g),
     _sortKey: sortKey(g.title),
+    _condition: conditionGroup(g.condition),
   }));
   state.hardware = collection.hardware || [];
 
@@ -574,13 +710,15 @@ async function boot() {
     document.title = config.title;
   }
   if (config.tagline) el.tagline.textContent = config.tagline;
-  if (config.footer) el.colophon.innerHTML = miniMarkdown(config.footer);
+  if (config.footer) el.colophon.replaceChildren(...miniMarkdown(config.footer));
 
   readUrl();
-  el.search.value = state.query;
-  el.sort.value = state.sort;
-
+  pruneDeadSorts();
+  renderConditionOptions();
+  if (!state.games.some((g) => g.notes)) el.notesToggle.remove();
+  syncControls();
   renderChips();
+  renderFriends();
   render();
   attachEvents();
 
@@ -590,6 +728,32 @@ async function boot() {
     const index = state.visible.findIndex((g) => g.id === wanted);
     if (index !== -1) openDetail(index);
   }
+
+  const withParam = new URLSearchParams(location.search).get('with');
+  if (withParam && state.view === 'compare') {
+    el.cmpUrl.value = withParam;
+    runComparison(withParam);
+  }
+}
+
+/** Links and bold only, built as nodes so nothing is ever parsed as html. */
+function miniMarkdown(text) {
+  const out = [];
+  const pattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|\*\*([^*]+)\*\*/g;
+  let last = 0;
+  let match;
+  while ((match = pattern.exec(text))) {
+    if (match.index > last) out.push(document.createTextNode(text.slice(last, match.index)));
+    if (match[2]) {
+      out.push(h('a', { href: match[2], target: '_blank', rel: 'noopener noreferrer',
+        text: match[1] }));
+    } else {
+      out.push(h('strong', { text: match[3] }));
+    }
+    last = pattern.lastIndex;
+  }
+  if (last < text.length) out.push(document.createTextNode(text.slice(last)));
+  return out;
 }
 
 boot();

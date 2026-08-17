@@ -11,7 +11,7 @@
 </head>
 <body>
 
-<a class="skip-link" href="#grid">Skip to the collection</a>
+<a class="skip-link" href="#view-shelf">Skip to the collection</a>
 
 <header class="masthead">
   <div class="masthead__bar">
@@ -49,6 +49,13 @@
         </select>
       </label>
 
+      <label class="select select--condition">
+        <span class="select__label">Condition</span>
+        <select id="condition" aria-label="Filter by condition">
+          <option value="all">Any condition</option>
+        </select>
+      </label>
+
       <button id="theme-toggle" class="icon-button" type="button"
               aria-label="Switch colour theme" title="Switch colour theme">
         <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
@@ -71,27 +78,93 @@
     </div>
   </div>
 
-  <nav class="filters" aria-label="Filter by platform">
+  <div class="masthead__nav">
+    <nav class="views" id="views" aria-label="Views">
+      <button class="viewtab" type="button" data-view="shelf" aria-current="true">Shelf</button>
+      <button class="viewtab" type="button" data-view="timeline">Timeline</button>
+      <button class="viewtab" type="button" data-view="stats">Stats</button>
+      <button class="viewtab" type="button" data-view="compare">Compare</button>
+    </nav>
+
+    <div class="quickacts">
+      <button id="notes-toggle" class="pillbutton" type="button" aria-pressed="false"
+              title="Show only games with a personal note">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 4h11l4 4v12H5z"></path><path d="M15 4v5h5"></path>
+        </svg>
+        <span>Notes</span>
+      </button>
+      <button id="dice" class="pillbutton pillbutton--accent" type="button"
+              title="Pick something at random from what's showing">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3.5" y="3.5" width="17" height="17" rx="4"></rect>
+          <circle cx="8.5" cy="8.5" r="1.4" fill="currentColor" stroke="none"></circle>
+          <circle cx="15.5" cy="15.5" r="1.4" fill="currentColor" stroke="none"></circle>
+          <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"></circle>
+        </svg>
+        <span>Surprise me</span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="filters" id="filters" aria-label="Filter by platform">
     <div class="chips" id="platform-chips" role="tablist"></div>
   </nav>
 </header>
 
 <main>
-  <div class="statline">
+  <div class="statline" id="statline">
     <p id="count" class="statline__count" aria-live="polite"></p>
     <button id="clear" class="link-button" type="button" hidden>Clear filters</button>
   </div>
 
-  <section id="grid" class="shelf" aria-label="Games"></section>
+  <!-- Shelf -->
+  <section id="view-shelf" class="view">
+    <div id="grid" class="shelf" aria-label="Games"></div>
+    <p id="empty" class="empty" hidden>
+      <strong>Nothing matches that.</strong>
+      <span>Try a different search, or clear the filters.</span>
+    </p>
+    <section id="hardware-section" class="hardware" hidden>
+      <h2 class="hardware__heading">Hardware</h2>
+      <div id="hardware-grid" class="hardware__grid"></div>
+    </section>
+  </section>
 
-  <p id="empty" class="empty" hidden>
-    <strong>Nothing matches that.</strong>
-    <span>Try a different search, or clear the filters.</span>
-  </p>
+  <!-- Timeline -->
+  <section id="view-timeline" class="view" hidden></section>
 
-  <section id="hardware-section" class="hardware" hidden>
-    <h2 class="hardware__heading">Hardware</h2>
-    <div id="hardware-grid" class="hardware__grid"></div>
+  <!-- Stats -->
+  <section id="view-stats" class="view" hidden></section>
+
+  <!-- Compare -->
+  <section id="view-compare" class="view" hidden>
+    <div class="cmp">
+      <div class="cmp__intro">
+        <h2 class="cmp__title">Put two shelves side by side</h2>
+        <p class="cmp__lede">
+          Every GameLog publishes its collection openly, so this page can read
+          somebody else's directly — no account, nothing in between. Paste the
+          address of any GameLog site to see what you share and what you're missing.
+        </p>
+      </div>
+
+      <form class="cmp__form" id="cmp-form">
+        <input
+          id="cmp-url"
+          class="cmp__input"
+          type="text"
+          placeholder="username.github.io/GameLog  ·  or  username/GameLog"
+          aria-label="Address of a GameLog to compare against"
+          autocomplete="off"
+          spellcheck="false">
+        <button class="cmp__go" type="submit">Compare</button>
+      </form>
+
+      <div class="cmp__friends" id="cmp-friends" hidden></div>
+      <p class="cmp__status" id="cmp-status" hidden></p>
+      <div id="cmp-output"></div>
+    </div>
   </section>
 </main>
 

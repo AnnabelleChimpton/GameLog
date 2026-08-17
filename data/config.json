@@ -4,5 +4,6 @@
   "accent": "#f0a04b",
   "defaultSort": "title",
   "showHardware": true,
+  "friends": [],
   "footer": "Built with [GameLog](https://github.com/AnnabelleChimpton/GameLog). Cover art and descriptions from [IGDB](https://www.igdb.com)."
 }
