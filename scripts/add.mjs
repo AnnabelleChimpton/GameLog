@@ -4,10 +4,12 @@
 //   npm run add "Chrono Trigger" -- --platform "SNES/Super Famicom"
 //   npm run add "Katamari Damacy" -- --platform "Nintendo Switch" --condition CIB
 //
-// It searches IGDB, shows you the matches, and writes the one you pick into
-// data/collection.json with its cover art, description, year and genres.
+// It searches, shows you the matches, and writes the one you pick into
+// data/collection.json with its cover art, description and year.
 //
-// No IGDB keys? `--no-lookup` adds a bare entry you can fill in by hand.
+// Uses IGDB when it is configured and the keyless sources otherwise -- no
+// signup is needed to add a game. `--source free` forces the keyless path,
+// `--no-lookup` skips lookup entirely and adds a bare entry.
 
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
@@ -16,6 +18,7 @@ import { PLATFORMS, platformInfo } from '../assets/js/platforms.mjs';
 import {
   loadEnv, getToken, createClient, searchGames, coverUrl, tidySummary, releaseYear, companies,
 } from './lib/igdb.mjs';
+import { searchFree, coverFor, hasFreeArt } from './lib/freelookup.mjs';
 
 function parseArgs(argv) {
   const opts = { positional: [] };
@@ -37,16 +40,27 @@ const ask = async (q, fallback = '') => {
   return answer || fallback;
 };
 
-function describeCandidate(g) {
-  const year = releaseYear(g.first_release_date);
-  const platforms = (g.platforms || [])
-    .map((p) => (typeof p === 'object' ? p.name : null))
-    .filter(Boolean)
-    .slice(0, 4)
-    .join(', ');
-  const bits = [year, platforms].filter(Boolean).join(' · ');
-  const art = g.cover?.image_id ? '' : '  (no cover art)';
-  return `${g.name}${bits ? `\n        ${bits}` : ''}${art}`;
+function describeCandidate(c) {
+  const bits = [c.year, (c.platforms || []).slice(0, 4).join(', ')]
+    .filter(Boolean).join(' · ');
+  const art = c.cover ? '' : '  (no cover art)';
+  return `${c.title}${bits ? `\n        ${bits}` : ''}${art}`;
+}
+
+/** IGDB's shape, flattened to the one the keyless search already returns. */
+function fromIgdb(g) {
+  const { developer, publisher } = companies(g);
+  return {
+    title: g.name,
+    year: releaseYear(g.first_release_date),
+    cover: g.cover?.image_id ? coverUrl(g.cover.image_id) : null,
+    description: tidySummary(g.summary, g.storyline),
+    genres: g.genres?.map((x) => x.name) || [],
+    developer,
+    publisher,
+    igdbId: g.id ?? null,
+    platforms: (g.platforms || []).map((p) => (typeof p === 'object' ? p.name : null)).filter(Boolean),
+  };
 }
 
 async function choosePlatform(collection, suggested) {
@@ -81,36 +95,45 @@ async function main() {
 
   let chosen = null;
   if (!opts.noLookup) {
-    let query;
-    try {
-      const creds = await loadEnv();
-      query = createClient({ id: creds.id, token: await getToken(creds) });
-    } catch (err) {
-      console.log(`\n${err.message}`);
-      console.log('Continuing without lookup — the entry will have no cover art yet.\n');
+    // IGDB when it is configured, otherwise the keyless sources. Both produce
+    // the same candidate shape, so the rest of this doesn't care which ran.
+    let query = null;
+    if (opts.source !== 'free') {
+      try {
+        const creds = await loadEnv();
+        query = createClient({ id: creds.id, token: await getToken(creds) });
+      } catch {
+        query = null;
+      }
     }
 
-    if (query) {
-      console.log(`\nSearching IGDB for "${title}"…`);
-      const results = await searchGames(query, title, { platform: opts.platform || null });
+    console.log(`\nSearching ${query ? 'IGDB' : 'Wikipedia and libretro'} for "${title}"…`);
+    if (!query && opts.source !== 'free') {
+      console.log('  (no IGDB keys configured — using the keyless sources)');
+    }
 
-      if (!results.length) {
-        console.log('  No results. Adding a bare entry you can fill in by hand.');
-      } else {
-        console.log('');
-        results.forEach((g, i) => console.log(`  ${String(i + 1).padStart(2)}. ${describeCandidate(g)}`));
-        console.log('   0. none of these — add a bare entry\n');
-        const pick = Number(await ask('  Which one? [1] ', '1'));
-        if (Number.isInteger(pick) && pick >= 1 && pick <= results.length) {
-          chosen = results[pick - 1];
-        }
+    let results;
+    if (query) {
+      const raw = await searchGames(query, title, { platform: opts.platform || null });
+      results = raw.map(fromIgdb);
+    } else {
+      results = await searchFree(title, { platform: opts.platform || null });
+    }
+
+    if (!results.length) {
+      console.log('  No results. Adding a bare entry you can fill in by hand.');
+    } else {
+      console.log('');
+      results.forEach((g, i) => console.log(`  ${String(i + 1).padStart(2)}. ${describeCandidate(g)}`));
+      console.log('   0. none of these — add a bare entry\n');
+      const pick = Number(await ask('  Which one? [1] ', '1'));
+      if (Number.isInteger(pick) && pick >= 1 && pick <= results.length) {
+        chosen = results[pick - 1];
       }
     }
   }
 
-  const suggestedPlatforms = (chosen?.platforms || [])
-    .map((p) => (typeof p === 'object' ? p.name : null))
-    .filter(Boolean);
+  const suggestedPlatforms = chosen?.platforms || [];
   const platform = opts.platform || (await choosePlatform(collection, suggestedPlatforms));
 
   const condition =
@@ -118,21 +141,26 @@ async function main() {
     (await ask('  Condition [CIB / Loose / Boxed / New / blank]: ', ''));
   const notes = opts.notes || (await ask('  Notes (optional): ', ''));
 
-  const finalTitle = chosen?.name || title;
+  const finalTitle = chosen?.title || title;
   const taken = new Set([...collection.games, ...collection.hardware].map((x) => x.id));
   const id = uniqueId(makeId(platform, finalTitle), taken);
-  const { developer, publisher } = chosen ? companies(chosen) : { developer: null, publisher: null };
+
+  // Keyless search can only resolve art once a platform is known, and the
+  // platform is chosen after the search. Fill it in now that we have both.
+  if (chosen && !chosen.cover && hasFreeArt(platform)) {
+    chosen.cover = await coverFor(finalTitle, platform, { region: opts.region || 'USA' });
+  }
 
   const entry = {
     id,
     title: finalTitle,
     platform,
-    year: chosen ? releaseYear(chosen.first_release_date) : null,
-    cover: chosen?.cover?.image_id ? coverUrl(chosen.cover.image_id) : null,
-    description: chosen ? tidySummary(chosen.summary, chosen.storyline) : null,
-    genres: chosen?.genres?.map((g) => g.name) || [],
-    developer,
-    publisher,
+    year: chosen?.year ?? null,
+    cover: chosen?.cover ?? null,
+    description: chosen?.description ?? null,
+    genres: chosen?.genres || [],
+    developer: chosen?.developer ?? null,
+    publisher: chosen?.publisher ?? null,
     region: opts.region || null,
     release: null,
     condition: condition || null,
@@ -140,7 +168,8 @@ async function main() {
     metacritic: null,
     notes: notes || null,
     added: new Date().toISOString().slice(0, 10),
-    igdbId: chosen?.id ?? null,
+    igdbId: chosen?.igdbId ?? null,
+    wikidataId: chosen?.wikidataId ?? null,
   };
 
   const duplicate = collection.games.find(

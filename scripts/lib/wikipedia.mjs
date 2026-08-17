@@ -61,6 +61,44 @@ async function queryTitles(titles) {
   return { found, alias };
 }
 
+/**
+ * Free-text search, for adding one game interactively.
+ *
+ * `generator=search` feeds the search results straight into the extract
+ * fetcher, so a search and its summaries cost one request rather than two.
+ */
+export async function searchTitles(term, { limit = 8 } = {}) {
+  const params = new URLSearchParams({
+    action: 'query',
+    format: 'json',
+    formatversion: '2',
+    generator: 'search',
+    gsrsearch: `${term} video game`,
+    gsrlimit: String(limit),
+    prop: 'extracts|pageprops',
+    exintro: '1',
+    explaintext: '1',
+    exsentences: '3',
+  });
+
+  const res = await fetch(`${API}?${params}`, { headers: { 'User-Agent': UA } });
+  if (!res.ok) return [];
+  const json = await res.json();
+
+  return (json.query?.pages || [])
+    .filter((page) => page.extract)
+    .map((page) => ({
+      title: page.title.replace(/\s*\(video game\)$/i, ''),
+      articleTitle: page.title,
+      extract: page.extract.replace(/\s+/g, ' ').trim(),
+      wikidata: page.pageprops?.wikibase_item || null,
+      // Search returns pages in relevance order; index preserves it.
+      order: page.index ?? 0,
+    }))
+    .filter((page) => looksRelevant(page.extract))
+    .sort((a, b) => a.order - b.order);
+}
+
 /** "…is a 1995 role-playing video game…" — the year is usually right there. */
 export function yearFromExtract(extract) {
   const early = String(extract || '').slice(0, 220);

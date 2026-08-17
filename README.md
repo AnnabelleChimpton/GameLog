@@ -125,8 +125,9 @@ accepts links and `**bold**`.
 npm run add "Chrono Trigger"
 ```
 
-It searches IGDB, shows you the matches, asks which platform and what condition,
-and writes the entry. Then:
+It searches, shows you the matches, asks which platform and what condition, and
+writes the entry — cover art, description and year included. No signup needed;
+it uses IGDB if you have it configured and the keyless sources otherwise. Then:
 
 ```bash
 git add data/collection.json && git commit -m "Add Chrono Trigger" && git push
@@ -159,10 +160,14 @@ Open the address it prints and you get a proper editor:
 - **Site** — title, tagline, accent colour (with a colour picker), and the
   shelves you follow.
 
-Adding a game searches your own collection *and* IGDB at once. Pick something
-you own and it links to it; pick something you don't and it's saved as a wanted
-entry with its cover art. Results that are ROM hacks or ports are labelled, so
-you don't accidentally add *Chrono Trigger+* instead of *Chrono Trigger*.
+Adding a game searches your own collection *and* a game database at once — IGDB
+if you've set it up, Wikipedia and libretro if you haven't. Pick something you
+own and it links to it; pick something you don't and it's saved as a wanted
+entry with its cover art. IGDB results that are ROM hacks or ports are labelled,
+so you don't accidentally add *Chrono Trigger+* instead of *Chrono Trigger*.
+
+Box art from the keyless source is chosen per platform, so a game added before
+you picked one gets its cover the moment you choose the platform.
 
 Changes are held in memory until you press **Save** (or ⌘/Ctrl+S), so a mis-click
 is undone by reloading the page. Saving writes `data/*.json` and nothing else —
@@ -371,6 +376,9 @@ baked into `collection.json`.
 | `npm run enrich -- --dry-run` | Show what would change, write nothing |
 | `npm run enrich -- --source free` | Keyless sources even if you have keys |
 | `npm run enrich -- --source igdb` | Require IGDB |
+
+`npm run add` takes `--source free` too, and the manager falls back to the
+keyless sources on its own when no keys are configured.
 
 Anything still without art keeps a generated placeholder — a wash of the
 platform's colour with its name — and those tiles show their title permanently,

@@ -135,7 +135,8 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
   results.replaceChildren();
   $('#picker-hint').textContent = state.igdb || !allowSearch
     ? 'Type at least two letters.'
-    : 'Searching your collection only — add IGDB keys to .env to search for games you don\'t own.';
+    : 'Type at least two letters. Without IGDB keys this searches Wikipedia and '
+      + 'libretro, which cover everything except current-gen consoles.';
 
   let timer;
   const run = async () => {
@@ -164,7 +165,7 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
       }
     }
 
-    if (allowSearch && state.igdb) {
+    if (allowSearch) {
       const params = new URLSearchParams({ q: term });
       if (platform) params.set('platform', platform);
       const res = await fetch(`/api/search?${params}`, { headers: API.headers })
@@ -353,7 +354,23 @@ function gameEditor(game) {
       thumb(game),
       h('div', { class: 'mg-grow' },
         field('Title', game.title, (v) => { game.title = v; markDirty('collection'); }),
-        platformField(game.platform, (v) => { game.platform = v; markDirty('collection'); })),
+        platformField(game.platform, async (v) => {
+          game.platform = v;
+          markDirty('collection');
+          // Keyless art is chosen per platform, so a game added before a
+          // platform was picked can only get its cover at this moment.
+          if (!game.cover && v) {
+            const params = new URLSearchParams({ title: game.title, platform: v });
+            if (game.region) params.set('region', game.region);
+            const found = await fetch(`/api/cover?${params}`, { headers: API.headers })
+              .then((r) => r.json()).catch(() => ({}));
+            if (found.cover && !game.cover) {
+              game.cover = found.cover;
+              status('Found box art for that platform.');
+              renderGames();
+            }
+          }
+        })),
       iconButton('Delete', () => {
         if (!confirm(`Remove "${game.title}" from your collection?`)) return;
         state.collection.games = state.collection.games.filter((g) => g !== game);

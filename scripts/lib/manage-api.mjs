@@ -20,6 +20,7 @@ import {
   ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH, SCHEMA_VERSION,
 } from './collection.mjs';
 import { loadEnv, getToken, createClient, searchGames, coverUrl, tidySummary, releaseYear, companies } from './igdb.mjs';
+import { searchFree, coverFor } from './freelookup.mjs';
 
 /** The only files the manager may ever write. */
 const WRITABLE = {
@@ -271,17 +272,22 @@ export async function handleApi(req, res, { port }) {
     }
 
     if (route === 'search' && req.method === 'GET') {
-      const query = await getIgdb();
-      if (!query) {
-        send(res, 200, { results: [], reason: 'no-credentials' });
-        return true;
-      }
       const term = (url.searchParams.get('q') || '').trim();
       if (!term) { send(res, 200, { results: [] }); return true; }
-
       const platform = url.searchParams.get('platform') || null;
+
+      // No IGDB configured is not a dead end -- the keyless sources answer the
+      // same question, just without genres and companies.
+      const query = await getIgdb();
+      if (!query) {
+        const free = await searchFree(term, { platform, limit: 8 });
+        send(res, 200, { results: free, source: 'free' });
+        return true;
+      }
+
       const found = await searchGames(query, term, { platform, limit: 10 });
       send(res, 200, {
+        source: 'igdb',
         results: found.map((g) => {
           const { developer, publisher } = companies(g);
           return {
@@ -296,6 +302,20 @@ export async function handleApi(req, res, { port }) {
             platforms: (g.platforms || []).map((p) => p?.name).filter(Boolean),
             derivative: Boolean(g.parent_game || g.version_parent),
           };
+        }),
+      });
+      return true;
+    }
+
+    if (route === 'cover' && req.method === 'GET') {
+      // Keyless art is per-platform, and the platform is often chosen after
+      // the search. This lets the UI fill the gap once it knows both.
+      const title = (url.searchParams.get('title') || '').trim();
+      const platform = (url.searchParams.get('platform') || '').trim();
+      if (!title || !platform) { send(res, 200, { cover: null }); return true; }
+      send(res, 200, {
+        cover: await coverFor(title, platform, {
+          region: url.searchParams.get('region') || 'USA',
         }),
       });
       return true;
