@@ -300,6 +300,10 @@ export async function handleApi(req, res, { port }) {
             developer,
             publisher,
             platforms: (g.platforms || []).map((p) => p?.name).filter(Boolean),
+            // Ids as well as names: the client maps them straight onto its own
+            // platform registry, which is exact where name-matching is not.
+            platformIds: (g.platforms || [])
+              .map((p) => (typeof p === 'object' ? p.id : p)).filter(Boolean),
             derivative: Boolean(g.parent_game || g.version_parent),
           };
         }),

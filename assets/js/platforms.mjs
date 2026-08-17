@@ -73,6 +73,18 @@ export function platformInfo(key) {
   };
 }
 
+/**
+ * IGDB's platform id -> the key used here.
+ *
+ * Search results say which platforms a game was released on, which is exactly
+ * the question "which shelf does this go on?" -- so it is worth translating
+ * rather than making someone pick from a list the answer was already in.
+ */
+export function platformFromIgdbId(id) {
+  const hit = PLATFORMS.find((p) => p.igdb === id);
+  return hit ? hit.key : null;
+}
+
 /** Sort order for platform filter chips: known platforms first, in registry order. */
 export function platformSortIndex(key) {
   const i = PLATFORMS.findIndex((p) => p.key.toLowerCase() === String(key).toLowerCase());

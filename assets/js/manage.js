@@ -7,7 +7,7 @@
 // Edits are held in memory and written on Save, so a mis-click is undone by
 // reloading rather than by digging through git.
 
-import { PLATFORMS } from './platforms.mjs';
+import { PLATFORMS, platformFromIgdbId, platformSortIndex } from './platforms.mjs';
 import { h, coverImage, titleKey, plural } from './lib.js';
 import { labelFor } from './profile.js';
 import { resolveList } from './lists.js';
@@ -123,10 +123,68 @@ function thumb(game) {
 let pickerResolve = null;
 
 /**
- * Search your own collection and IGDB at once. Picking something you own
- * produces a ref; picking an IGDB result produces a standalone entry.
+ * Which shelves a search result could plausibly go on.
+ *
+ * IGDB says which platforms a game was released for, so the answer is usually
+ * already in the result -- asking someone to pick it out of a list of thirty
+ * afterwards was throwing that away.
  */
-function openPicker({ title, allowOwned = true, allowSearch = true, platform = null }) {
+function likelyPlatforms(candidate) {
+  const fromIds = (candidate.platformIds || [])
+    .map(platformFromIgdbId)
+    .filter(Boolean);
+
+  if (fromIds.length) {
+    // IGDB returns platforms in no meaningful order, so the first button was
+    // as likely to be a later port as the original -- Star Fox 64 offered Wii
+    // ahead of Nintendo 64. Rank by how much of that platform this collection
+    // already holds, since you are usually adding to a shelf you already keep,
+    // and fall back to registry order (roughly chronological) to break ties.
+    const owned = new Map();
+    for (const game of state.collection.games) {
+      owned.set(game.platform, (owned.get(game.platform) || 0) + 1);
+    }
+    return [...new Set(fromIds)].sort((a, b) =>
+      (owned.get(b) || 0) - (owned.get(a) || 0)
+      || platformSortIndex(a) - platformSortIndex(b));
+  }
+
+  // Keyless results carry no platform data, so fall back to the shelves this
+  // collection already uses -- far shorter than the full registry.
+  return [...new Set(state.collection.games.map((g) => g.platform))].filter(Boolean).sort();
+}
+
+/** Step two of the picker: which platform is your copy for. */
+function renderPlatformStep(candidate, results, done) {
+  const suggested = likelyPlatforms(candidate);
+
+  const all = h('select', { class: 'mg-input' },
+    h('option', { value: '', text: '— another platform —' }),
+    ...PLATFORMS.map((p) => h('option', { value: p.key, text: p.key })));
+  all.addEventListener('change', () => { if (all.value) done(all.value); });
+
+  results.replaceChildren(
+    h('p', { class: 'mg-picked' },
+      h('span', { class: 'mg-picked__label', text: 'Adding' }),
+      h('span', { class: 'mg-picked__name',
+        text: `${candidate.title}${candidate.year ? ` (${candidate.year})` : ''}` })),
+    h('p', { class: 'mg-hint', text: 'Which platform is your copy for?' }),
+    h('div', { class: 'mg-platgrid' },
+      suggested.map((key) => h('button', {
+        type: 'button', class: 'mg-mini mg-platpick', onclick: () => done(key),
+      }, h('span', { text: key })))),
+    all);
+}
+
+/**
+ * Search your own collection and a game database at once. Picking something you
+ * own produces a ref; picking anything else produces a standalone entry.
+ *
+ * With `needPlatform`, a second step in the same dialog asks which shelf it
+ * belongs on and resolves box art for it before returning.
+ */
+function openPicker({ title, allowOwned = true, allowSearch = true, platform = null,
+                      needPlatform = false }) {
   const dialog = $('#picker');
   const input = $('#picker-input');
   const results = $('#picker-results');
@@ -173,7 +231,25 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
       for (const found of res.results || []) {
         rows.push(h('button', {
           type: 'button', class: 'mg-result',
-          onclick: () => { dialog.close(); pickerResolve?.({ kind: 'new', game: found }); },
+          onclick: () => {
+            if (!needPlatform) {
+              dialog.close();
+              pickerResolve?.({ kind: 'new', game: found });
+              return;
+            }
+            $('#picker-hint').textContent = '';
+            renderPlatformStep(found, results, async (chosenPlatform) => {
+              dialog.close();
+              // Keyless art is per-platform, so it can only be resolved now.
+              if (!found.cover && chosenPlatform) {
+                const params = new URLSearchParams({ title: found.title, platform: chosenPlatform });
+                const got = await fetch(`/api/cover?${params}`, { headers: API.headers })
+                  .then((r) => r.json()).catch(() => ({}));
+                found.cover = got.cover || null;
+              }
+              pickerResolve?.({ kind: 'new', game: found, platform: chosenPlatform });
+            });
+          },
         },
           thumb({ cover: found.cover, platform: platform || found.platforms?.[0] }),
           h('div', { class: 'mg-result__body' },
@@ -430,24 +506,33 @@ function renderGames() {
     h('button', {
       type: 'button', class: 'pillbutton pillbutton--accent',
       onclick: async () => {
-        const picked = await openPicker({ title: 'Add a game you own', allowOwned: false });
-        if (!picked) return;
+        const picked = await openPicker({
+          title: 'Add a game you own', allowOwned: false, needPlatform: true,
+        });
+        if (!picked || !picked.platform) return;
         const g = picked.game;
         const game = {
-          id: '', title: g.title, platform: '', year: g.year, cover: g.cover,
+          id: '', title: g.title, platform: picked.platform, year: g.year, cover: g.cover,
           description: g.description, genres: g.genres || [], developer: g.developer,
           publisher: g.publisher, region: null, release: null, condition: null,
           copies: 1, metacritic: null, notes: null,
-          added: new Date().toISOString().slice(0, 10), igdbId: g.igdbId,
+          added: new Date().toISOString().slice(0, 10), igdbId: g.igdbId ?? null,
+          wikidataId: g.wikidataId ?? null,
         };
         game.id = uniqueGameId(game);
         state.collection.games.push(game);
         state.collection.games.sort((a, b) =>
           a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }));
         state.editing = game.id;
+        // Show just the game that was added, rather than dropping it into
+        // alphabetical order somewhere down a list of hundreds and scrolling
+        // after it. One row, editor already open, nothing to hunt for --
+        // clearing the filter brings everything back.
+        state.gameQuery = game.title;
         markDirty('collection');
         renderGames();
-        status('Added. Pick its platform below — it needs one before you can save.');
+        status(`Added ${game.title} — ${game.platform}. `
+          + 'Clear the filter above to see the whole collection again.')
       },
     }, h('span', { text: '+ Add a game' })));
 

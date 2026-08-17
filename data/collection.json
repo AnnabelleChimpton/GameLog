@@ -2005,6 +2005,28 @@
       "added": "2024-10-09"
     },
     {
+      "id": "game-milo-s-astro-lanes",
+      "title": "Milo's Astro Lanes",
+      "platform": "Nintendo 64",
+      "year": 1998,
+      "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co47sq.jpg",
+      "description": "Have you ever bowled against your buddies with a Nuclear Ball on a lane constructed out of an alien's tongue? Probably not. But now you can, as you bowl for the perfect game in Milo's Astro Lanes, the wackiest, most spaced-out bowling blast ever! Use awesome power-ups like the devastating Pea Ball, toxic Cosmic Slime and mighty White Dwarf to thwart your opponents or keep them from stopping you. This insane game is what the future of bowling is all about!",
+      "genres": [
+        "Simulator",
+        "Sport"
+      ],
+      "developer": "Player 1",
+      "publisher": "Crave Entertainment",
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-17",
+      "igdbId": 3411
+    },
+    {
       "id": "3do-mind-teazzer",
       "title": "Mind Teazzer",
       "platform": "3DO",

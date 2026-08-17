@@ -1969,3 +1969,17 @@ div.minitile { cursor: default; }
   border-radius: var(--radius-ui);
 }
 .empty__aside { font-size: 0.8rem; color: var(--text-faint); }
+
+/* Second step of the picker: which shelf does this go on. */
+.mg-picked { display: grid; gap: 1px; margin-bottom: 4px; }
+.mg-picked__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.mg-picked__name { font-size: 1rem; font-weight: 650; }
+.mg-platgrid { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 12px; }
+.mg-platpick { padding: 7px 14px; font-size: 0.83rem; }
+.mg-platpick:hover { border-color: var(--accent); color: var(--text); }

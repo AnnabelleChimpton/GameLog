@@ -7,7 +7,7 @@
   "showHardware": true,
   "profile": {
     "name": "Annabelle",
-    "photo": null,
+    "photo": "assets/profile/avatar.jpg",
     "about": "This is me",
     "links": []
   },
