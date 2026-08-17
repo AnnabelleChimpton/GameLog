@@ -20,7 +20,9 @@ export { ROOT };
 const GAME_KEYS = [
   'id', 'title', 'platform', 'year', 'cover', 'description', 'genres',
   'developer', 'publisher', 'region', 'release', 'condition', 'copies',
-  'metacritic', 'notes', 'added', 'igdbId',
+  'metacritic', 'notes', 'added', 'igdbId', 'wikidataId',
+  // Play-through tracking, kept last so a catalogue entry reads as one first.
+  'status', 'beatenOn', 'video', 'verdict',
 ];
 
 const HARDWARE_KEYS = [

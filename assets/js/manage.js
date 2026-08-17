@@ -8,7 +8,7 @@
 // reloading rather than by digging through git.
 
 import { PLATFORMS, platformFromIgdbId, platformSortIndex } from './platforms.mjs';
-import { h, coverImage, titleKey, plural } from './lib.js';
+import { h, coverImage, titleKey, plural, STATUSES, STATUS_LABEL, playStatus } from './lib.js';
 import { labelFor } from './profile.js';
 import { resolveList } from './lists.js';
 
@@ -455,6 +455,37 @@ function gameEditor(game) {
         renderGames();
       }, { danger: true })),
 
+    // The play-through fields sit first: while a project is running these are
+    // the only ones being edited, and the catalogue metadata is already done.
+    h('div', { class: 'mg-track' },
+      h('div', { class: 'mg-row mg-row--tight' },
+        h('span', { class: 'mg-field__label', text: 'Status' }),
+        ...['unplayed', ...STATUSES].map((key) => h('button', {
+          type: 'button',
+          class: playStatus(game) === key ? 'mg-mini mg-statuspick is-on' : 'mg-mini mg-statuspick',
+          onclick: () => {
+            game.status = key === 'unplayed' ? null : key;
+            // Finishing something usually happens today, so fill the date in
+            // rather than making it a second chore.
+            if (key === 'beaten' && !game.beatenOn) {
+              game.beatenOn = new Date().toISOString().slice(0, 10);
+            }
+            if (key === 'unplayed') { game.beatenOn = null; }
+            markDirty('collection');
+            renderGames();
+          },
+        }, h('span', { text: STATUS_LABEL[key] })))),
+      h('div', { class: 'mg-row' },
+        field('Date beaten', game.beatenOn, (v) => {
+          game.beatenOn = v || null; markDirty('collection');
+        }, { type: 'date' }),
+        field('Episode link', game.video, (v) => {
+          game.video = v || null; markDirty('collection');
+        }, { placeholder: 'https://youtube.com/watch?v=...' })),
+      field('Verdict', game.verdict, (v) => {
+        game.verdict = v || null; markDirty('collection');
+      }, { rows: 2, placeholder: 'Your one-line take, shown on the game\'s page' })),
+
     h('div', { class: 'mg-row' },
       field('Year', game.year ?? '', (v) => {
         game.year = v ? Number(v) : null; markDirty('collection');
@@ -548,7 +579,10 @@ function renderGames() {
         h('div', { class: 'mg-item__body' },
           h('span', { class: 'mg-item__name', text: game.title }),
           h('span', { class: 'mg-item__meta',
-            text: [game.platform || '⚠ no platform', game.year, game.condition]
+            // Status goes in the collapsed row too, so a long list stays
+            // scannable during a play-through without opening every entry.
+            text: [game.platform || '⚠ no platform', game.year, game.condition,
+              playStatus(game) === 'unplayed' ? null : STATUS_LABEL[playStatus(game)]]
               .filter(Boolean).join(' · ') })),
         h('span', { class: 'mg-hint', text: open ? '−' : 'edit' })),
       open ? gameEditor(game) : null);

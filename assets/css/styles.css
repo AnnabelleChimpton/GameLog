@@ -2029,3 +2029,103 @@ div.minitile { cursor: default; }
   border-left: 2.5px solid var(--accent);
   border-radius: 0 7px 7px 0;
 }
+
+/* ==========================================================================
+   Play tracking
+   ========================================================================== */
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 2px 18px;
+}
+.progress__track {
+  flex: 1;
+  height: 8px;
+  background: var(--chart-track);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+.progress__fill {
+  height: 100%;
+  background: var(--chart-bar);
+  border-radius: 0 4px 4px 0;
+  transition: width 0.3s var(--ease);
+}
+.progress__text {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* A corner mark rather than a badge across the art: on a beaten game it shows
+   the episode number, which is the thing worth reading at a glance. */
+.tile__status {
+  position: absolute;
+  bottom: 7px;
+  left: 7px;
+  min-width: 22px;
+  padding: 2px 7px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-align: center;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.tile__status--beaten { color: var(--accent-ink); background: var(--accent); }
+.tile__status--playing { color: #fff; background: #2f8f4e; }
+.tile__status--dropped { color: #fff; background: #6b6b76; }
+
+/* Unfinished business should be what stands out, so a settled game recedes. */
+.tile--beaten .tile__cover,
+.tile--dropped .tile__cover { opacity: 0.62; }
+.tile--beaten:hover .tile__cover,
+.tile--dropped:hover .tile__cover { opacity: 1; }
+
+.detail__episode {
+  margin-top: 9px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.detail__verdict {
+  margin-top: 11px;
+  padding: 11px 15px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--surface-sunk);
+  border-radius: var(--radius-ui);
+}
+.detail__video {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 8px 16px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+}
+.detail__video:hover { filter: brightness(1.07); }
+
+.mg-track {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface-sunk);
+  border-radius: var(--radius-ui);
+}
+.mg-statuspick.is-on {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}

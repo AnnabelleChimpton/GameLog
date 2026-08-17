@@ -41,6 +41,58 @@ export function conditionGroup(condition) {
 
 export const CONDITION_ORDER = ['New', 'CIB', 'Boxed', 'Loose', 'Other'];
 
+/* --- Play status ---------------------------------------------------------- */
+
+/**
+ * Where a game stands in a play-through project.
+ *
+ * "dropped" is deliberately a first-class outcome rather than a failure. Some
+ * games have no ending to reach: Just Dance and Wii Play never roll credits,
+ * and saying so with a reason is more honest, and better viewing, than
+ * pretending a score threshold was a finish line.
+ */
+export const STATUSES = ['playing', 'beaten', 'dropped'];
+
+export const STATUS_LABEL = {
+  playing: 'Playing',
+  beaten: 'Beaten',
+  dropped: 'Dropped',
+  unplayed: 'Not started',
+};
+
+export const playStatus = (game) =>
+  (STATUSES.includes(game?.status) ? game.status : 'unplayed');
+
+/**
+ * Episode numbers, in the order games were actually finished.
+ *
+ * This is what makes a video title like "Plumbers Don't Wear Ties (12/185)"
+ * something the site works out rather than something counted by hand, which
+ * is the part people get wrong by episode forty.
+ */
+export function episodeNumbers(games) {
+  const beaten = games
+    .filter((g) => playStatus(g) === 'beaten')
+    .sort((a, b) =>
+      String(a.beatenOn || '9999').localeCompare(String(b.beatenOn || '9999'))
+      || String(a.title).localeCompare(String(b.title), 'en'));
+
+  const numbers = new Map();
+  beaten.forEach((game, i) => numbers.set(game, i + 1));
+  return numbers;
+}
+
+/** Beaten / total across whatever set is passed in, so any subset works. */
+export function progressOf(games) {
+  const counts = { beaten: 0, playing: 0, dropped: 0, unplayed: 0 };
+  for (const game of games) counts[playStatus(game)] += 1;
+  // Dropped games are settled, so they count as done for the purposes of
+  // "how far through is this", but are reported separately.
+  const total = games.length;
+  const done = counts.beaten + counts.dropped;
+  return { ...counts, total, done, pct: total ? Math.round((done / total) * 100) : 0 };
+}
+
 /**
  * A generated cover for games with no art: a wash of the platform colour with
  * the platform label. It carries no title, because tiles without real art keep

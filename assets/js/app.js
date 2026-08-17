@@ -10,7 +10,7 @@
 import { platformInfo, platformSortIndex } from './platforms.mjs';
 import {
   fold, sortKey, conditionGroup, CONDITION_ORDER, coverImage, placeholderCover,
-  safeImageUrl, h, plural,
+  safeImageUrl, h, plural, playStatus, STATUS_LABEL, episodeNumbers, progressOf,
 } from './lib.js';
 import { renderStats } from './stats.js';
 import { renderTimeline } from './timeline.js';
@@ -24,6 +24,10 @@ const el = {
   search: $('#search'),
   sort: $('#sort'),
   condition: $('#condition'),
+  status: $('#status'),
+  progress: $('#progress'),
+  progressFill: $('#progress-fill'),
+  progressText: $('#progress-text'),
   chips: $('#platform-chips'),
   filters: $('#filters'),
   views: $('#views'),
@@ -58,6 +62,9 @@ const el = {
   dDescription: $('#detail-description'),
   dMeta: $('#detail-meta'),
   dNotes: $('#detail-notes'),
+  dEpisode: $('#detail-episode'),
+  dVerdict: $('#detail-verdict'),
+  dVideo: $('#detail-video'),
   dPrev: $('#detail-prev'),
   dNext: $('#detail-next'),
   dClose: $('.detail__close'),
@@ -75,10 +82,12 @@ const state = {
   query: '',
   platform: 'all',
   condition: 'all',
+  status: 'all',
   notesOnly: false,
   sort: 'title',
   visible: [],
   openIndex: -1,
+  episodes: new Map(),
 };
 
 /* --- Filtering and sorting ------------------------------------------------ */
@@ -102,6 +111,7 @@ function compute() {
   const list = state.games.filter((game) => {
     if (state.platform !== 'all' && game.platform !== state.platform) return false;
     if (state.condition !== 'all' && game._condition !== state.condition) return false;
+    if (state.status !== 'all' && playStatus(game) !== state.status) return false;
     if (state.notesOnly && !game.notes) return false;
     // Every term must appear somewhere, so "zelda n64" narrows as you'd expect.
     return terms.every((t) => game._index.includes(t));
@@ -126,7 +136,8 @@ function compute() {
 }
 
 const isFiltered = () =>
-  Boolean(state.query) || state.platform !== 'all' || state.condition !== 'all' || state.notesOnly;
+  Boolean(state.query) || state.platform !== 'all' || state.condition !== 'all'
+  || state.status !== 'all' || state.notesOnly;
 
 /* --- Shelf ---------------------------------------------------------------- */
 
@@ -168,6 +179,18 @@ function renderGrid() {
 
     tile.append(img, badge, plate);
 
+    const status = playStatus(game);
+    if (status !== 'unplayed') {
+      const mark = document.createElement('span');
+      mark.className = `tile__status tile__status--${status}`;
+      const ep = state.episodes.get(game);
+      mark.textContent = status === 'beaten' ? (ep ? `#${ep}` : '\u2713')
+        : status === 'playing' ? '\u25b6' : '\u2715';
+      mark.title = STATUS_LABEL[status] + (game.beatenOn ? ` ${game.beatenOn}` : '');
+      tile.append(mark);
+      tile.classList.add(`tile--${status}`);
+    }
+
     if (game.notes) {
       const dot = document.createElement('span');
       dot.className = 'tile__note';
@@ -201,6 +224,20 @@ function renderCount() {
     const extra = copies > total ? ` · ${copies} copies` : '';
     el.count.textContent =
       `${total} game${total === 1 ? '' : 's'} · ${plural(platforms, 'platform')}${extra}`;
+  }
+
+  // Progress over the *filtered* set, so "every 3DO game" and "the whole
+  // collection" are the same feature with a different chip selected.
+  const tracked = state.games.some((g) => playStatus(g) !== 'unplayed');
+  if (tracked) {
+    const p = progressOf(state.visible);
+    el.progress.hidden = false;
+    el.progressFill.style.width = `${p.pct}%`;
+    el.progressText.textContent =
+      `${p.beaten} of ${p.total} beaten` + (p.dropped ? `, ${p.dropped} dropped` : '')
+      + (p.playing ? `, ${p.playing} in progress` : '');
+  } else {
+    el.progress.hidden = true;
   }
 
   el.clear.hidden = !isFiltered();
@@ -435,7 +472,23 @@ function openDetail(index) {
     ...metaRow('Region', game.region),
     ...metaRow('Metascore', game.metacritic ? `${game.metacritic}/100` : null),
     ...metaRow('Added', game.added),
+    ...metaRow('Status', playStatus(game) === 'unplayed' ? null : STATUS_LABEL[playStatus(game)]),
+    ...metaRow('Beaten', game.beatenOn),
   );
+
+  // The episode number and the write-up are the reason someone clicks through
+  // from a video description, so they sit above the catalogue metadata.
+  const episode = state.episodes.get(game);
+  el.dEpisode.hidden = !episode;
+  if (episode) el.dEpisode.textContent = `Episode ${episode}`;
+
+  el.dVerdict.hidden = !game.verdict;
+  el.dVerdict.textContent = game.verdict || '';
+
+  const video = typeof game.video === 'string' && /^https?:\/\//i.test(game.video)
+    ? game.video : null;
+  el.dVideo.hidden = !video;
+  if (video) el.dVideo.href = video;
 
   el.dNotes.hidden = !game.notes;
   el.dNotes.textContent = game.notes || '';
@@ -473,6 +526,7 @@ function openFromAnywhere(game) {
     state.query = '';
     state.platform = 'all';
     state.condition = 'all';
+    state.status = 'all';
     state.notesOnly = false;
     syncControls();
   }
@@ -485,7 +539,13 @@ function step(delta) {
   if (next >= 0 && next < state.visible.length) openDetail(next);
 }
 
-/** Pick something at random from whatever is currently showing. */
+/**
+ * Pick something at random from whatever is currently showing.
+ *
+ * Randomised order is what the N64 project used, and it removes the nightly
+ * argument about what to play next. Filter to "Not started" first and this
+ * becomes the roll that picks the episode.
+ */
 function surpriseMe() {
   if (!state.visible.length) return;
   // Never hand back the game already open -- that reads as a broken button.
@@ -552,6 +612,7 @@ function readUrl() {
   state.query = params.get('q') || '';
   state.platform = params.get('platform') || 'all';
   state.condition = params.get('condition') || 'all';
+  state.status = params.get('status') || 'all';
   state.notesOnly = params.get('notes') === '1';
   state.list = params.get('list') || null;
   state.sort = params.get('sort') || state.config.defaultSort || 'title';
@@ -563,6 +624,7 @@ function writeUrl() {
   if (state.query) params.set('q', state.query);
   if (state.platform !== 'all') params.set('platform', state.platform);
   if (state.condition !== 'all') params.set('condition', state.condition);
+  if (state.status !== 'all') params.set('status', state.status);
   if (state.notesOnly) params.set('notes', '1');
   if (state.view === 'lists' && state.list) params.set('list', state.list);
   if (state.sort !== (state.config.defaultSort || 'title')) params.set('sort', state.sort);
@@ -577,6 +639,7 @@ function syncControls() {
   el.search.value = state.query;
   el.sort.value = state.sort;
   el.condition.value = state.condition;
+  el.status.value = state.status;
   el.notesToggle.setAttribute('aria-pressed', String(state.notesOnly));
 }
 
@@ -618,6 +681,12 @@ function attachEvents() {
     render();
   });
 
+  el.status.addEventListener('change', () => {
+    state.status = el.status.value;
+    writeUrl();
+    render();
+  });
+
   el.notesToggle.addEventListener('click', () => {
     state.notesOnly = !state.notesOnly;
     syncControls();
@@ -650,6 +719,7 @@ function attachEvents() {
     state.query = '';
     state.platform = 'all';
     state.condition = 'all';
+    state.status = 'all';
     state.notesOnly = false;
     syncControls();
     writeUrl();
@@ -749,6 +819,7 @@ async function boot() {
   }));
   state.hardware = collection.hardware || [];
   state.lists = lists;
+  state.episodes = episodeNumbers(state.games);
 
   // Config-driven chrome.
   if (config.accent) document.documentElement.style.setProperty('--accent', config.accent);

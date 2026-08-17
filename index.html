@@ -66,6 +66,17 @@
         </select>
       </label>
 
+      <label class="select select--status">
+        <span class="select__label">Status</span>
+        <select id="status" aria-label="Filter by play status">
+          <option value="all">Any status</option>
+          <option value="unplayed">Not started</option>
+          <option value="playing">Playing</option>
+          <option value="beaten">Beaten</option>
+          <option value="dropped">Dropped</option>
+        </select>
+      </label>
+
       <label class="select select--condition">
         <span class="select__label">Condition</span>
         <select id="condition" aria-label="Filter by condition">
@@ -126,6 +137,11 @@
   <div class="statline" id="statline">
     <p id="count" class="statline__count" aria-live="polite"></p>
     <button id="clear" class="link-button" type="button" hidden>Clear filters</button>
+  </div>
+
+  <div class="progress" id="progress" hidden>
+    <div class="progress__track"><div class="progress__fill" id="progress-fill"></div></div>
+    <p class="progress__text" id="progress-text"></p>
   </div>
 
   <!-- Shelf -->
@@ -201,6 +217,10 @@
     <div class="detail__body">
       <p class="detail__eyebrow"><span id="detail-platform"></span><span id="detail-year"></span></p>
       <h2 class="detail__title" id="detail-title"></h2>
+      <p class="detail__episode" id="detail-episode" hidden></p>
+      <p class="detail__verdict" id="detail-verdict" hidden></p>
+      <a class="detail__video" id="detail-video" href="#" target="_blank"
+         rel="noopener noreferrer" hidden>Watch the episode</a>
       <ul class="detail__genres" id="detail-genres"></ul>
       <p class="detail__description" id="detail-description"></p>
       <dl class="detail__meta" id="detail-meta"></dl>

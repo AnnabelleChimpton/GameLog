@@ -51,6 +51,17 @@ for (const [kind, items] of [['game', games], ['hardware', hardware]]) {
     if (item.copies != null && (!Number.isInteger(item.copies) || item.copies < 1)) {
       problems.push(`${label}: "copies" should be a whole number of 1 or more`);
     }
+    if (kind === 'game' && item.status
+        && !['playing', 'beaten', 'dropped'].includes(item.status)) {
+      problems.push(`${label}: "${item.status}" is not a status `
+        + '(use playing, beaten, dropped, or leave it out)');
+    }
+    if (item.beatenOn && !/^\d{4}-\d{2}-\d{2}$/.test(item.beatenOn)) {
+      problems.push(`${label}: "beatenOn" should look like 2026-08-20`);
+    }
+    if (item.video && !/^https?:\/\//i.test(item.video)) {
+      warnings.push(`${label}: "video" is not a link, so it won't be shown`);
+    }
     if (item.cover && !/^(https?:)?\/\/|^data:|^assets\//.test(item.cover)) {
       warnings.push(`${label}: "cover" is not a url or an assets/ path. It may not load`);
     }
@@ -102,6 +113,7 @@ for (const list of lists.lists) {
   }
 }
 
+const beaten = games.filter((g) => g.status === 'beaten');
 const noCover = games.filter((g) => !g.cover);
 const noDescription = games.filter((g) => !g.description);
 const noYear = games.filter((g) => !g.year);
@@ -133,6 +145,12 @@ if (noCover.length || noDescription.length || noYear.length) {
   if (noDescription.length) console.log(`  ${noDescription.length} without a description`);
   if (noYear.length) console.log(`  ${noYear.length} without a release year`);
   console.log('');
+}
+
+if (beaten.length) {
+  const withVideo = beaten.filter((g) => g.video).length;
+  console.log(`Play-through: ${beaten.length} of ${games.length} beaten`
+    + `, ${withVideo} with an episode link\n`);
 }
 
 if (!problems.length) {
