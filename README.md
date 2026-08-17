@@ -55,10 +55,20 @@ In your fork: **Settings → Pages → Build and deployment → Source: GitHub A
 That's the only setting to change. From now on every push publishes the site to
 `https://YOUR-USERNAME.github.io/GameLog/`, usually within a minute.
 
-### 3. Put your own games in
+### 3. Clear out the previous collection
 
-Empty out `data/collection.json` and start adding. There are four ways, and they
-all write to the same file — mix and match freely.
+A fork arrives with whoever's games you forked from. One command empties them,
+along with their name, bio and footer:
+
+```bash
+npm run start-fresh
+```
+
+It asks you to confirm, and leaves `.env` and your git history alone.
+
+### 4. Put your own games in
+
+Four ways, all writing to the same file — mix and match freely.
 
 **Use the manager.** `npm run manage` opens an editor in your browser, which is
 the easiest way in. The rest of these work just as well.
@@ -99,7 +109,7 @@ npm run add "Hades"
 npm run import:gameye -- ~/Downloads/your-export.csv
 ```
 
-### 4. Change the name and colour
+### 5. Change the name and colour
 
 `data/config.json` holds everything about the site's identity:
 
@@ -115,7 +125,14 @@ npm run import:gameye -- ~/Downloads/your-export.csv
 ```
 
 `accent` is any CSS colour and drives the highlights throughout. `footer`
-accepts links and `**bold**`.
+accepts links and `**bold**`. The manager's **Site** and **Profile** tabs edit
+all of this without touching the file.
+
+### 6. Publish
+
+```bash
+git add -A && git commit -m "Start my collection" && git push
+```
 
 ---
 
@@ -414,7 +431,7 @@ scripts/lib/wikipedia.mjs keyless descriptions and years
 data/collection.json     your games and hardware
 data/lists.json          your lists (optional)
 data/config.json         site title, tagline, accent colour, friends
-scripts/                 the optional Node helpers
+scripts/                 the optional Node helpers (start-fresh, add, enrich, …)
 ```
 
 `data/collection.json` is the only file you need to touch day to day.

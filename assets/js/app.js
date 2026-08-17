@@ -209,6 +209,24 @@ function renderCount() {
   el.empty.hidden = shown > 0;
   el.grid.hidden = shown === 0;
   el.dice.disabled = shown === 0;
+
+  // An empty collection and a search that found nothing are different
+  // situations. A fresh fork told to "try a different search" is being blamed
+  // for a filter it never set -- and it's the first screen anyone sees.
+  if (shown === 0) {
+    el.empty.replaceChildren(...(total === 0
+      ? [
+          h('strong', { text: 'No games yet' }),
+          h('span', { text: 'This collection is empty — which means it\'s yours to fill.' }),
+          h('code', { class: 'empty__cmd', text: 'npm run manage' }),
+          h('span', { class: 'empty__aside',
+            text: 'Or add one from the terminal with  npm run add "Some Game"' }),
+        ]
+      : [
+          h('strong', { text: 'Nothing matches that.' }),
+          h('span', { text: 'Try a different search, or clear the filters.' }),
+        ]));
+  }
 }
 
 function renderHardware() {

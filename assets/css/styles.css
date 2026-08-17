@@ -1956,5 +1956,16 @@ div.minitile { cursor: default; }
 .mg-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .mg-file__label { display: inline-flex; align-items: center; cursor: pointer; }
 
-@media (max-width: 560px) {
-  
+/* The first screen of an empty fork, which should read as an invitation
+   rather than as a failed search. */
+.empty__cmd {
+  margin-top: 6px;
+  padding: 9px 16px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86rem;
+  color: var(--text);
+  background: var(--surface-sunk);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-ui);
+}
+.empty__aside { font-size: 0.8rem; color: var(--text-faint); }
