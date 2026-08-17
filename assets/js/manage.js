@@ -534,6 +534,11 @@ function renderSite() {
         h('label', { class: 'mg-field mg-field--narrow' },
           h('span', { class: 'mg-field__label', text: 'Accent colour' }), accent)),
       field('Tagline', config.tagline, set('tagline')),
+      field('Published address', config.siteUrl, set('siteUrl'),
+        { placeholder: 'https://you.github.io/GameLog' }),
+      h('p', { class: 'mg-hint',
+        text: 'Used for the link preview card when someone shares your page — '
+          + 'an absolute address is the only kind a crawler can resolve an image from.' }),
       field('Footer', config.footer, set('footer'),
         { rows: 2, placeholder: 'Markdown links and **bold** work here' }),
       h('label', { class: 'mg-check' },

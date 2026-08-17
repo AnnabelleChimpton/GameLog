@@ -1,6 +1,7 @@
 {
   "title": "GameLog",
   "tagline": "A shelf of everything I've collected.",
+  "siteUrl": "",
   "accent": "#f0a04b",
   "defaultSort": "title",
   "showHardware": true,

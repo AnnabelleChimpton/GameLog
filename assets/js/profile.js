@@ -1,12 +1,15 @@
-// The About view: who owns this shelf.
+// The hero: who this is, above what they collect.
 //
-// Entirely optional. With no profile in data/config.json the tab never appears,
-// so a fork that only wants a catalogue stays a catalogue.
+// Someone arriving from a shared link should learn two things without doing
+// anything -- whose shelf this is, and what's on it. So the page opens with the
+// person, and the collection begins immediately underneath.
+//
+// It scrolls away. The controls below it are what stays pinned, because once
+// you're browsing, the search box matters more than the biography.
 
 import { h, safeImageUrl, plural } from './lib.js';
-import { platformInfo } from './platforms.mjs';
 
-/** True when there is anything worth showing a tab for. */
+/** True when there's a person to introduce, rather than just a site title. */
 export function hasProfile(profile) {
   if (!profile || typeof profile !== 'object') return false;
   return Boolean(
@@ -31,14 +34,13 @@ const ICONS = {
 };
 
 function iconFor(url) {
+  if (url.startsWith('mailto:')) return 'mail';
   let host = '';
   try {
     host = new URL(url).hostname.replace(/^www\./, '');
   } catch {
-    if (url.startsWith('mailto:')) return 'mail';
     return 'globe';
   }
-  if (url.startsWith('mailto:')) return 'mail';
   if (host.endsWith('github.com')) return 'github';
   if (host.endsWith('twitch.tv')) return 'twitch';
   if (host.endsWith('youtube.com') || host === 'youtu.be') return 'youtube';
@@ -75,7 +77,7 @@ function svgIcon(name) {
 /** Paragraphs, plus the same restrained markdown the footer allows. */
 function prose(text) {
   return String(text).split(/\n{2,}/).map((para) => {
-    const node = h('p', { class: 'about__para' });
+    const node = h('p', { class: 'hero__para' });
     const pattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|\*\*([^*]+)\*\*/g;
     let last = 0;
     let match;
@@ -94,70 +96,90 @@ function prose(text) {
   });
 }
 
-export function renderProfile(profile, { games, hardware, config }) {
+/** "184 games · 10 platforms · 5 consoles · 1983–2024" */
+function factLine(games, hardware) {
+  const platforms = new Set(games.map((g) => g.platform)).size;
+  const years = games.map((g) => g.year).filter(Boolean).sort((a, b) => a - b);
+  return [
+    plural(games.length, 'game'),
+    plural(platforms, 'platform'),
+    hardware.length ? plural(hardware.length, 'console') : null,
+    years.length ? `${years[0]}–${years[years.length - 1]}` : null,
+  ].filter(Boolean).join(' · ');
+}
+
+/**
+ * Build the hero.
+ *
+ * With no profile set this still renders -- the site title, tagline and facts --
+ * so a fork that only wants a catalogue gets a proper masthead rather than a
+ * gap where a person would have been.
+ */
+export function renderHero(config, { games, hardware }) {
+  const profile = config.profile || {};
   const photo = safeImageUrl(profile.photo);
+  const named = Boolean(profile.name);
 
   const links = (profile.links || [])
     .filter((link) => link && typeof link.url === 'string' && link.url.trim())
     // Only ever render a link we are willing to follow.
     .filter((link) => /^(https?:|mailto:)/i.test(link.url.trim()));
 
-  const platforms = new Set(games.map((g) => g.platform));
-  const years = games.map((g) => g.year).filter(Boolean).sort((a, b) => a - b);
+  const heading = h('h1', { class: 'hero__name', text: profile.name || config.title || 'GameLog' });
 
-  const facts = [
-    `${plural(games.length, 'game')} across ${plural(platforms.size, 'platform')}`,
-    hardware.length ? plural(hardware.length, 'console') : null,
-    years.length ? `spanning ${years[0]}–${years[years.length - 1]}` : null,
-  ].filter(Boolean).join(' · ');
+  // With a person named, the site title becomes their shelf's subtitle rather
+  // than competing with their name for the top line.
+  const subtitle = named
+    ? [config.title, config.tagline].filter(Boolean).join(' — ')
+    : (config.tagline || '');
 
-  // The platform they own most of says something a bar chart doesn't.
-  const counts = new Map();
-  for (const game of games) counts.set(game.platform, (counts.get(game.platform) || 0) + 1);
-  const [topPlatform, topCount] = [...counts].sort((a, b) => b[1] - a[1])[0] || [];
+  const body = h('div', { class: 'hero__body' },
+    heading,
+    subtitle ? h('p', { class: 'hero__subtitle', text: subtitle }) : null,
+    h('p', { class: 'hero__facts', text: factLine(games, hardware) }));
 
-  return h('div', { class: 'about' },
-    h('div', { class: 'about__head' },
-      photo
-        ? (() => {
-            const img = h('img', { class: 'about__photo', src: photo, alt: '',
-              loading: 'eager', decoding: 'async' });
-            img.addEventListener('error', () => img.remove(), { once: true });
-            return img;
-          })()
-        : null,
-      h('div', { class: 'about__intro' },
-        h('h2', { class: 'about__name',
-          text: profile.name || config.title || 'About' }),
-        h('p', { class: 'about__facts', text: facts }),
-        topPlatform
-          ? h('p', { class: 'about__facts',
-              text: `Deepest on ${topPlatform} — ${plural(topCount, 'game')}.` })
-          : null,
-        links.length
-          ? h('div', { class: 'about__links' },
-              links.map((link) => h('a', {
-                class: 'plink',
-                href: link.url.trim(),
-                target: link.url.startsWith('mailto:') ? null : '_blank',
-                rel: 'noopener noreferrer',
-              }, svgIcon(iconFor(link.url.trim())),
-                 h('span', { text: link.label?.trim() || labelFor(link.url.trim()) }))))
-          : null)),
+  if (profile.about) {
+    const bio = h('div', { class: 'hero__bio' }, prose(profile.about));
+    const more = h('button', {
+      class: 'hero__more', type: 'button', hidden: true,
+      onclick: () => {
+        const open = bio.classList.toggle('is-open');
+        more.textContent = open ? 'Show less' : 'Read more';
+      },
+    }, 'Read more');
+    body.append(bio, more);
 
-    profile.about
-      ? h('div', { class: 'about__body' }, prose(profile.about))
-      : null,
+    // Only offer the toggle when the text is actually being clipped -- a
+    // two-line bio with a "Read more" under it looks broken.
+    requestAnimationFrame(() => {
+      if (bio.scrollHeight - bio.clientHeight > 4) more.hidden = false;
+    });
+  }
 
-    // Platform dots double as a compact portrait of what they collect.
-    counts.size
-      ? h('div', { class: 'about__platforms' },
-          [...counts].sort((a, b) => b[1] - a[1]).map(([name, count]) => {
-            const info = platformInfo(name);
-            return h('span', { class: 'about__plat' },
-              h('span', { class: 'chip__dot', style: `--chip-color:${info.color}` }),
-              h('span', { text: name }),
-              h('span', { class: 'chip__count', text: String(count) }));
-          }))
-      : null);
+  if (links.length) {
+    body.append(h('div', { class: 'hero__links' },
+      links.map((link) => {
+        const url = link.url.trim();
+        return h('a', {
+          class: 'plink',
+          href: url,
+          target: url.startsWith('mailto:') ? null : '_blank',
+          rel: 'noopener noreferrer',
+        }, svgIcon(iconFor(url)), h('span', { text: link.label?.trim() || labelFor(url) }));
+      })));
+  }
+
+  const avatar = photo
+    ? (() => {
+        const img = h('img', { class: 'hero__photo', src: photo,
+          alt: profile.name ? `${profile.name}` : '', loading: 'eager', decoding: 'async' });
+        // A broken photo url should leave a tidy header, not a torn one.
+        img.addEventListener('error', () => img.remove(), { once: true });
+        return img;
+      })()
+    : null;
+
+  return h('div', { class: avatar ? 'hero__inner' : 'hero__inner hero__inner--nophoto' },
+    avatar, body);
 }
+

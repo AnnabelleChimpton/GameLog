@@ -4,6 +4,10 @@ A pretty, static site for showing off a video game collection. Search it, filter
 it by console, sort it, click any cover for the details. Host it free on GitHub
 Pages.
 
+The page opens with **you** — photo, name, a few words, your links — and your
+collection begins right underneath. Someone following a shared link learns whose
+shelf this is and what's on it without clicking anything.
+
 No framework, no build step, no dependencies. The repo *is* the site: a page, a
 stylesheet, a script, and one JSON file holding your collection. Edit it through
 a local UI (`npm run manage`), a CLI, or a text editor — whichever you prefer.
@@ -15,7 +19,6 @@ a local UI (`npm run manage`), a CLI, or a text editor — whichever you prefer.
 - **Lists** — backlogs, wishlists, favourites; owned games and hunted ones.
 - **Stats** — decades, platforms, genres, scores and condition at a glance.
 - **Compare** — point it at *somebody else's* GameLog and see what you share.
-- **About** — optional: your photo, a few words, and where else to find you.
 
 **Compare** is the reason this is a static site rather than an app. Every
 GameLog publishes its `collection.json` openly, and GitHub Pages serves it with
@@ -191,8 +194,13 @@ half-written collection behind.
 ## About you
 
 A collection is more interesting when you know whose it is. Add a photo, a few
-paragraphs and some links, and an **About** tab appears on your site with a
-round avatar beside your title.
+paragraphs and some links, and they become the top of your page: your name as
+the heading, the collection's own title and tagline beneath it, a line of facts
+worked out from the data, your bio, and your links.
+
+The bio is clipped to three lines with a **Read more** toggle, so the covers
+still clear the fold. The header scrolls away as you browse; the search box and
+filters are what stay pinned.
 
 The manager's **Profile** tab is the easy way — "Choose a photo…" resizes the
 image to 512px in your browser before saving it, so a 4 MB phone photo lands in
@@ -220,8 +228,22 @@ The About page also works out a few things on its own — how many games across
 how many platforms, the years they span, and which console you're deepest on —
 so it stays accurate as the collection grows.
 
-**Every part is optional.** Leave `profile` empty and the About tab and the
-avatar never appear at all, which is the default for a fresh fork.
+**Every part is optional.** Leave `profile` empty and the header falls back to
+just your site title, tagline and collection facts — which is the default for a
+fresh fork.
+
+### Sharing the link
+
+Link previews are built by crawlers that don't run JavaScript, so those tags
+can't be assembled at runtime like the rest of the page — they live in
+`index.html`, between two `gamelog:meta` markers. Saving in the manager rewrites
+that block from your config: the title becomes "Your Name — Your Title", the
+description comes from your bio, and your photo becomes the card image.
+
+For the image to work, set **Published address** on the manager's Site tab (or
+`siteUrl` in the config) to your site's address — a crawler can't resolve a
+relative path. Edit `config.json` rather than those meta lines; anything you
+type between the markers is overwritten on the next save.
 
 ## Lists
 

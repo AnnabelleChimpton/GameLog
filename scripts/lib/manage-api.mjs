@@ -87,6 +87,83 @@ function validateConfig(data) {
   return data;
 }
 
+const INDEX_PATH = join(ROOT, 'index.html');
+const META_START = '<!-- gamelog:meta';
+const META_END = '<!-- /gamelog:meta -->';
+
+const escapeAttr = (value) => String(value ?? '')
+  .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+  .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/** Strip the small markdown the bio allows, for a plain-text description. */
+function plainText(value, limit = 200) {
+  const text = String(value ?? '')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text.length > limit ? `${text.slice(0, limit - 1).trimEnd()}…` : text;
+}
+
+/**
+ * Rewrite the meta block in index.html from the config.
+ *
+ * Link previews are built by crawlers that don't run JavaScript, so a card for
+ * a shared GameLog cannot be assembled at runtime the way the rest of the page
+ * is -- these tags have to exist in the html on disk. Only the region between
+ * the two markers is touched; without them the file is left alone entirely.
+ */
+async function syncMeta(config) {
+  let html;
+  try {
+    html = await readFile(INDEX_PATH, 'utf8');
+  } catch {
+    return; // No index.html to update; not this function's problem.
+  }
+
+  const start = html.indexOf(META_START);
+  const end = html.indexOf(META_END);
+  if (start === -1 || end === -1 || end < start) return;
+
+  const profile = config.profile || {};
+  const siteTitle = config.title || 'GameLog';
+  const title = profile.name ? `${profile.name} — ${siteTitle}` : siteTitle;
+  const description = plainText(profile.about)
+    || plainText(config.tagline)
+    || 'A video game collection.';
+
+  const lines = [
+    `${META_START} — rewritten from data/config.json when you save in the manager.`,
+    "     Crawlers don't run JavaScript, so a shared link's preview card has to live",
+    '     in the html itself. Edit config.json rather than these lines. -->',
+    `<title>${escapeAttr(title)}</title>`,
+    `<meta name="description" content="${escapeAttr(description)}">`,
+    '<meta property="og:type" content="profile">',
+    `<meta property="og:title" content="${escapeAttr(title)}">`,
+    `<meta property="og:description" content="${escapeAttr(description)}">`,
+  ];
+
+  // A relative path can't be resolved by a crawler, so an absolute siteUrl is
+  // what makes the image usable. Without one, the card falls back to text.
+  const photo = profile.photo;
+  const base = typeof config.siteUrl === 'string' ? config.siteUrl.trim().replace(/\/+$/, '') : '';
+  if (photo && /^https?:\/\//i.test(photo)) {
+    lines.push(`<meta property="og:image" content="${escapeAttr(photo)}">`);
+    lines.push('<meta name="twitter:card" content="summary">');
+  } else if (photo && base) {
+    lines.push(`<meta property="og:image" content="${escapeAttr(`${base}/${photo.replace(/^\/+/, '')}`)}">`);
+    lines.push('<meta name="twitter:card" content="summary">');
+  } else {
+    lines.push('<meta name="twitter:card" content="summary">');
+  }
+  if (base) lines.push(`<meta property="og:url" content="${escapeAttr(base)}/">`);
+
+  lines.push(META_END);
+
+  const updated = html.slice(0, start) + lines.join('\n') + html.slice(end + META_END.length);
+  await writeAtomic(INDEX_PATH, updated);
+}
+
 /** Write via a temp file so an interrupted save can't truncate the real one. */
 async function writeAtomic(path, contents) {
   const tmp = `${path}.tmp`;
@@ -260,6 +337,9 @@ export async function handleApi(req, res, { port }) {
       const payload = await readJsonBody(req);
       const clean = validate(payload);
       await writeAtomic(path, JSON.stringify(clean, null, 2) + '\n');
+      // The link-preview tags live in index.html and are derived from config,
+      // so they are refreshed here rather than drifting until someone notices.
+      if (route === 'config') await syncMeta(clean);
       send(res, 200, { ok: true, file: path.replace(ROOT + '/', '') });
       return true;
     }

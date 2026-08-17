@@ -169,26 +169,12 @@ button, input, select { font: inherit; color: inherit; }
 .masthead__bar {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 16px var(--page-pad) 12px;
+  padding: 11px var(--page-pad) 9px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
   flex-wrap: wrap;
-}
-
-.masthead__title {
-  font-size: clamp(1.25rem, 1rem + 1.1vw, 1.7rem);
-  font-weight: 700;
-  letter-spacing: -0.022em;
-  line-height: 1.1;
-}
-
-.masthead__tagline {
-  margin-top: 3px;
-  font-size: 0.855rem;
-  color: var(--text-faint);
-  max-width: 46ch;
 }
 
 .masthead__tools {
@@ -856,8 +842,9 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  flex-wrap: wrap;
 }
+.masthead__nav .filters { flex: 1 1 auto; min-width: 0; padding: 0; }
+.masthead__nav .quickacts { flex: 0 0 auto; }
 
 .views {
   display: flex;
@@ -1812,49 +1799,89 @@ div.minitile { cursor: default; }
 .mg-listbar .chip { flex: 0 0 auto; }
 
 /* ==========================================================================
-   About / profile
+   Hero — the introduction above the collection
    ========================================================================== */
 
-.masthead__identity { display: flex; align-items: center; gap: 13px; }
-
-.masthead__avatar {
-  flex: 0 0 auto;
-  width: 46px; height: 46px;
-  padding: 0;
-  background: var(--surface-sunk);
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  overflow: hidden;
-  cursor: pointer;
-  transition: border-color 0.16s var(--ease), transform 0.16s var(--ease);
+/* Deliberately not sticky. Someone arriving cold reads this once; someone
+   browsing wants the search box pinned instead, which is the bar below. */
+.hero {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: clamp(26px, 4vw, 44px) var(--page-pad) clamp(20px, 3vw, 30px);
 }
-.masthead__avatar:hover { border-color: var(--accent); transform: scale(1.05); }
-.masthead__avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-.about { display: grid; gap: 26px; max-width: 74ch; }
+.hero__inner {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(18px, 3vw, 30px);
+}
 
-.about__head { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
-
-.about__photo {
+.hero__photo {
   flex: 0 0 auto;
-  width: 132px; height: 132px;
+  width: clamp(84px, 11vw, 124px);
+  aspect-ratio: 1;
   object-fit: cover;
-  border-radius: 14px;
-  border: 1px solid var(--border);
+  border-radius: 50%;
+  border: 3px solid var(--surface);
   box-shadow: var(--shadow-lift);
   background: var(--surface-sunk);
 }
 
-.about__intro { flex: 1 1 260px; display: grid; gap: 4px; align-content: start; }
-.about__name {
-  font-size: clamp(1.4rem, 1.1rem + 1.2vw, 1.9rem);
-  font-weight: 700;
-  letter-spacing: -0.026em;
-  line-height: 1.15;
-}
-.about__facts { font-size: 0.86rem; color: var(--text-faint); }
+.hero__body { min-width: 0; flex: 1 1 auto; max-width: 66ch; }
 
-.about__links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+.hero__name {
+  font-size: clamp(1.6rem, 1.2rem + 2vw, 2.5rem);
+  font-weight: 750;
+  letter-spacing: -0.032em;
+  line-height: 1.08;
+}
+
+.hero__subtitle {
+  margin-top: 5px;
+  font-size: clamp(0.9rem, 0.85rem + 0.2vw, 1rem);
+  color: var(--text-soft);
+}
+
+.hero__facts {
+  margin-top: 9px;
+  font-size: 0.815rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+}
+
+/* Clamped to three lines so the collection still clears the fold; the toggle
+   below only appears when there is genuinely more to read. */
+.hero__bio {
+  margin-top: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hero__bio.is-open {
+  display: block;
+  overflow: visible;
+}
+
+.hero__para { font-size: 0.945rem; line-height: 1.66; color: var(--text-soft); }
+.hero__para + .hero__para { margin-top: 11px; }
+.hero__para a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.hero__para strong { color: var(--text); }
+
+.hero__more {
+  margin-top: 6px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+.hero__more:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.hero__links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
 
 .plink {
   display: inline-flex;
@@ -1878,19 +1905,16 @@ div.minitile { cursor: default; }
 }
 .plink__icon { width: 15px; height: 15px; fill: currentColor; flex: 0 0 auto; }
 
-.about__body { display: grid; gap: 13px; }
-.about__para { font-size: 0.97rem; line-height: 1.72; color: var(--text-soft); }
-.about__para a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
-.about__para strong { color: var(--text); }
-
-.about__platforms {
+/* The platform spread, under the shelf rather than in the hero. */
+.platsum {
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
-  padding-top: 20px;
+  margin-top: 34px;
+  padding-top: 22px;
   border-top: 1px solid var(--border);
 }
-.about__plat {
+.platsum__item {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -1901,6 +1925,15 @@ div.minitile { cursor: default; }
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
 }
+
+@media (max-width: 620px) {
+  .hero { padding-top: 22px; }
+  .hero__inner { gap: 15px; }
+  .hero__photo { width: 68px; }
+  .hero__name { font-size: 1.45rem; }
+}
+
+
 
 /* Profile editor ----------------------------------------------------------- */
 
@@ -1924,6 +1957,4 @@ div.minitile { cursor: default; }
 .mg-file__label { display: inline-flex; align-items: center; cursor: pointer; }
 
 @media (max-width: 560px) {
-  .about__photo { width: 96px; height: 96px; }
-  .masthead__avatar { width: 38px; height: 38px; }
-}
+  
