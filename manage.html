@@ -20,6 +20,7 @@
     <div class="mg-top__actions">
       <span id="dirty" class="mg-dirty" hidden>unsaved changes</span>
       <button id="save" class="cmp__go" type="button" disabled>Save</button>
+      <button id="publish" class="pillbutton" type="button">Publish…</button>
       <a class="pillbutton" href="index.html" target="_blank" rel="noopener">View site ↗</a>
       <button id="theme-toggle" class="icon-button" type="button" aria-label="Switch colour theme">
         <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
@@ -76,6 +77,23 @@
     <p class="cmp__blurb">Then open the address it prints.</p>
   </div>
 </div>
+
+<dialog id="publisher" class="mg-picker" aria-label="Publish your changes">
+  <div class="mg-pub">
+    <h2 class="mg-card__title">Publish</h2>
+    <p class="mg-hint" id="pub-where"></p>
+    <div id="pub-body"></div>
+    <label class="mg-field">
+      <span class="mg-field__label">Describe this change (optional)</span>
+      <input id="pub-message" class="mg-input" type="text" placeholder="Update collection">
+    </label>
+    <div class="mg-pub__acts">
+      <button id="pub-cancel" class="pillbutton" type="button">Cancel</button>
+      <button id="pub-go" class="cmp__go" type="button">Commit and push</button>
+    </div>
+    <p class="mg-status" id="pub-status" hidden></p>
+  </div>
+</dialog>
 
 <dialog id="picker" class="mg-picker" aria-label="Find a game">
   <form method="dialog" class="mg-picker__head">

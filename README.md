@@ -50,9 +50,11 @@ git clone https://github.com/YOUR-USERNAME/GameLog.git && cd GameLog
 
 ### 2. Turn on GitHub Pages
 
-In your fork: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+In your fork: **Settings → Pages → Build and deployment → Source: Deploy from a
+branch**, branch `main`, folder `/ (root)`.
 
-That's the only setting to change. From now on every push publishes the site to
+That's the only setting to change. There's no build step and no workflow — the
+repo *is* the site, so GitHub just serves it. Every push publishes to
 `https://YOUR-USERNAME.github.io/GameLog/`, usually within a minute.
 
 ### 3. Clear out the previous collection
@@ -130,6 +132,11 @@ all of this without touching the file.
 
 ### 6. Publish
 
+Press **Publish…** in the manager. It shows exactly which files are about to go
+out, lets you describe the change, then commits and pushes.
+
+Or do it yourself, if you'd rather:
+
 ```bash
 git add -A && git commit -m "Start my collection" && git push
 ```
@@ -144,7 +151,9 @@ npm run add "Chrono Trigger"
 
 It searches, shows you the matches, asks which platform and what condition, and
 writes the entry — cover art, description and year included. No signup needed;
-it uses IGDB if you have it configured and the keyless sources otherwise. Then:
+it uses IGDB if you have it configured and the keyless sources otherwise.
+
+Then push, either with **Publish…** in the manager or:
 
 ```bash
 git add data/collection.json && git commit -m "Add Chrono Trigger" && git push
@@ -187,13 +196,13 @@ Box art from the keyless source is chosen per platform, so a game added before
 you picked one gets its cover the moment you choose the platform.
 
 Changes are held in memory until you press **Save** (or ⌘/Ctrl+S), so a mis-click
-is undone by reloading the page. Saving writes `data/*.json` and nothing else —
-edits produce small, readable diffs, so you can see exactly what changed before
-committing:
+is undone by reloading the page. Saving writes `data/*.json` and nothing else,
+which keeps diffs small and readable.
 
-```bash
-git add data && git commit -m "Update collection" && git push
-```
+**Publish…** then commits and pushes. It lists what's going out first, and only
+ever stages the files the manager itself edits — anything else you've changed is
+shown as "left alone" for you to handle in git. If there's no `origin` remote
+yet, or your credentials aren't set up, it says so rather than half-succeeding.
 
 ### It's local-only, on purpose
 
@@ -384,9 +393,9 @@ npm run check
 ```
 
 It flags invalid JSON, duplicate ids, missing platforms and unknown consoles,
-and tells you how much is still waiting on `npm run enrich`. The deploy workflow
-runs the same check, so a broken `collection.json` fails the build instead of
-publishing a blank page.
+and tells you how much is still waiting on `npm run enrich`. The manager runs
+the same shape checks before it writes anything, so data saved through the UI is
+already valid — this is for catching hand-edits.
 
 ---
 

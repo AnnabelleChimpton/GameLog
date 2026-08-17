@@ -1983,3 +1983,36 @@ div.minitile { cursor: default; }
 .mg-platgrid { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 12px; }
 .mg-platpick { padding: 7px 14px; font-size: 0.83rem; }
 .mg-platpick:hover { border-color: var(--accent); color: var(--text); }
+
+/* Publish dialog */
+.mg-pub { display: grid; gap: 12px; padding: 22px 24px; }
+.mg-pub__acts { display: flex; gap: 9px; justify-content: flex-end; }
+.mg-pub__files {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.83rem;
+  max-height: 30vh;
+  overflow-y: auto;
+}
+.mg-pub__files li { display: flex; gap: 9px; align-items: baseline; }
+.mg-pub__files--muted { color: var(--text-faint); }
+.mg-pub__state {
+  flex: 0 0 auto;
+  min-width: 56px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.mg-pub__warn {
+  padding: 9px 13px;
+  font-size: 0.83rem;
+  color: var(--text);
+  background: var(--surface-sunk);
+  border-left: 2.5px solid var(--accent);
+  border-radius: 0 7px 7px 0;
+}

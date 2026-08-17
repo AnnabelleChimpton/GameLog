@@ -800,6 +800,95 @@ function renderProfileTab() {
       }, h('span', { text: '+ Add a link' }))));
 }
 
+/* --- Publishing ----------------------------------------------------------- */
+
+const STATE_WORDS = { M: 'changed', A: 'added', D: 'deleted', R: 'renamed', '??': 'new' };
+
+async function openPublisher() {
+  const dialog = $('#publisher');
+  const body = $('#pub-body');
+  const where = $('#pub-where');
+  const status = $('#pub-status');
+  status.hidden = true;
+  $('#pub-go').disabled = false;
+
+  body.replaceChildren(h('p', { class: 'mg-hint', text: 'Checking…' }));
+  dialog.showModal();
+
+  const git = await fetch('/api/git', { headers: API.headers })
+    .then((r) => r.json()).catch(() => null);
+
+  if (!git?.isRepo) {
+    where.textContent = '';
+    body.replaceChildren(h('p', { class: 'cmp__none',
+      text: 'This folder is not a git repository, so there is nothing to publish to.' }));
+    $('#pub-go').disabled = true;
+    return;
+  }
+
+  where.textContent = git.remote
+    ? `${git.branch} → ${git.remote.replace(/^https:\/\/[^@]*@/, 'https://')}`
+    : `${git.branch} — no remote set`;
+
+  const parts = [];
+
+  if (state.dirty.size) {
+    parts.push(h('p', { class: 'mg-pub__warn',
+      text: 'You have unsaved edits. Save them first, or they will not be included.' }));
+  }
+
+  if (git.mine.length) {
+    parts.push(h('p', { class: 'mg-field__label', text: 'Will be published' }));
+    parts.push(h('ul', { class: 'mg-pub__files' },
+      git.mine.map((c) => h('li', {},
+        h('span', { class: 'mg-pub__state', text: STATE_WORDS[c.state] || c.state }),
+        h('span', { text: c.path })))));
+  } else if (git.unpushed > 0) {
+    parts.push(h('p', { class: 'mg-hint',
+      text: `No new edits, but ${plural(git.unpushed, 'commit')} have never been pushed.` }));
+  } else {
+    parts.push(h('p', { class: 'cmp__none', text: 'Nothing to publish — everything is up to date.' }));
+    $('#pub-go').disabled = true;
+  }
+
+  if (git.others.length) {
+    parts.push(h('p', { class: 'mg-field__label', text: 'Left alone' }));
+    parts.push(h('ul', { class: 'mg-pub__files mg-pub__files--muted' },
+      git.others.map((c) => h('li', {},
+        h('span', { class: 'mg-pub__state', text: STATE_WORDS[c.state] || c.state }),
+        h('span', { text: c.path })))));
+    parts.push(h('p', { class: 'mg-hint',
+      text: 'The manager only publishes what it edits. Handle these in git yourself.' }));
+  }
+
+  if (!git.remote) $('#pub-go').disabled = true;
+  body.replaceChildren(...parts);
+}
+
+async function doPublish() {
+  const status = $('#pub-status');
+  $('#pub-go').disabled = true;
+  status.hidden = false;
+  status.dataset.kind = 'info';
+  status.textContent = 'Publishing…';
+
+  try {
+    const res = await fetch('/api/publish', {
+      method: 'POST', headers: API.headers,
+      body: JSON.stringify({ message: $('#pub-message').value }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Publish failed.');
+    status.dataset.kind = 'info';
+    status.textContent = `${json.summary}  Your site updates in a minute or so.`;
+    $('#pub-message').value = '';
+  } catch (err) {
+    status.dataset.kind = 'error';
+    status.textContent = err.message;
+    $('#pub-go').disabled = false;
+  }
+}
+
 /* --- Tabs and boot -------------------------------------------------------- */
 
 
@@ -855,6 +944,9 @@ async function boot() {
   });
 
   $('#save').addEventListener('click', save);
+  $('#publish').addEventListener('click', openPublisher);
+  $('#pub-go').addEventListener('click', doPublish);
+  $('#pub-cancel').addEventListener('click', () => $('#publisher').close());
 
   $('#theme-toggle').addEventListener('click', () => {
     const root = document.documentElement;

@@ -15,6 +15,7 @@
 //     leave a half-written collection behind
 
 import { writeFile, rename, readFile, mkdir, rm } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
 import { join } from 'node:path';
 import {
   ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH, SCHEMA_VERSION,
@@ -86,6 +87,101 @@ function validateConfig(data) {
     throw new Error('"friends" should be a list.');
   }
   return data;
+}
+
+/* --- Publishing ----------------------------------------------------------- */
+
+/**
+ * The paths the manager writes, and therefore the only ones it offers to
+ * publish. Anything else you have changed stays yours to handle in git, and is
+ * reported rather than silently swept into a commit.
+ */
+const PUBLISHABLE = ['data', 'assets/profile', 'index.html'];
+
+/** Run git without a shell, so nothing here can be interpolated into one. */
+function git(args, { cwd = ROOT } = {}) {
+  return new Promise((resolve) => {
+    execFile('git', args, { cwd, maxBuffer: 4 * 1024 * 1024 }, (error, stdout, stderr) => {
+      resolve({
+        ok: !error,
+        code: error?.code ?? 0,
+        stdout: String(stdout || '').trim(),
+        stderr: String(stderr || '').trim(),
+      });
+    });
+  });
+}
+
+/** What would be published, and whether publishing is even possible. */
+async function gitStatus() {
+  const inside = await git(['rev-parse', '--is-inside-work-tree']);
+  if (!inside.ok) return { isRepo: false };
+
+  const [branch, remote, porcelain] = await Promise.all([
+    git(['rev-parse', '--abbrev-ref', 'HEAD']),
+    git(['remote', 'get-url', 'origin']),
+    git(['status', '--porcelain']),
+  ]);
+
+  const changes = porcelain.stdout.split('\n').filter(Boolean).map((line) => ({
+    state: line.slice(0, 2).trim(),
+    path: line.slice(3).replace(/^"|"$/g, ''),
+  }));
+
+  const isOurs = (p) => PUBLISHABLE.some((base) => p === base || p.startsWith(`${base}/`));
+
+  // How far ahead of the remote we are, so "nothing to publish" can tell the
+  // difference between "no changes" and "committed but never pushed".
+  let unpushed = 0;
+  if (remote.ok) {
+    const counted = await git(['rev-list', '--count', `origin/${branch.stdout}..HEAD`]);
+    unpushed = counted.ok ? Number(counted.stdout) || 0 : 0;
+  }
+
+  return {
+    isRepo: true,
+    branch: branch.stdout || null,
+    remote: remote.ok ? remote.stdout : null,
+    unpushed,
+    mine: changes.filter((c) => isOurs(c.path)),
+    others: changes.filter((c) => !isOurs(c.path)),
+  };
+}
+
+/** Stage the manager's files, commit, and push. */
+async function gitPublish(message) {
+  const status = await gitStatus();
+  if (!status.isRepo) throw new Error('This folder is not a git repository.');
+  if (!status.remote) {
+    throw new Error('No "origin" remote is set, so there is nowhere to publish to. '
+      + 'Create the repo on GitHub and add it with `git remote add origin <url>`.');
+  }
+
+  const summary = [];
+
+  if (status.mine.length) {
+    const add = await git(['add', '--', ...PUBLISHABLE]);
+    if (!add.ok) throw new Error(`git add failed: ${add.stderr}`);
+
+    const subject = String(message || '').trim() || 'Update collection';
+    const commit = await git(['commit', '-m', subject]);
+    // "nothing to commit" is a normal outcome, not a failure.
+    if (!commit.ok && !/nothing to commit/i.test(commit.stdout + commit.stderr)) {
+      throw new Error(`git commit failed: ${commit.stderr || commit.stdout}`);
+    }
+    if (commit.ok) summary.push(`Committed ${status.mine.length} file(s).`);
+  }
+
+  const push = await git(['push']);
+  if (!push.ok) {
+    throw new Error(
+      `Committed locally, but the push failed:\n${push.stderr || push.stdout}\n\n`
+      + 'This is usually credentials. Run `git push` in a terminal once to sort it out.'
+    );
+  }
+
+  summary.push('Pushed to ' + status.remote.replace(/^https:\/\/[^@]*@/, 'https://'));
+  return { summary: summary.join(' '), after: await gitStatus() };
 }
 
 const INDEX_PATH = join(ROOT, 'index.html');
@@ -308,6 +404,17 @@ export async function handleApi(req, res, { port }) {
           };
         }),
       });
+      return true;
+    }
+
+    if (route === 'git' && req.method === 'GET') {
+      send(res, 200, await gitStatus());
+      return true;
+    }
+
+    if (route === 'publish' && req.method === 'POST') {
+      const body = await readJsonBody(req).catch(() => ({}));
+      send(res, 200, await gitPublish(body?.message));
       return true;
     }
 
