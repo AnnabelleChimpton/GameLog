@@ -13,6 +13,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 export const COLLECTION_PATH = join(ROOT, 'data', 'collection.json');
 export const CONFIG_PATH = join(ROOT, 'data', 'config.json');
+export const LISTS_PATH = join(ROOT, 'data', 'lists.json');
 export { ROOT };
 
 /** Field order used when writing entries back out, so diffs stay readable. */
@@ -53,6 +54,29 @@ export async function saveCollection(collection) {
     hardware: collection.hardware.map((h) => orderKeys(h, HARDWARE_KEYS)),
   };
   await writeFile(COLLECTION_PATH, JSON.stringify(out, null, 2) + '\n', 'utf8');
+}
+
+/* --- Lists ---------------------------------------------------------------- */
+
+const LIST_KEYS = ['id', 'name', 'description', 'items'];
+const ITEM_KEYS = ['ref', 'title', 'platform', 'note', 'year', 'cover', 'description',
+  'genres', 'developer', 'publisher', 'igdbId'];
+
+export async function loadLists() {
+  if (!existsSync(LISTS_PATH)) return { lists: [] };
+  const data = JSON.parse(await readFile(LISTS_PATH, 'utf8'));
+  return { lists: Array.isArray(data.lists) ? data.lists : [] };
+}
+
+export async function saveLists(data) {
+  const out = {
+    lists: data.lists.map((list) => {
+      const ordered = orderKeys(list, LIST_KEYS);
+      ordered.items = (list.items || []).map((item) => orderKeys(item, ITEM_KEYS));
+      return ordered;
+    }),
+  };
+  await writeFile(LISTS_PATH, JSON.stringify(out, null, 2) + '\n', 'utf8');
 }
 
 /** A stable, readable, URL-safe id like "nintendo-64-goldeneye-007". */

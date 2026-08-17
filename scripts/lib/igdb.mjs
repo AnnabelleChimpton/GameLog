@@ -193,7 +193,14 @@ export async function findGame(query, { title, platform }) {
   return best ? { ...best.game, _matchScore: best.score } : null;
 }
 
-/** Free-text search returning several candidates, for the interactive adder. */
+/**
+ * Free-text search returning several candidates, best first.
+ *
+ * Ranking matters more than it looks: whoever runs this non-interactively takes
+ * candidate 1 sight unseen. Sorting on "has cover art" alone once put the ROM
+ * hack "Chrono Trigger+" above Chrono Trigger, so an exact title match and a
+ * real main-game release both outrank prettiness.
+ */
 export async function searchGames(query, term, { platform = null, limit = 8 } = {}) {
   const igdbPlatform = platform ? platformInfo(platform).igdb : null;
   const where = igdbPlatform ? ` where platforms = (${igdbPlatform});` : '';
@@ -201,10 +208,32 @@ export async function searchGames(query, term, { platform = null, limit = 8 } = 
     'games',
     `${FIELDS} search "${escapeQuotes(term)}";${where} limit ${limit * 3};`
   );
-  // Games with cover art first -- they're what you actually want to pick.
+
+  const wanted = normalizeForCompare(term);
+  const rank = (g) => {
+    let score = 0;
+    const name = normalizeForCompare(g.name || '');
+    if (name === wanted) score += 100;
+    else if (name.startsWith(wanted)) score += 40;
+    else if (name.includes(wanted)) score += 15;
+    // parent_game is the reliable tell for a derivative. IGDB leaves `category`
+    // off the response entirely for main games, so testing it for 0 matches
+    // nothing -- every ROM hack of Chrono Trigger carries parent_game 1802
+    // while the 1995 original carries none.
+    if (g.parent_game || g.version_parent) score -= 60;
+    else score += 25;
+    // A total_rating means real reviews, which fan patches never have.
+    if (typeof g.total_rating === 'number') score += 20;
+    if (g.cover?.image_id) score += 10;
+    if (g.first_release_date) score += 5;
+    return score;
+  };
+
   return results
-    .sort((a, b) => (b.cover?.image_id ? 1 : 0) - (a.cover?.image_id ? 1 : 0))
-    .slice(0, limit);
+    .map((g) => ({ g, score: rank(g) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((x) => x.g);
 }
 
 function normalizeForCompare(s) {
@@ -232,9 +261,10 @@ function scoreMatch(game, wantedTitle, igdbPlatform, platformFiltered) {
     else score -= 15;
   }
 
-  // Prefer main games over DLC/bundles/ports (IGDB category 0 = main_game).
+  // Prefer originals over hacks, ports, bundles and DLC. parent_game is the
+  // dependable signal; `category` is simply absent on main-game responses.
   if (game.category !== undefined && game.category !== 0) score -= 8;
-  if (game.version_parent) score -= 12;
+  if (game.parent_game || game.version_parent) score -= 25;
 
   // A cover is the whole point of the lookup.
   if (!game.cover?.image_id) score -= 20;

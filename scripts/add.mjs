@@ -29,7 +29,10 @@ function parseArgs(argv) {
 }
 
 const rl = createInterface({ input: stdin, output: stdout });
+
+/** Ask, unless nobody is there to answer -- scripted runs take the fallback. */
 const ask = async (q, fallback = '') => {
+  if (!stdin.isTTY) return fallback;
   const answer = (await rl.question(q)).trim();
   return answer || fallback;
 };

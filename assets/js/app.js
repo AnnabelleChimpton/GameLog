@@ -5,7 +5,7 @@
 // A few hundred games is small enough that re-rendering on every keystroke is
 // imperceptible, so there is no virtualisation to reason about.
 //
-// Four views share one filter state: shelf, timeline, stats, compare.
+// Five views share one filter state: shelf, timeline, lists, stats, compare.
 
 import { platformInfo, platformSortIndex } from './platforms.mjs';
 import {
@@ -15,6 +15,7 @@ import {
 import { renderStats } from './stats.js';
 import { renderTimeline } from './timeline.js';
 import * as compare from './compare.js';
+import { renderLists } from './lists.js';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -40,6 +41,7 @@ const el = {
   themeToggle: $('#theme-toggle'),
   viewShelf: $('#view-shelf'),
   viewTimeline: $('#view-timeline'),
+  viewLists: $('#view-lists'),
   viewStats: $('#view-stats'),
   viewCompare: $('#view-compare'),
   cmpForm: $('#cmp-form'),
@@ -61,13 +63,15 @@ const el = {
   dClose: $('.detail__close'),
 };
 
-const VIEWS = ['shelf', 'timeline', 'stats', 'compare'];
+const VIEWS = ['shelf', 'timeline', 'lists', 'stats', 'compare'];
 
 const state = {
   games: [],
   hardware: [],
+  lists: [],
   config: {},
   view: 'shelf',
+  list: null,
   query: '',
   platform: 'all',
   condition: 'all',
@@ -258,6 +262,7 @@ function render() {
 
   el.viewShelf.hidden = state.view !== 'shelf';
   el.viewTimeline.hidden = state.view !== 'timeline';
+  el.viewLists.hidden = state.view !== 'lists';
   el.viewStats.hidden = state.view !== 'stats';
   el.viewCompare.hidden = state.view !== 'compare';
 
@@ -268,7 +273,7 @@ function render() {
   el.statline.hidden = !listy;
   el.dice.hidden = !listy;
   el.notesToggle.hidden = !listy;
-  el.search.closest('.search').hidden = state.view === 'stats' || state.view === 'compare';
+  el.search.closest('.search').hidden = state.view !== 'shelf' && state.view !== 'timeline';
   el.sort.closest('.select').hidden = state.view !== 'shelf';
   el.condition.closest('.select').hidden = !listy;
 
@@ -280,6 +285,12 @@ function render() {
     renderCount();
     el.viewTimeline.replaceChildren(
       renderTimeline(state.visible, { onOpen: openByGame }));
+  } else if (state.view === 'lists') {
+    el.viewLists.replaceChildren(renderLists(state.lists, state.games, {
+      selected: state.list,
+      onSelect: (id) => { state.list = id; writeUrl(); render(); },
+      onOpen: openFromAnywhere,
+    }));
   } else if (state.view === 'stats') {
     el.viewStats.replaceChildren(renderStats(state.games, state.hardware));
   }
@@ -435,6 +446,24 @@ function closeDetail() {
   if (el.dialog.open) el.dialog.close();
 }
 
+/**
+ * Open a game picked from a view that isn't the shelf. The dialog steps through
+ * `visible`, so the game has to be in it -- if the current filters exclude it,
+ * drop them rather than opening nothing.
+ */
+function openFromAnywhere(game) {
+  const inView = state.visible.some((g) => g.id === game.id);
+  if (!inView) {
+    state.query = '';
+    state.platform = 'all';
+    state.condition = 'all';
+    state.notesOnly = false;
+    syncControls();
+  }
+  setView('shelf');
+  openByGame(game);
+}
+
 function step(delta) {
   const next = state.openIndex + delta;
   if (next >= 0 && next < state.visible.length) openDetail(next);
@@ -474,15 +503,7 @@ async function runComparison(input) {
 
     cmpStatus('');
     el.cmpOutput.replaceChildren(
-      compare.renderComparison(result, label, { onOpen: (game) => {
-        setView('shelf');
-        // Clear filters first, or the game may not be in the visible list.
-        state.query = ''; state.platform = 'all'; state.condition = 'all';
-        state.notesOnly = false;
-        syncControls();
-        render();
-        openByGame(game);
-      } }));
+      compare.renderComparison(result, label, { onOpen: openFromAnywhere }));
 
     el.cmpUrl.value = input;
     writeUrl();
@@ -516,6 +537,7 @@ function readUrl() {
   state.platform = params.get('platform') || 'all';
   state.condition = params.get('condition') || 'all';
   state.notesOnly = params.get('notes') === '1';
+  state.list = params.get('list') || null;
   state.sort = params.get('sort') || state.config.defaultSort || 'title';
 }
 
@@ -526,6 +548,7 @@ function writeUrl() {
   if (state.platform !== 'all') params.set('platform', state.platform);
   if (state.condition !== 'all') params.set('condition', state.condition);
   if (state.notesOnly) params.set('notes', '1');
+  if (state.view === 'lists' && state.list) params.set('list', state.list);
   if (state.sort !== (state.config.defaultSort || 'title')) params.set('sort', state.sort);
   if (state.view === 'compare' && el.cmpUrl.value.trim()) {
     params.set('with', el.cmpUrl.value.trim());
@@ -675,14 +698,21 @@ async function boot() {
 
   let collection;
   let config = {};
+  let lists = [];
   try {
-    const [collectionRes, configRes] = await Promise.all([
+    const [collectionRes, configRes, listsRes] = await Promise.all([
       fetch('data/collection.json', { cache: 'no-cache' }),
       fetch('data/config.json', { cache: 'no-cache' }).catch(() => null),
+      fetch('data/lists.json', { cache: 'no-cache' }).catch(() => null),
     ]);
     if (!collectionRes.ok) throw new Error(`HTTP ${collectionRes.status}`);
     collection = await collectionRes.json();
     if (configRes?.ok) config = await configRes.json();
+    // Lists are optional -- a collection with no lists.json still works.
+    if (listsRes?.ok) {
+      const parsed = await listsRes.json().catch(() => null);
+      if (Array.isArray(parsed?.lists)) lists = parsed.lists;
+    }
   } catch (err) {
     el.grid.hidden = true;
     el.empty.hidden = false;
@@ -702,6 +732,7 @@ async function boot() {
     _condition: conditionGroup(g.condition),
   }));
   state.hardware = collection.hardware || [];
+  state.lists = lists;
 
   // Config-driven chrome.
   if (config.accent) document.documentElement.style.setProperty('--accent', config.accent);

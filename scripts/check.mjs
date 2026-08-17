@@ -6,7 +6,7 @@
 // invalid JSON, missing required fields, duplicate ids, unknown platforms,
 // and how much is still waiting on `npm run enrich`.
 
-import { loadCollection, COLLECTION_PATH } from './lib/collection.mjs';
+import { loadCollection, loadLists, COLLECTION_PATH } from './lib/collection.mjs';
 import { PLATFORMS, platformInfo } from '../assets/js/platforms.mjs';
 
 const problems = [];
@@ -57,12 +57,63 @@ for (const [kind, items] of [['game', games], ['hardware', hardware]]) {
   });
 }
 
+/* --- Lists ---------------------------------------------------------------- */
+
+let lists = { lists: [] };
+try {
+  lists = await loadLists();
+} catch (err) {
+  problems.push(`data/lists.json is not valid JSON: ${err.message}`);
+}
+
+const listIds = new Set();
+const gameIds = new Set(games.map((g) => g.id));
+let wantedCount = 0;
+
+for (const list of lists.lists) {
+  const label = list.name || list.id || '<unnamed list>';
+  if (!list.id) problems.push(`${label}: a list needs an "id"`);
+  else if (listIds.has(list.id)) problems.push(`two lists share the id "${list.id}"`);
+  else listIds.add(list.id);
+
+  if (!Array.isArray(list.items)) {
+    problems.push(`${label}: "items" should be a list`);
+    continue;
+  }
+
+  for (const item of list.items) {
+    if (!item || (!item.ref && !item.title)) {
+      problems.push(`${label}: an entry has neither "ref" nor "title"`);
+      continue;
+    }
+    // A dangling ref is the one list error that shows up on the page, as a
+    // tile with an exclamation mark and no artwork.
+    if (item.ref && !gameIds.has(item.ref)) {
+      warnings.push(
+        `${label}: "${item.ref}" doesn't match any game id — that entry will ` +
+        `show as broken. Either fix the id or replace it with a "title".`
+      );
+    }
+    if (!item.ref && !games.some((g) =>
+      g.title.toLowerCase().replace(/[^a-z0-9]/g, '')
+        === String(item.title).toLowerCase().replace(/[^a-z0-9]/g, ''))) {
+      wantedCount += 1;
+    }
+  }
+}
+
 const noCover = games.filter((g) => !g.cover);
 const noDescription = games.filter((g) => !g.description);
 const noYear = games.filter((g) => !g.year);
 
 console.log(`${COLLECTION_PATH.replace(process.cwd() + '/', '')}`);
-console.log(`  ${games.length} games, ${hardware.length} hardware items\n`);
+console.log(`  ${games.length} games, ${hardware.length} hardware items`);
+if (lists.lists.length) {
+  const items = lists.lists.reduce((n, l) => n + (l.items?.length || 0), 0);
+  console.log(`  ${lists.lists.length} list(s), ${items} entries` +
+    (wantedCount ? `, ${wantedCount} not owned yet` : ''));
+}
+console.log('');
 
 if (problems.length) {
   console.log(`${problems.length} problem(s) to fix:`);

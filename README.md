@@ -12,6 +12,7 @@ scripts that fetch cover art are optional and run on your own machine.
 
 - **Shelf** — the cover grid, with search, platform filters and sorting.
 - **Timeline** — your collection by release year, gaps and all.
+- **Lists** — backlogs, wishlists, favourites; owned games and hunted ones.
 - **Stats** — decades, platforms, genres, scores and condition at a glance.
 - **Compare** — point it at *somebody else's* GameLog and see what you share.
 
@@ -134,6 +135,66 @@ npm run add "Chrono Trigger" -- --platform "SNES/Super Famicom" --condition CIB
 
 ---
 
+## Lists
+
+A list is any named set of games — a backlog, a wishlist, the ones you'd save
+from a fire. Entries can be games you own *or* games you're still hunting.
+
+```bash
+npm run list
+```
+
+That walks you through it. The direct forms:
+
+```bash
+npm run list -- new "The hunt"
+npm run list -- add the-hunt "Chrono Trigger" --platform "SNES/Super Famicom"
+npm run list -- rm the-hunt "Chrono Trigger"
+npm run list -- show
+```
+
+Add a game you already own and it stores a `ref` to your collection entry. Add
+one you don't and it stores the title, looking up cover art so the tile still
+looks like something.
+
+**The part worth knowing:** entries are resolved against your collection on
+every page load, not frozen when you add them. Put *Chrono Trigger* on your
+hunting list, buy it a year later, run `npm run add "Chrono Trigger"` — and the
+list entry turns from wanted into owned by itself. Nothing to edit, and the
+"3 of 7 owned" meter moves on its own.
+
+Wanted games render dimmed with a **want** badge; owned ones are full colour and
+open their details on click.
+
+### The file
+
+`data/lists.json`, and it's plain enough to write by hand:
+
+```json
+{
+  "lists": [
+    {
+      "id": "the-hunt",
+      "name": "The hunt",
+      "description": "Actively looking for these.",
+      "items": [
+        { "title": "Panzer Dragoon Saga", "platform": "Sega Saturn", "note": "disc only is fine" },
+        { "ref": "nintendo-64-banjo-kazooie", "note": "want a boxed copy" }
+      ]
+    }
+  ]
+}
+```
+
+Each entry is either a `ref` (a game `id` from your collection) or a `title`
+(plus an optional `platform` to pin which version you want). `note` is yours to
+use however. Order is preserved, so a "play next" list stays in the order you
+put it in. `npm run check` warns about a `ref` that doesn't match anything.
+
+One caveat on the scripted form: `npm run list -- add …` run without a terminal
+takes the first search result sight unseen. Run it interactively when the title
+is ambiguous — there are a lot of *Chrono Trigger* ROM hacks.
+
 ## Cover art
 
 Cover art and descriptions come from [IGDB](https://www.igdb.com), which is free
@@ -232,9 +293,11 @@ assets/js/app.js         state, routing, the shelf, the detail dialog
 assets/js/lib.js         helpers shared by every view
 assets/js/stats.js       the stats view and its charts
 assets/js/timeline.js    the by-year view
+assets/js/lists.js       lists, and resolving entries against the collection
 assets/js/compare.js     fetching and diffing another collection
 assets/js/platforms.mjs  the platform registry — names, colours, IGDB ids
 data/collection.json     your games and hardware
+data/lists.json          your lists (optional)
 data/config.json         site title, tagline, accent colour, friends
 scripts/                 the optional Node helpers
 ```
