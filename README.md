@@ -85,8 +85,8 @@ the easiest way in. The rest of these work just as well.
 }
 ```
 
-**Let a script look it up.** This is the easy way — it finds the cover art,
-description, year and genres for you:
+**Let a script look it up.** It finds the cover art, description and year for
+you, with no signup required:
 
 ```bash
 npm run add "Hades"
@@ -305,10 +305,50 @@ One caveat on the scripted form: `npm run list -- add …` run without a termina
 takes the first search result sight unseen. Run it interactively when the title
 is ambiguous — there are a lot of *Chrono Trigger* ROM hacks.
 
-## Cover art
+## Cover art and descriptions
 
-Cover art and descriptions come from [IGDB](https://www.igdb.com), which is free
-but wants you to register. It takes about two minutes and you only do it once.
+```bash
+npm run enrich
+```
+
+That works with **no signup at all**. It fills in whatever is missing and never
+overwrites something you edited yourself, so it's safe to re-run.
+
+There are two sources and it picks for you:
+
+| | Setup | Box art | Text | Current-gen |
+| --- | --- | --- | --- | --- |
+| **Keyless** (default) | none | [libretro](https://thumbnails.libretro.com) | [Wikipedia](https://en.wikipedia.org) | ✗ |
+| **IGDB** | free Twitch app, ~2 min | [IGDB](https://www.igdb.com) | IGDB | ✓ |
+
+With no credentials configured it uses the keyless sources and tells you so.
+
+### The keyless source
+
+libretro publishes scanned box art so emulator frontends can display it, and
+serves it openly. It's excellent on anything emulated and **absent on
+current-gen** — nothing has scanned PlayStation 5 or Switch boxes there, because
+nobody emulates them. On this collection it matched 95% of games on the
+platforms it covers.
+
+Wikipedia supplies the descriptions and release years, batched 50 titles per
+request so a whole collection costs a handful of calls.
+
+Two things worth being straight about:
+
+- It's scanned publisher artwork, exactly like IGDB's. Keyless is a **setup**
+  improvement, not a licensing one.
+- Wikipedia is used for words only, never images. Almost all game box art there
+  is non-free content under a fair-use rationale that covers the article, not
+  reuse on your site.
+
+For anything the keyless source misses, open `npm run manage` and drop in an
+image or paste a url — no API involved.
+
+### IGDB, if you want current-gen covered
+
+One database for everything, plus genres and companies. It needs a free Twitch
+developer application, which takes about two minutes and is done once.
 
 1. Go to [dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps) and log
    in (IGDB is owned by Twitch, so it uses a Twitch login).
@@ -318,24 +358,10 @@ but wants you to register. It takes about two minutes and you only do it once.
    - **Category** — Application Integration
    - **Client Type** — Confidential
 3. Copy the **Client ID**, then click **New Secret** and copy that too.
-4. Save them locally:
+4. `cp .env.example .env` and paste both in.
 
-```bash
-cp .env.example .env
-```
-
-Paste both values into `.env`. It is gitignored, so your keys never leave your
-machine — and the published site never needs them, because the art urls are
+`.env` is gitignored, and the published site never needs it — the image urls are
 baked into `collection.json`.
-
-Then fill in everything that's missing:
-
-```bash
-npm run enrich
-```
-
-Re-run it any time. It only touches entries that are still missing something and
-never overwrites anything you edited yourself, so it's safe to run repeatedly.
 
 | Command | What it does |
 | --- | --- |
@@ -343,13 +369,12 @@ never overwrites anything you edited yourself, so it's safe to run repeatedly.
 | `npm run enrich -- --force` | Refetch everything, overwriting |
 | `npm run enrich -- --only <id>` | Redo a single entry |
 | `npm run enrich -- --dry-run` | Show what would change, write nothing |
+| `npm run enrich -- --source free` | Keyless sources even if you have keys |
+| `npm run enrich -- --source igdb` | Require IGDB |
 
-Anything IGDB can't find keeps a generated placeholder cover — a wash of the
-platform's colour with its name. Those tiles show their title permanently, so
-the shelf still reads properly. To fix one by hand, paste any image url into its
-`cover` field.
-
----
+Anything still without art keeps a generated placeholder — a wash of the
+platform's colour with its name — and those tiles show their title permanently,
+so the shelf still reads properly.
 
 ## Preview before you push
 
@@ -411,6 +436,8 @@ assets/js/manage.js      the local manager UI
 manage.html              the manager page (local use only)
 assets/js/compare.js     fetching and diffing another collection
 assets/js/platforms.mjs  the platform registry — names, colours, IGDB ids
+scripts/lib/libretro.mjs keyless box art
+scripts/lib/wikipedia.mjs keyless descriptions and years
 data/collection.json     your games and hardware
 data/lists.json          your lists (optional)
 data/config.json         site title, tagline, accent colour, friends
@@ -440,9 +467,14 @@ shown.
 | `metacritic` | 0–100 |
 | `notes` | Anything personal; shown in the detail view |
 | `added` | `YYYY-MM-DD`, used by the "Recently added" sort |
+| `igdbId` / `wikidataId` | Set by `enrich`. Stable ids that let one collection be matched against another exactly, rather than by title |
 
 `hardware` entries use `name` instead of `title` and `image` instead of `cover`,
 and appear in their own section at the bottom of the page.
+
+The file also carries `"gamelog": 1` — a schema version, so that anything
+reading a collection over the network (the Compare view, or an index across many
+sites later) can tell which format it's looking at rather than guessing.
 
 ---
 
@@ -475,5 +507,9 @@ on the game itself.
 
 ## Licence
 
-MIT. Cover art and game descriptions come from
-[IGDB](https://www.igdb.com) and belong to their respective owners.
+MIT, for the code.
+
+Cover art and descriptions come from [IGDB](https://www.igdb.com),
+[libretro](https://thumbnails.libretro.com) and [Wikipedia](https://en.wikipedia.org)
+depending on which source you use. The artwork itself belongs to its respective
+publishers — none of it is mine to license.

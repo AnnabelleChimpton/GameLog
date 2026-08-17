@@ -1,4 +1,5 @@
 {
+  "gamelog": 1,
   "games": [
     {
       "id": "nintendo-gamecube-1080-avalanche",
@@ -291,7 +292,7 @@
       "platform": "Nintendo 64",
       "year": 1997,
       "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/coafzh.jpg",
-      "description": null,
+      "description": "Chameleon Twist is a 1997 video game developed by Japan System Supply, published by Japan System Supply in Japan, and published by Sunsoft in North America and Europe for the Nintendo 64. Though disliked by critics due to its easy gameplay, repetitive music, and awkward camera angles, Chameleon Twist was followed by a sequel titled Chameleon Twist 2. This 3D platform game has players take on the role of one of four anthropomorphic chameleons, and travel across six themed worlds.",
       "genres": [
         "Platformer"
       ],
@@ -304,7 +305,8 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-11",
-      "igdbId": 366631
+      "igdbId": 366631,
+      "wikidataId": "Q2948513"
     },
     {
       "id": "nintendo-64-command-and-conquer",
@@ -2435,9 +2437,9 @@
       "id": "microsoft-xbox-360-pocketbike-racer",
       "title": "Pocketbike Racer",
       "platform": "Microsoft Xbox 360",
-      "year": null,
+      "year": 2006,
       "cover": null,
-      "description": null,
+      "description": "PocketBike Racer is a racing game developed by Blitz Games and published by King Games for the Xbox and Xbox 360 video game consoles, released in 2006. Burger King sold the game with the purchase of value meals. It is one of three titles released by Burger King.",
       "genres": [
         "Racing"
       ],
@@ -2449,7 +2451,8 @@
       "copies": 1,
       "metacritic": 54,
       "notes": null,
-      "added": "2026-08-17"
+      "added": "2026-08-17",
+      "wikidataId": "Q7206363"
     },
     {
       "id": "nintendo-switch-pokemon-shield",

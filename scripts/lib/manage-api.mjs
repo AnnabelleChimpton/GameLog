@@ -17,7 +17,7 @@
 import { writeFile, rename, readFile, mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
-  ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH,
+  ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH, SCHEMA_VERSION,
 } from './collection.mjs';
 import { loadEnv, getToken, createClient, searchGames, coverUrl, tidySummary, releaseYear, companies } from './igdb.mjs';
 
@@ -58,7 +58,7 @@ function validateCollection(data) {
       throw new Error(`"${game.title}" needs a platform.`);
     }
   }
-  return { games: data.games, hardware: data.hardware || [] };
+  return { gamelog: SCHEMA_VERSION, games: data.games, hardware: data.hardware || [] };
 }
 
 function validateLists(data) {

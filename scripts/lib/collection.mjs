@@ -48,8 +48,19 @@ export async function loadCollection() {
   };
 }
 
+/**
+ * Bumped only when the shape of this file changes incompatibly.
+ *
+ * It exists so anything reading somebody else's collection over the network --
+ * the Compare view today, an index over many sites later -- can tell which
+ * format it is looking at instead of inferring it from which keys happen to
+ * be present.
+ */
+export const SCHEMA_VERSION = 1;
+
 export async function saveCollection(collection) {
   const out = {
+    gamelog: SCHEMA_VERSION,
     games: collection.games.map((g) => orderKeys(g, GAME_KEYS)),
     hardware: collection.hardware.map((h) => orderKeys(h, HARDWARE_KEYS)),
   };
