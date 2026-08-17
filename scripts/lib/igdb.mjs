@@ -114,14 +114,46 @@ function escapeQuotes(s) {
   return String(s).replace(/"/g, '\\"');
 }
 
+/** Edition wording that catalogues carry but IGDB's game titles do not. */
+const EDITION_SUFFIX =
+  /[\s:,-]*\b((collector'?s|special|limited|deluxe|premium|launch|anniversary|legacy|gold|platinum|definitive|complete|player'?s choice|best seller|greatest hits|not for resale)\b[\s-]*)*(edition|choice|hits|seller)\b\s*$/i;
+
+/**
+ * Search terms to try for one shelf title, most faithful first.
+ *
+ * Retail titles rarely match a database exactly: they carry edition wording,
+ * a licence prefix, or an article the exporter dropped. Each variant is a
+ * different guess at the underlying game, and scoring still decides the winner.
+ */
+function titleVariants(title) {
+  const base = searchableTitle(title);
+  const variants = [base];
+
+  const withoutEdition = base.replace(EDITION_SUFFIX, '').trim();
+  if (withoutEdition && withoutEdition !== base) variants.push(withoutEdition);
+
+  // "Advanced Dungeons & Dragons: DeathKeep" is catalogued by IGDB as just
+  // "Deathkeep" -- the part before the colon is the licence, not the game.
+  const colon = base.indexOf(':');
+  if (colon > 0) {
+    const after = base.slice(colon + 1).trim();
+    const before = base.slice(0, colon).trim();
+    if (after.length > 2) variants.push(after);
+    if (before.length > 2) variants.push(before);
+  }
+
+  // Gameye files "The Legend of Zelda" under "Legend of Zelda".
+  if (!/^(the|a|an)\s/i.test(base)) variants.push(`The ${base}`);
+
+  return [...new Set(variants)];
+}
+
 /**
  * Find the best IGDB match for a title on a given platform.
  *
- * Strategy, most trustworthy first:
- *   1. search the cleaned title, filtered to the platform
- *   2. search the cleaned title with no platform filter
- *   3. search the title with any leading article restored ("Legend of Zelda"
- *      is how Gameye writes "The Legend of Zelda")
+ * Each title variant is tried platform-filtered first, then unfiltered, and
+ * every result is scored against the original title. The search stops as soon
+ * as something scores as a confident, platform-confirmed match.
  *
  * Returns null rather than guessing wildly when nothing scores well.
  */
@@ -130,19 +162,15 @@ export async function findGame(query, { title, platform }) {
   const igdbPlatform = platformInfo(platform).igdb;
 
   const attempts = [];
-  if (igdbPlatform) {
+  for (const variant of titleVariants(title)) {
+    if (igdbPlatform) {
+      attempts.push({
+        body: `${FIELDS} search "${escapeQuotes(variant)}"; where platforms = (${igdbPlatform}); limit 20;`,
+        platformFiltered: true,
+      });
+    }
     attempts.push({
-      body: `${FIELDS} search "${escapeQuotes(clean)}"; where platforms = (${igdbPlatform}); limit 20;`,
-      platformFiltered: true,
-    });
-  }
-  attempts.push({
-    body: `${FIELDS} search "${escapeQuotes(clean)}"; limit 20;`,
-    platformFiltered: false,
-  });
-  if (/^(Legend of|Lord of the|Last of Us|Incredible|Perfect General|Daedalus)/i.test(clean)) {
-    attempts.push({
-      body: `${FIELDS} search "The ${escapeQuotes(clean)}"; limit 20;`,
+      body: `${FIELDS} search "${escapeQuotes(variant)}"; limit 20;`,
       platformFiltered: false,
     });
   }
@@ -151,6 +179,8 @@ export async function findGame(query, { title, platform }) {
   for (const attempt of attempts) {
     const results = await query('games', attempt.body);
     if (!results.length) continue;
+    // Always score against the real title, never the variant that found it --
+    // otherwise a loose variant would score its own loose match too highly.
     const scored = results
       .map((g) => ({ game: g, score: scoreMatch(g, clean, igdbPlatform, attempt.platformFiltered) }))
       .filter((s) => s.score > 0)

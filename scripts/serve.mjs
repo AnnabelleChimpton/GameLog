@@ -46,7 +46,10 @@ const server = createServer(async (req, res) => {
     const body = await readFile(path);
     res.writeHead(200, {
       'Content-Type': TYPES[extname(path).toLowerCase()] || 'application/octet-stream',
-      'Cache-Control': 'no-cache',
+      // no-store, not no-cache: this server sends no ETag or Last-Modified, so
+      // "revalidate" gives the browser nothing to revalidate against and it
+      // keeps serving a stale file. You would edit CSS and see no change.
+      'Cache-Control': 'no-store',
     });
     res.end(body);
   } catch {

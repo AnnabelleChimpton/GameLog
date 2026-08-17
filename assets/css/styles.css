@@ -734,7 +734,11 @@ main {
   border-radius: 0 7px 7px 0;
 }
 
-/* Prev / next float outside the dialog on wide screens, inline on narrow. */
+/* Prev / next sit in the gutters beside the dialog, but only where gutters
+   actually exist: the dialog is up to 920px and each button needs 56px, so
+   below ~1032px of viewport they have nowhere to go and become a footer bar
+   instead. Keyed to that total, not to a layout breakpoint -- guessing at a
+   round number here is what put the buttons on top of the text. */
 .detail__nav {
   position: absolute;
   inset: 0 -56px;
@@ -761,16 +765,32 @@ main {
 .detail__step:hover { transform: scale(1.09); border-color: var(--border-strong); }
 .detail__step[disabled] { opacity: 0.3; cursor: default; transform: none; }
 
+@media (max-width: 1032px) {
+  .detail__inner { padding-bottom: 74px; }
+
+  /* The stepper needs its own ground down here. Floating it bare left the
+     buttons sitting directly on top of the description text. */
+  .detail__nav {
+    inset: auto 0 0 0;
+    justify-content: flex-end;
+    gap: 9px;
+    padding: 16px 22px 14px;
+    border-radius: 0 0 15px 15px;
+    background: linear-gradient(to top,
+      var(--surface) 0%, var(--surface) 62%, transparent 100%);
+  }
+}
+
 @media (max-width: 880px) {
+  .detail {
+    max-height: 90vh;
+  }
   .detail__inner {
     grid-template-columns: 1fr;
     gap: 20px;
-    padding: 22px;
+    padding: 22px 22px 74px;
   }
   .detail__art { max-width: 190px; }
-  .detail__nav { inset: auto 22px 12px; justify-content: flex-end; gap: 9px; }
-  .detail { max-height: 90vh; }
-  .detail__inner { padding-bottom: 68px; }
 }
 
 /* --- Motion --------------------------------------------------------------- */
