@@ -21,7 +21,8 @@
 import { loadCollection, saveCollection } from './lib/collection.mjs';
 import { platformInfo } from '../assets/js/platforms.mjs';
 import {
-  loadEnv, getToken, createClient, findGame, coverUrl, tidySummary, releaseYear, companies,
+  loadEnv, getToken, createClient, findGame, coverUrl, tidySummary, releaseYear,
+  platformReleaseYear, companies,
 } from './lib/igdb.mjs';
 import { findCover, coverage } from './lib/libretro.mjs';
 import { lookupAll, yearFromExtract } from './lib/wikipedia.mjs';
@@ -74,7 +75,8 @@ async function enrichWithIgdb(collection, targets) {
       game.description = summary;
       changes.push('description');
     }
-    const year = releaseYear(match.first_release_date);
+    // Prefer the date for this platform over the franchise's first release.
+    const year = platformReleaseYear(match, game.platform) ?? releaseYear(match.first_release_date);
     if (year && (force || !game.year)) { game.year = year; changes.push('year'); }
     if (match.genres?.length && !game.genres?.length) {
       game.genres = match.genres.map((x) => x.name);

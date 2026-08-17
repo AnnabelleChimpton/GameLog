@@ -94,6 +94,7 @@ export function createClient({ id, token }) {
 const FIELDS =
   'fields name, summary, storyline, first_release_date, cover.image_id, ' +
   'platforms, platforms.name, genres.name, total_rating, category, parent_game, ' +
+  'release_dates.date, release_dates.platform, ' +
   'version_parent, involved_companies.developer, involved_companies.publisher, ' +
   'involved_companies.company.name;';
 
@@ -287,6 +288,24 @@ export function tidySummary(summary, storyline) {
   const cut = collapsed.slice(0, 600);
   const lastStop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '));
   return (lastStop > 300 ? cut.slice(0, lastStop + 1) : cut.trimEnd() + '…');
+}
+
+/**
+ * The year this game came out *on this platform*.
+ *
+ * first_release_date is the earliest release anywhere, which is the wrong
+ * answer for a shelf organised by platform: it dated the Switch copy of
+ * Knights of the Old Republic to 2003 rather than 2021, and would put a port
+ * decades before the console it runs on. IGDB carries per-platform dates, so
+ * prefer those and fall back only when it has none.
+ */
+export function platformReleaseYear(game, platform) {
+  const igdbPlatform = platformInfo(platform).igdb;
+  if (!igdbPlatform || !Array.isArray(game?.release_dates)) return null;
+  const years = game.release_dates
+    .filter((r) => r?.platform === igdbPlatform && r?.date)
+    .map((r) => new Date(r.date * 1000).getUTCFullYear());
+  return years.length ? Math.min(...years) : null;
 }
 
 export function releaseYear(unixSeconds) {
