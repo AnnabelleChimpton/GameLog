@@ -54,13 +54,13 @@ async function enrichWithIgdb(collection, targets) {
     try {
       match = await findGame(query, { title: game.title, platform: game.platform });
     } catch (err) {
-      console.log(`  !  ${label} — ${err.message}`);
+      console.log(`  !  ${label}: ${err.message}`);
       continue;
     }
 
     if (!match) {
       unmatched.push(game);
-      console.log(`  ?  ${label} — no match`);
+      console.log(`  ?  ${label}. No match`);
       continue;
     }
 
@@ -104,12 +104,12 @@ async function enrichFree(collection, targets) {
   const platforms = [...new Set(targets.map((g) => g.platform))];
   const { covered, missing } = await coverage(platforms);
 
-  console.log('Using the keyless sources — libretro for art, Wikipedia for text.\n');
+  console.log('Using the keyless sources: libretro for art, Wikipedia for text.\n');
   if (covered.length) console.log(`  box art available for: ${covered.join(', ')}`);
   if (missing.length) {
     console.log(`  no art source for:     ${missing.join(', ')}`);
     console.log('    (current-gen consoles aren\'t emulated, so nobody has scanned them here.');
-    console.log('     Add those covers in `npm run manage`, or set up IGDB — see the README.)');
+    console.log('     Add those covers in `npm run manage`, or set up IGDB: see the README.)');
   }
   console.log('');
 
@@ -218,7 +218,7 @@ async function main() {
   const stillBare = collection.games.filter((g) => !g.cover);
   if (stillBare.length) {
     console.log(`\n${stillBare.length} game(s) still have no cover art.`);
-    console.log('  Add one by hand in `npm run manage` — drop in an image or paste a url —');
+    console.log('  Add one by hand in `npm run manage`: drop in an image or paste a url -');
     if (source === 'free') console.log('  or set up IGDB for the ones no emulator database covers.');
   }
 }

@@ -4,26 +4,26 @@ A pretty, static site for showing off a video game collection. Search it, filter
 it by console, sort it, click any cover for the details. Host it free on GitHub
 Pages.
 
-The page opens with **you** — photo, name, a few words, your links — and your
-collection begins right underneath. Someone following a shared link learns whose
-shelf this is and what's on it without clicking anything.
+The page opens with **you**: photo, name, a few words, your links. Your
+collection begins right underneath, so someone following a shared link learns
+whose shelf this is and what's on it without clicking anything.
 
 No framework, no build step, no dependencies. The repo *is* the site: a page, a
 stylesheet, a script, and one JSON file holding your collection. Edit it through
-a local UI (`npm run manage`), a CLI, or a text editor — whichever you prefer.
+a local UI (`npm run manage`), a CLI, or a text editor, whichever you prefer.
 
 **Views:**
 
-- **Shelf** — the cover grid, with search, platform filters and sorting.
-- **Timeline** — your collection by release year, gaps and all.
-- **Lists** — backlogs, wishlists, favourites; owned games and hunted ones.
-- **Stats** — decades, platforms, genres, scores and condition at a glance.
-- **Compare** — point it at *somebody else's* GameLog and see what you share.
+- **Shelf**: the cover grid, with search, platform filters and sorting.
+- **Timeline**: your collection by release year, gaps and all.
+- **Lists**: backlogs, wishlists, favourites; owned games and hunted ones.
+- **Stats**: decades, platforms, genres, scores and condition at a glance.
+- **Compare**: point it at *somebody else's* GameLog and see what you share.
 
 **Compare** is the reason this is a static site rather than an app. Every
 GameLog publishes its `collection.json` openly, and GitHub Pages serves it with
 `access-control-allow-origin: *`, so any GameLog can read any other one straight
-from the browser — no server, no accounts, no API in between. Paste a friend's
+from the browser. No server, no accounts, no API in between. Paste a friend's
 address and you get three lists: what they have that you don't, what you both
 have, and what's yours alone.
 
@@ -53,7 +53,7 @@ git clone https://github.com/YOUR-USERNAME/GameLog.git && cd GameLog
 In your fork: **Settings → Pages → Build and deployment → Source: Deploy from a
 branch**, branch `main`, folder `/ (root)`.
 
-That's the only setting to change. There's no build step and no workflow — the
+That's the only setting to change. There's no build step and no workflow. The
 repo *is* the site, so GitHub just serves it. Every push publishes to
 `https://YOUR-USERNAME.github.io/GameLog/`, usually within a minute.
 
@@ -70,7 +70,7 @@ It asks you to confirm, and leaves `.env` and your git history alone.
 
 ### 4. Put your own games in
 
-Four ways, all writing to the same file — mix and match freely.
+Four ways, all writing to the same file: mix and match freely.
 
 **Use the manager.** `npm run manage` opens an editor in your browser, which is
 the easiest way in. The rest of these work just as well.
@@ -150,7 +150,7 @@ npm run add "Chrono Trigger"
 ```
 
 It searches, shows you the matches, asks which platform and what condition, and
-writes the entry — cover art, description and year included. No signup needed;
+writes the entry: cover art, description and year included. No signup needed;
 it uses IGDB if you have it configured and the keyless sources otherwise.
 
 Then push, either with **Publish…** in the manager or:
@@ -179,14 +179,14 @@ npm run manage
 
 Open the address it prints and you get a proper editor:
 
-- **Lists** — make them, rename them, drag entries up and down, add notes.
-- **Games** — edit any field on any game, or add one by searching IGDB.
-- **Hardware** — your consoles.
-- **Profile** — your photo, bio and links.
-- **Site** — title, tagline, accent colour (with a colour picker), and the
+- **Lists**: make them, rename them, drag entries up and down, add notes.
+- **Games**: edit any field on any game, or add one by searching IGDB.
+- **Hardware**: your consoles.
+- **Profile**: your photo, bio and links.
+- **Site**: title, tagline, accent colour (with a colour picker), and the
   shelves you follow.
 
-Adding a game searches your own collection *and* a game database at once — IGDB
+Adding a game searches your own collection *and* a game database at once: IGDB
 if you've set it up, Wikipedia and libretro if you haven't. Pick something you
 own and it links to it; pick something you don't and it's saved as a wanted
 entry with its cover art. IGDB results that are ROM hacks or ports are labelled,
@@ -200,7 +200,7 @@ is undone by reloading the page. Saving writes `data/*.json` and nothing else,
 which keeps diffs small and readable.
 
 **Publish…** then commits and pushes. It lists what's going out first, and only
-ever stages the files the manager itself edits — anything else you've changed is
+ever stages the files the manager itself edits. Anything else you've changed is
 shown as "left alone" for you to handle in git. If there's no `origin` remote
 yet, or your credentials aren't set up, it says so rather than half-succeeding.
 
@@ -208,7 +208,7 @@ yet, or your credentials aren't set up, it says so rather than half-succeeding.
 
 The manager needs a server that can write files, and that server only exists
 while `npm run manage` is running on your machine. Your published site is static
-files on someone else's host — there's nothing there to save to, which is
+files on someone else's host. There's nothing there to save to, which is
 precisely why nobody visiting your site can edit it. Open `manage.html` on the
 published copy and it just tells you to run it locally.
 
@@ -233,7 +233,7 @@ The bio is clipped to three lines with a **Read more** toggle, so the covers
 still clear the fold. The header scrolls away as you browse; the search box and
 filters are what stay pinned.
 
-The manager's **Profile** tab is the easy way — "Choose a photo…" resizes the
+The manager's **Profile** tab is the easy way: "Choose a photo…" resizes the
 image to 512px in your browser before saving it, so a 4 MB phone photo lands in
 your repo as about 30 KB instead of sitting in git history forever at full size.
 
@@ -255,30 +255,30 @@ By hand, it's a `profile` block in `data/config.json`:
 Mastodon, YouTube and `mailto:` addresses get their own icon; everything else
 gets a globe. Leave `label` out and the address is used instead.
 
-The About page also works out a few things on its own — how many games across
-how many platforms, the years they span, and which console you're deepest on —
+The About page also works out a few things on its own: how many games across
+how many platforms, the years they span, and which console you're deepest on -
 so it stays accurate as the collection grows.
 
 **Every part is optional.** Leave `profile` empty and the header falls back to
-just your site title, tagline and collection facts — which is the default for a
+just your site title, tagline and collection facts. Which is the default for a
 fresh fork.
 
 ### Sharing the link
 
 Link previews are built by crawlers that don't run JavaScript, so those tags
-can't be assembled at runtime like the rest of the page — they live in
+can't be assembled at runtime like the rest of the page. They live in
 `index.html`, between two `gamelog:meta` markers. Saving in the manager rewrites
-that block from your config: the title becomes "Your Name — Your Title", the
+that block from your config: the title becomes "Your Name. Your Title", the
 description comes from your bio, and your photo becomes the card image.
 
 For the image to work, set **Published address** on the manager's Site tab (or
-`siteUrl` in the config) to your site's address — a crawler can't resolve a
+`siteUrl` in the config) to your site's address. A crawler can't resolve a
 relative path. Edit `config.json` rather than those meta lines; anything you
 type between the markers is overwritten on the next save.
 
 ## Lists
 
-A list is any named set of games — a backlog, a wishlist, the ones you'd save
+A list is any named set of games. A backlog, a wishlist, the ones you'd save
 from a fire. Entries can be games you own *or* games you're still hunting.
 
 ```bash
@@ -300,7 +300,7 @@ looks like something.
 
 **The part worth knowing:** entries are resolved against your collection on
 every page load, not frozen when you add them. Put *Chrono Trigger* on your
-hunting list, buy it a year later, run `npm run add "Chrono Trigger"` — and the
+hunting list, buy it a year later, run `npm run add "Chrono Trigger"`, and the
 list entry turns from wanted into owned by itself. Nothing to edit, and the
 "3 of 7 owned" meter moves on its own.
 
@@ -334,7 +334,7 @@ put it in. `npm run check` warns about a `ref` that doesn't match anything.
 
 One caveat on the scripted form: `npm run list -- add …` run without a terminal
 takes the first search result sight unseen. Run it interactively when the title
-is ambiguous — there are a lot of *Chrono Trigger* ROM hacks.
+is ambiguous. There are a lot of *Chrono Trigger* ROM hacks.
 
 ## Cover art and descriptions
 
@@ -346,7 +346,7 @@ No signup. It fills in what's missing, never overwrites your own edits, and is
 safe to re-run. Box art comes from [libretro](https://thumbnails.libretro.com),
 descriptions and years from [Wikipedia](https://en.wikipedia.org).
 
-It's very good on anything emulated — 95% of games on the platforms it covers —
+It's very good on anything emulated: 95% of games on the platforms it covers -
 and **has nothing for current-gen**, because nobody scans PlayStation 5 or
 Switch boxes for an emulation project.
 
@@ -366,7 +366,7 @@ number for 2FA**, and there's no email-only path.
 2. Copy the Client ID, click **New Secret**, copy that.
 3. `cp .env.example .env` and paste both in.
 
-`.env` is gitignored and the published site never needs it — image urls are
+`.env` is gitignored and the published site never needs it: image urls are
 baked into `collection.json`. With keys present, `enrich` and `add` use IGDB
 automatically; `--source free` forces the keyless path either way.
 
@@ -395,13 +395,13 @@ npm run check
 It flags invalid JSON, duplicate ids, missing platforms and unknown consoles,
 and tells you how much is still waiting on `npm run enrich`. The manager runs
 the same shape checks before it writes anything, so data saved through the UI is
-already valid — this is for catching hand-edits.
+already valid. This is for catching hand-edits.
 
 ---
 
 ## Adding a console the registry doesn't know
 
-Everything still works with an unrecognised platform — it just gets an
+Everything still works with an unrecognised platform. It just gets an
 auto-generated abbreviation and colour. To give it a proper one, add a line to
 `assets/js/platforms.mjs`:
 
@@ -409,10 +409,10 @@ auto-generated abbreviation and colour. To give it a proper one, add a line to
 { key: 'Sega Dreamcast', short: 'DC', color: '#e06c3b', igdb: 23 },
 ```
 
-- `key` — exactly as you spell it in `collection.json`
-- `short` — the badge label; keep it to about four characters
-- `color` — the chip dot, badge, and placeholder-cover colour
-- `igdb` — IGDB's platform id, which narrows cover-art searches. Look it up in
+- `key`: exactly as you spell it in `collection.json`
+- `short`: the badge label; keep it to about four characters
+- `color`: the chip dot, badge, and placeholder-cover colour
+- `igdb`: IGDB's platform id, which narrows cover-art searches. Look it up in
   the [IGDB platform list](https://api-docs.igdb.com/#platform), or set `null`.
 
 That one file is shared by the site and the scripts, so a platform added there
@@ -434,7 +434,7 @@ assets/js/profile.js     the About view
 assets/js/manage.js      the local manager UI
 manage.html              the manager page (local use only)
 assets/js/compare.js     fetching and diffing another collection
-assets/js/platforms.mjs  the platform registry — names, colours, IGDB ids
+assets/js/platforms.mjs  the platform registry: names, colours, IGDB ids
 scripts/lib/libretro.mjs keyless box art
 scripts/lib/wikipedia.mjs keyless descriptions and years
 data/collection.json     your games and hardware
@@ -463,7 +463,7 @@ shown.
 | `release` | Non-standard editions: `Demo`, `Not For Resale` |
 | `condition` | Free text: `CIB`, `Loose`, `Boxed`, `New`, whatever you use |
 | `copies` | Shows an `×2` badge when above 1 |
-| `metacritic` | 0–100 |
+| `metacritic` | 0-100 |
 | `notes` | Anything personal; shown in the detail view |
 | `added` | `YYYY-MM-DD`, used by the "Recently added" sort |
 | `igdbId` / `wikidataId` | Set by `enrich`. Stable ids that let one collection be matched against another exactly, rather than by title |
@@ -471,7 +471,7 @@ shown.
 `hardware` entries use `name` instead of `title` and `image` instead of `cover`,
 and appear in their own section at the bottom of the page.
 
-The file also carries `"gamelog": 1` — a schema version, so that anything
+The file also carries `"gamelog": 1`. A schema version, so that anything
 reading a collection over the network (the Compare view, or an index across many
 sites later) can tell which format it's looking at rather than guessing.
 
@@ -479,13 +479,13 @@ sites later) can tell which format it's looking at rather than guessing.
 
 ## Notes
 
-Everything in `collection.json` is public once you push it — it's a static site,
+Everything in `collection.json` is public once you push it. It's a static site,
 so anyone can read the raw file. Don't put anything in `notes` you wouldn't want
 seen. There are no price or valuation fields for the same reason.
 
 Cover images are hotlinked to IGDB's CDN rather than committed, which keeps the
 repo small. If you'd rather host them yourself, download them into
-`assets/covers/` and point the `cover` fields at the local paths — the site
+`assets/covers/` and point the `cover` fields at the local paths. The site
 treats any url the same way.
 
 Keyboard: `/` focuses search, `r` picks a game at random from whatever is
@@ -493,7 +493,7 @@ showing, `Esc` clears the search or closes the dialog, and `←` / `→` step
 through games while a detail view is open.
 
 Controls hide themselves when they'd be lying. "Recently added" only appears if
-your `added` dates actually differ — a bulk import stamps every row with the
+your `added` dates actually differ. A bulk import stamps every row with the
 same day, and sorting by it would just reproduce the alphabetical order. Same
 for "Highest rated" without scores, and the condition filter with only one
 condition in use.
@@ -511,4 +511,4 @@ MIT, for the code.
 Cover art and descriptions come from [IGDB](https://www.igdb.com),
 [libretro](https://thumbnails.libretro.com) and [Wikipedia](https://en.wikipedia.org)
 depending on which source you use. The artwork itself belongs to its respective
-publishers — none of it is mine to license.
+publishers: none of it is mine to license.

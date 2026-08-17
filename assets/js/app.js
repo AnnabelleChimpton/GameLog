@@ -1,4 +1,4 @@
-// GameLog — the front end.
+// GameLog. The front end.
 //
 // No build step and no dependencies: this reads data/collection.json and
 // data/config.json at load, then renders and filters entirely in the browser.
@@ -144,8 +144,6 @@ function renderGrid() {
     tile.dataset.index = String(i);
     tile.setAttribute('aria-label',
       `${game.title}${game.year ? `, ${game.year}` : ''}, ${game.platform}`);
-    // Stagger only the first screenful; beyond that it's just delay.
-    if (i < 24) tile.style.animationDelay = `${Math.min(i * 14, 340)}ms`;
 
     const img = coverImage(game, { eager: i < 12 });
     img.className = 'tile__cover';
@@ -217,7 +215,7 @@ function renderCount() {
     el.empty.replaceChildren(...(total === 0
       ? [
           h('strong', { text: 'No games yet' }),
-          h('span', { text: 'This collection is empty — which means it\'s yours to fill.' }),
+          h('span', { text: 'This collection is empty. Which means it\'s yours to fill.' }),
           h('code', { class: 'empty__cmd', text: 'npm run manage' }),
           h('span', { class: 'empty__aside',
             text: 'Or add one from the terminal with  npm run add "Some Game"' }),
@@ -758,9 +756,10 @@ async function boot() {
   // The tab title names the person when there is one -- a shared link that says
   // "Annabelle's GameLog" is more use in a row of tabs than "GameLog".
   const owner = config.profile?.name;
-  document.title = owner
-    ? `${owner} — ${config.title || 'GameLog'}`
-    : (config.title || 'GameLog');
+  const siteTitle = config.title || 'GameLog';
+  document.title = owner && !siteTitle.toLowerCase().includes(owner.toLowerCase())
+    ? `${owner}'s ${siteTitle}`
+    : siteTitle;
 
   el.hero.replaceChildren(renderHero(config, {
     games: state.games, hardware: state.hardware,

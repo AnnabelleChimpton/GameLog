@@ -34,7 +34,7 @@ const META_START = '<!-- gamelog:meta';
 const META_END = '<!-- /gamelog:meta -->';
 
 const FRESH_META = [
-  `${META_START} — rewritten from data/config.json when you save in the manager.`,
+  `${META_START}: rewritten from data/config.json when you save in the manager.`,
   "     Crawlers don't run JavaScript, so a shared link's preview card has to live",
   '     in the html itself. Edit config.json rather than these lines. -->',
   '<title>GameLog</title>',
@@ -114,7 +114,7 @@ async function main() {
   }
   await resetMeta();
 
-  console.log('\n  Done — the collection is yours now.\n');
+  console.log('\n  Done. The collection is yours now.\n');
   console.log('  Next:');
   console.log('    npm run manage      add games, write your profile, set the title');
   console.log('    npm run enrich      fill in cover art and descriptions');

@@ -1,7 +1,7 @@
 {
   "title": "GameLog",
   "tagline": "A shelf of everything I've collected.",
-  "siteUrl": "",
+  "siteUrl": "https://annabellechimpton.github.io/GameLog",
   "accent": "#f0a04b",
   "defaultSort": "title",
   "showHardware": true,

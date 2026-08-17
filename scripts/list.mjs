@@ -122,14 +122,14 @@ async function cmdAdd(data, collection, listKey, title, opts) {
   let entry;
   if (owned && !opts.wanted) {
     entry = { ref: owned.id };
-    console.log(`  You own this — linked to ${owned.title} (${platformInfo(owned.platform).short}).`);
+    console.log(`  You own this: linked to ${owned.title} (${platformInfo(owned.platform).short}).`);
   } else {
     const platform = opts.platform
       || (await ask('  Platform you want it on (optional): '));
     console.log(`\nSearching IGDB for "${gameTitle}"…`);
     const found = await lookupWanted(gameTitle, platform || null);
     entry = { title: found?.title || gameTitle, platform: platform || null, ...(found || {}) };
-    if (!found) console.log('  No match — added without cover art.');
+    if (!found) console.log('  No match: added without cover art.');
   }
 
   const note = opts.note ?? (await ask('  Note (optional): '));
@@ -174,7 +174,7 @@ function cmdShow(data, collection) {
     const owned = list.items.filter((i) =>
       i.ref ? collection.games.some((g) => g.id === i.ref)
             : matchOwned(collection.games, i.title, i.platform)).length;
-    console.log(`\n${list.name}  [${list.id}]  — ${list.items.length} items, ${owned} owned`);
+    console.log(`\n${list.name}  [${list.id}] : ${list.items.length} items, ${owned} owned`);
     if (list.description) console.log(`  ${list.description}`);
     for (const item of list.items) {
       const isOwned = item.ref
@@ -183,7 +183,7 @@ function cmdShow(data, collection) {
       const label = item.ref
         ? (collection.games.find((g) => g.id === item.ref)?.title || item.ref)
         : item.title;
-      console.log(`  ${isOwned ? '✓' : '·'} ${label}${item.note ? `  — ${item.note}` : ''}`);
+      console.log(`  ${isOwned ? '✓' : '·'} ${label}${item.note ? ` : ${item.note}` : ''}`);
     }
   }
   console.log('');

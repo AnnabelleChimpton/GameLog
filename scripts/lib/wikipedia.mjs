@@ -99,7 +99,7 @@ export async function searchTitles(term, { limit = 8 } = {}) {
     .sort((a, b) => a.order - b.order);
 }
 
-/** "…is a 1995 role-playing video game…" — the year is usually right there. */
+/** "…is a 1995 role-playing video game…". The year is usually right there. */
 export function yearFromExtract(extract) {
   const early = String(extract || '').slice(0, 220);
   const matches = [...early.matchAll(/\b(19[5-9]\d|20[0-4]\d)\b/g)].map((m) => Number(m[1]));

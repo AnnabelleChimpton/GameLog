@@ -118,7 +118,7 @@ function listTile(entry, { onOpen }) {
     class: classes.join(' '),
     role: 'listitem',
     'aria-label': `${game.title}, ${game.platform}, not owned`,
-    title: note || `${game.title} — not in your collection`,
+    title: note || `${game.title}: not in your collection`,
   }, children);
 }
 
@@ -142,14 +142,14 @@ export function renderLists(lists, games, { selected, onSelect, onOpen }) {
       h('div', { class: 'lists__empty' },
         h('h2', { class: 'cmp__title', text: 'No lists yet' }),
         h('p', { class: 'cmp__lede' },
-          'A list is any set of games you want to keep together — a backlog, ' +
+          'A list is any set of games you want to keep together. A backlog, ' +
           'a wishlist, the ones you\'d save from a fire. Entries can be games ' +
           'you own or games you\'re still hunting, and a hunted game flips to ' +
           'owned by itself once it turns up in your collection.'),
         h('p', { class: 'lists__how' }, 'Make one:'),
         h('pre', { class: 'lists__code' }, h('code', { text: 'npm run list' })),
         h('p', { class: 'cmp__blurb',
-          text: 'Or write data/lists.json by hand — the README has the shape.' })));
+          text: 'Or write data/lists.json by hand. The README has the shape.' })));
   }
 
   const resolved = lists.map((list) => resolveList(list, games));

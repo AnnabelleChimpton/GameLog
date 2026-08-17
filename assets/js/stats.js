@@ -84,7 +84,7 @@ export function renderStats(games, hardware) {
 
   const avgScore = rated.length
     ? (rated.reduce((s, g) => s + g.metacritic, 0) / rated.length).toFixed(1)
-    : '—';
+    : '-';
 
   /* Headline numbers. A row of stat tiles, not a chart -- these are single
      values and a bar chart of five unrelated numbers says nothing. */
@@ -92,7 +92,7 @@ export function renderStats(games, hardware) {
     statTile(String(games.length), 'games', copies > games.length ? `${copies} copies` : null),
     statTile(String(platforms.size), 'platforms',
       hardware.length ? plural(hardware.length, 'console') : null),
-    statTile(years.length ? `${years[0]}–${years[years.length - 1]}` : '—', 'years covered',
+    statTile(years.length ? `${years[0]}-${years[years.length - 1]}` : '-', 'years covered',
       years.length ? `median ${years[Math.floor(years.length / 2)]}` : null),
     statTile(String(avgScore), 'avg metascore',
       rated.length ? `across ${rated.length} rated` : null));
@@ -113,7 +113,7 @@ export function renderStats(games, hardware) {
     }
     const peak = rows.reduce((a, b) => (b.value > a.value ? b : a), rows[0]);
     panels.push(columnChart('By decade released', rows, {
-      note: `Heaviest in the ${peak.label} — ${plural(peak.value, 'game')}.`,
+      note: `Heaviest in the ${peak.label}: ${plural(peak.value, 'game')}.`,
     }));
   }
 
@@ -150,7 +150,7 @@ export function renderStats(games, hardware) {
     const rows = [];
     for (let b = lowest; b <= 90; b += 10) {
       rows.push({ label: `${b}s`, value: buckets.get(b) || 0,
-        tip: `Scored ${b}–${b + 9}: ${plural(buckets.get(b) || 0, 'game')}` });
+        tip: `Scored ${b}-${b + 9}: ${plural(buckets.get(b) || 0, 'game')}` });
     }
     panels.push(columnChart('Metascore spread', rows, {
       note: `${rated.length} of ${games.length} games carry a score.`,
@@ -164,7 +164,7 @@ export function renderStats(games, hardware) {
     panels.push(barChart('By condition',
       conditions.map(([name, count]) => ({ label: name, value: count,
         tip: `${name}: ${plural(count, 'game')}` })),
-      { note: 'Grouped from however you wrote it — "CIB+" and "CIB" count together.' }));
+      { note: 'Grouped from however you wrote it: "CIB+" and "CIB" count together.' }));
   }
 
   /* Ranked lists, where a chart would add nothing. */

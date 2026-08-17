@@ -96,7 +96,7 @@ export async function loadCollection(input) {
   }
 
   if (!data || !Array.isArray(data.games)) {
-    throw new Error(`${url} loaded, but has no "games" list — probably not a GameLog.`);
+    throw new Error(`${url} loaded, but has no "games" list: probably not a GameLog.`);
   }
 
   const games = data.games.slice(0, MAX_ENTRIES).filter((g) => g && typeof g.title === 'string');
@@ -148,7 +148,7 @@ function miniTile(game, { onOpen = null, subtitle = null } = {}) {
 
   const props = {
     class: game.cover ? 'minitile' : 'minitile minitile--noart',
-    title: `${game.title} — ${game.platform || 'unknown platform'}`,
+    title: `${game.title}: ${game.platform || 'unknown platform'}`,
   };
 
   const children = [

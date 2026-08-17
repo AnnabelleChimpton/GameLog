@@ -96,7 +96,7 @@ function prose(text) {
   });
 }
 
-/** "184 games · 10 platforms · 5 consoles · 1983–2024" */
+/** "184 games · 10 platforms · 5 consoles · 1983-2024" */
 function factLine(games, hardware) {
   const platforms = new Set(games.map((g) => g.platform)).size;
   const years = games.map((g) => g.year).filter(Boolean).sort((a, b) => a - b);
@@ -104,7 +104,7 @@ function factLine(games, hardware) {
     plural(games.length, 'game'),
     plural(platforms, 'platform'),
     hardware.length ? plural(hardware.length, 'console') : null,
-    years.length ? `${years[0]}–${years[years.length - 1]}` : null,
+    years.length ? `${years[0]}-${years[years.length - 1]}` : null,
   ].filter(Boolean).join(' · ');
 }
 
@@ -130,7 +130,7 @@ export function renderHero(config, { games, hardware }) {
   // With a person named, the site title becomes their shelf's subtitle rather
   // than competing with their name for the top line.
   const subtitle = named
-    ? [config.title, config.tagline].filter(Boolean).join(' — ')
+    ? [config.title, config.tagline].filter(Boolean).join(': ')
     : (config.tagline || '');
 
   const body = h('div', { class: 'hero__body' },

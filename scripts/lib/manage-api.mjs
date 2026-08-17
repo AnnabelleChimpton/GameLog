@@ -224,13 +224,17 @@ async function syncMeta(config) {
 
   const profile = config.profile || {};
   const siteTitle = config.title || 'GameLog';
-  const title = profile.name ? `${profile.name} — ${siteTitle}` : siteTitle;
+  // "Annabelle's GameLog" rather than a separator character, unless the title
+  // already names them, in which case repeating it would read oddly.
+  const title = profile.name && !siteTitle.toLowerCase().includes(profile.name.toLowerCase())
+    ? `${profile.name}'s ${siteTitle}`
+    : siteTitle;
   const description = plainText(profile.about)
     || plainText(config.tagline)
     || 'A video game collection.';
 
   const lines = [
-    `${META_START} — rewritten from data/config.json when you save in the manager.`,
+    `${META_START}: rewritten from data/config.json when you save in the manager.`,
     "     Crawlers don't run JavaScript, so a shared link's preview card has to live",
     '     in the html itself. Edit config.json rather than these lines. -->',
     `<title>${escapeAttr(title)}</title>`,

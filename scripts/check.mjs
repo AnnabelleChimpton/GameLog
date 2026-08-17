@@ -39,7 +39,7 @@ for (const [kind, items] of [['game', games], ['hardware', hardware]]) {
     if (!item.platform) problems.push(`${label}: missing "platform"`);
     else if (!known.has(String(item.platform).toLowerCase())) {
       warnings.push(
-        `${label}: platform "${item.platform}" is not in the registry — ` +
+        `${label}: platform "${item.platform}" is not in the registry: ` +
         `it will still show, with a generated "${platformInfo(item.platform).short}" badge. ` +
         `Add it to assets/js/platforms.mjs for a proper label and colour.`
       );
@@ -52,7 +52,7 @@ for (const [kind, items] of [['game', games], ['hardware', hardware]]) {
       problems.push(`${label}: "copies" should be a whole number of 1 or more`);
     }
     if (item.cover && !/^(https?:)?\/\/|^data:|^assets\//.test(item.cover)) {
-      warnings.push(`${label}: "cover" is not a url or an assets/ path — it may not load`);
+      warnings.push(`${label}: "cover" is not a url or an assets/ path. It may not load`);
     }
   });
 }
@@ -90,7 +90,7 @@ for (const list of lists.lists) {
     // tile with an exclamation mark and no artwork.
     if (item.ref && !gameIds.has(item.ref)) {
       warnings.push(
-        `${label}: "${item.ref}" doesn't match any game id — that entry will ` +
+        `${label}: "${item.ref}" doesn't match any game id. That entry will ` +
         `show as broken. Either fix the id or replace it with a "title".`
       );
     }
@@ -136,7 +136,7 @@ if (noCover.length || noDescription.length || noYear.length) {
 }
 
 if (!problems.length) {
-  console.log(warnings.length ? 'No blocking problems — safe to push.' : 'All good.');
+  console.log(warnings.length ? 'No blocking problems: safe to push.' : 'All good.');
 }
 
 process.exit(problems.length ? 1 : 0);

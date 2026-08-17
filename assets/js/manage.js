@@ -95,7 +95,7 @@ function platformField(value, onChange) {
   const known = PLATFORMS.map((p) => p.key);
   // Keep an unrecognised platform selectable rather than silently rewriting it.
   const options = known.includes(value) || !value ? known : [value, ...known];
-  select.append(h('option', { value: '', text: '— pick a platform —' }));
+  select.append(h('option', { value: '', text: '- pick a platform -' }));
   for (const key of options) select.append(h('option', { value: key, text: key }));
   select.value = value || '';
   select.addEventListener('change', () => onChange(select.value));
@@ -159,7 +159,7 @@ function renderPlatformStep(candidate, results, done) {
   const suggested = likelyPlatforms(candidate);
 
   const all = h('select', { class: 'mg-input' },
-    h('option', { value: '', text: '— another platform —' }),
+    h('option', { value: '', text: '- another platform -' }),
     ...PLATFORMS.map((p) => h('option', { value: p.key, text: p.key })));
   all.addEventListener('change', () => { if (all.value) done(all.value); });
 
@@ -312,7 +312,7 @@ function renderLists() {
 
   if (!lists.length) {
     wrap.replaceChildren(picker, h('div', { class: 'mg-empty' },
-      h('p', { text: 'No lists yet. Make one — a backlog, a wishlist, whatever you like.' })));
+      h('p', { text: 'No lists yet. Make one. A backlog, a wishlist, whatever you like.' })));
     return;
   }
 
@@ -366,7 +366,7 @@ function renderLists() {
       h('div', { class: 'mg-item__body' },
         h('span', { class: 'mg-item__name', text: game.title }),
         h('span', { class: 'mg-item__meta',
-          text: missing ? 'broken link — no such game id'
+          text: missing ? 'broken link. No such game id'
             : owned ? `${game.platform} · in your collection`
             : `${game.platform || 'any platform'} · not owned yet` }),
         h('input', {
@@ -484,7 +484,7 @@ function gameEditor(game) {
       { placeholder: 'https://…  or  assets/covers/foo.jpg' }),
     field('Description', game.description, set('description'), { rows: 4 }),
     field('Your note', game.notes, set('notes'),
-      { rows: 2, placeholder: 'Anything personal — where it came from, what state it\'s in' }));
+      { rows: 2, placeholder: 'Anything personal: where it came from, what state it\'s in' }));
 }
 
 function renderGames() {
@@ -531,7 +531,7 @@ function renderGames() {
         state.gameQuery = game.title;
         markDirty('collection');
         renderGames();
-        status(`Added ${game.title} — ${game.platform}. `
+        status(`Added ${game.title}: ${game.platform}. `
           + 'Clear the filter above to see the whole collection again.')
       },
     }, h('span', { text: '+ Add a game' })));
@@ -558,7 +558,7 @@ function renderGames() {
     rows.length ? h('div', { class: 'mg-items' }, rows)
       : h('div', { class: 'mg-empty' }, h('p', { text: 'Nothing matches.' })),
     games.length > 400
-      ? h('p', { class: 'mg-hint', text: 'Showing the first 400 — narrow the filter to see more.' })
+      ? h('p', { class: 'mg-hint', text: 'Showing the first 400: narrow the filter to see more.' })
       : null);
 }
 
@@ -639,7 +639,7 @@ function renderSite() {
       field('Published address', config.siteUrl, set('siteUrl'),
         { placeholder: 'https://you.github.io/GameLog' }),
       h('p', { class: 'mg-hint',
-        text: 'Used for the link preview card when someone shares your page — '
+        text: 'Used for the link preview card when someone shares your page: '
           + 'an absolute address is the only kind a crawler can resolve an image from.' }),
       field('Footer', config.footer, set('footer'),
         { rows: 2, placeholder: 'Markdown links and **bold** work here' }),
@@ -778,7 +778,7 @@ function renderProfileTab() {
           placeholder: 'A few lines about you and what you collect. Blank lines make '
             + 'paragraphs; [links](https://example.com) and **bold** work.' }),
       field('Photo path or url', profile.photo, set('photo'),
-        { placeholder: 'assets/profile/avatar.jpg — or paste any image url' })),
+        { placeholder: 'assets/profile/avatar.jpg, or paste any image url' })),
 
     h('div', { class: 'mg-card' },
       h('h2', { class: 'mg-card__title', text: 'Links' }),
@@ -828,7 +828,7 @@ async function openPublisher() {
 
   where.textContent = git.remote
     ? `${git.branch} → ${git.remote.replace(/^https:\/\/[^@]*@/, 'https://')}`
-    : `${git.branch} — no remote set`;
+    : `${git.branch}. No remote set`;
 
   const parts = [];
 
@@ -847,7 +847,7 @@ async function openPublisher() {
     parts.push(h('p', { class: 'mg-hint',
       text: `No new edits, but ${plural(git.unpushed, 'commit')} have never been pushed.` }));
   } else {
-    parts.push(h('p', { class: 'cmp__none', text: 'Nothing to publish — everything is up to date.' }));
+    parts.push(h('p', { class: 'cmp__none', text: 'Nothing to publish: everything is up to date.' }));
     $('#pub-go').disabled = true;
   }
 
@@ -969,7 +969,7 @@ async function boot() {
   });
 
   if (!state.igdb) {
-    status('No IGDB keys in .env — you can still edit everything, but searching for '
+    status('No IGDB keys in .env. You can still edit everything, but searching for '
       + 'games you don\'t own is unavailable.', 'warn');
   }
 

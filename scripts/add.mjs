@@ -109,7 +109,7 @@ async function main() {
 
     console.log(`\nSearching ${query ? 'IGDB' : 'Wikipedia and libretro'} for "${title}"…`);
     if (!query && opts.source !== 'free') {
-      console.log('  (no IGDB keys configured — using the keyless sources)');
+      console.log('  (no IGDB keys configured: using the keyless sources)');
     }
 
     let results;
@@ -125,7 +125,7 @@ async function main() {
     } else {
       console.log('');
       results.forEach((g, i) => console.log(`  ${String(i + 1).padStart(2)}. ${describeCandidate(g)}`));
-      console.log('   0. none of these — add a bare entry\n');
+      console.log('   0. none of these: add a bare entry\n');
       const pick = Number(await ask('  Which one? [1] ', '1'));
       if (Number.isInteger(pick) && pick >= 1 && pick <= results.length) {
         chosen = results[pick - 1];
@@ -197,7 +197,7 @@ async function main() {
 
   const p = platformInfo(platform);
   console.log(`\n  Added "${entry.title}" [${p.short}]${entry.year ? ` (${entry.year})` : ''}`);
-  if (!entry.cover) console.log('  No cover art yet — run `npm run enrich` later, or paste a url into "cover".');
+  if (!entry.cover) console.log('  No cover art yet: run `npm run enrich` later, or paste a url into "cover".');
   console.log('\n  Commit and push to publish:');
   console.log(`    git add data/collection.json && git commit -m "Add ${entry.title}" && git push`);
 }

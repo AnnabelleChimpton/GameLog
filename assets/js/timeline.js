@@ -57,7 +57,7 @@ export function renderTimeline(games, { onOpen }) {
           const tile = h('button', {
             type: 'button',
             class: game.cover ? 'minitile' : 'minitile minitile--noart',
-            title: `${game.title} — ${game.platform}`,
+            title: `${game.title}: ${game.platform}`,
             'aria-label': `${game.title}, ${year}, ${game.platform}`,
             onclick: () => onOpen(game),
           },
