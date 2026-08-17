@@ -316,73 +316,38 @@ is ambiguous — there are a lot of *Chrono Trigger* ROM hacks.
 npm run enrich
 ```
 
-That works with **no signup at all**. It fills in whatever is missing and never
-overwrites something you edited yourself, so it's safe to re-run.
+No signup. It fills in what's missing, never overwrites your own edits, and is
+safe to re-run. Box art comes from [libretro](https://thumbnails.libretro.com),
+descriptions and years from [Wikipedia](https://en.wikipedia.org).
 
-There are two sources and it picks for you:
+It's very good on anything emulated — 95% of games on the platforms it covers —
+and **has nothing for current-gen**, because nobody scans PlayStation 5 or
+Switch boxes for an emulation project.
 
-| | Setup | Box art | Text | Current-gen |
-| --- | --- | --- | --- | --- |
-| **Keyless** (default) | none | [libretro](https://thumbnails.libretro.com) | [Wikipedia](https://en.wikipedia.org) | ✗ |
-| **IGDB** | free Twitch app, ~2 min | [IGDB](https://www.igdb.com) | IGDB | ✓ |
+For those, open `npm run manage` and drop an image straight onto the game. No
+API, no account, and you get the exact cover you want.
 
-With no credentials configured it uses the keyless sources and tells you so.
+<details>
+<summary>Using IGDB instead, if you want current-gen filled in automatically</summary>
 
-### The keyless source
+One database for everything, plus genres and companies. The catch is the
+sign-up: IGDB is owned by Twitch, so it needs a Twitch account **with a phone
+number for 2FA**, and there's no email-only path.
 
-libretro publishes scanned box art so emulator frontends can display it, and
-serves it openly. It's excellent on anything emulated and **absent on
-current-gen** — nothing has scanned PlayStation 5 or Switch boxes there, because
-nobody emulates them. On this collection it matched 95% of games on the
-platforms it covers.
+1. [dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps) → **Register
+   Your Application**. OAuth Redirect URL `http://localhost`, category
+   Application Integration, client type Confidential.
+2. Copy the Client ID, click **New Secret**, copy that.
+3. `cp .env.example .env` and paste both in.
 
-Wikipedia supplies the descriptions and release years, batched 50 titles per
-request so a whole collection costs a handful of calls.
+`.env` is gitignored and the published site never needs it — image urls are
+baked into `collection.json`. With keys present, `enrich` and `add` use IGDB
+automatically; `--source free` forces the keyless path either way.
 
-Two things worth being straight about:
+</details>
 
-- It's scanned publisher artwork, exactly like IGDB's. Keyless is a **setup**
-  improvement, not a licensing one.
-- Wikipedia is used for words only, never images. Almost all game box art there
-  is non-free content under a fair-use rationale that covers the article, not
-  reuse on your site.
-
-For anything the keyless source misses, open `npm run manage` and drop in an
-image or paste a url — no API involved.
-
-### IGDB, if you want current-gen covered
-
-One database for everything, plus genres and companies. It needs a free Twitch
-developer application, which takes about two minutes and is done once.
-
-1. Go to [dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps) and log
-   in (IGDB is owned by Twitch, so it uses a Twitch login).
-2. **Register Your Application**:
-   - **Name** — anything, e.g. `GameLog`
-   - **OAuth Redirect URL** — `http://localhost`
-   - **Category** — Application Integration
-   - **Client Type** — Confidential
-3. Copy the **Client ID**, then click **New Secret** and copy that too.
-4. `cp .env.example .env` and paste both in.
-
-`.env` is gitignored, and the published site never needs it — the image urls are
-baked into `collection.json`.
-
-| Command | What it does |
-| --- | --- |
-| `npm run enrich` | Fill in whatever is missing |
-| `npm run enrich -- --force` | Refetch everything, overwriting |
-| `npm run enrich -- --only <id>` | Redo a single entry |
-| `npm run enrich -- --dry-run` | Show what would change, write nothing |
-| `npm run enrich -- --source free` | Keyless sources even if you have keys |
-| `npm run enrich -- --source igdb` | Require IGDB |
-
-`npm run add` takes `--source free` too, and the manager falls back to the
-keyless sources on its own when no keys are configured.
-
-Anything still without art keeps a generated placeholder — a wash of the
-platform's colour with its name — and those tiles show their title permanently,
-so the shelf still reads properly.
+A game with no art keeps a generated placeholder in its platform's colour, and
+those tiles show their title permanently, so the shelf still reads properly.
 
 ## Preview before you push
 
