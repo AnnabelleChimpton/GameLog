@@ -388,13 +388,13 @@ It's very good on anything emulated: 95% of games on the platforms it covers -
 and **has nothing for current-gen**, because nobody scans PlayStation 5 or
 Switch boxes for an emulation project.
 
-For those, open `npm run manage`, find the game, and use the cover box. Four
-ways in, whichever suits where the picture is:
+For those, open `npm run manage`, find the game, and use the cover box:
 
-- **drop** an image file onto it
-- **click** it and pick a file
-- **paste** an image straight from the clipboard
-- **paste a link** to one, which gets downloaded rather than hotlinked
+- **drop** an image file onto it, or **click** it and pick one
+- **paste a link** into the field underneath and press **Download**
+
+(Copying an image to the clipboard and pressing ctrl-V also works once the drop
+zone has focus, but it is a shortcut rather than the way in.)
 
 Whatever you give it is resized to 600px, written to `assets/covers/<game-id>`,
 and the path is filled in for you.

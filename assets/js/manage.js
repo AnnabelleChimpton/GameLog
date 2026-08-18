@@ -482,12 +482,11 @@ function coverPicker(game) {
 
   const zone = h('div', {
     class: 'mg-cover__zone', tabindex: '0', role: 'button',
-    'aria-label': `Set cover art for ${game.title}`,
+    'aria-label': `Choose a cover image file for ${game.title}`,
   },
     h('span', {},
-      h('span', { class: 'mg-cover__lead', text: 'Drop an image, paste, or ' }),
-      h('span', { class: 'mg-cover__link', text: 'choose a file' })),
-    h('span', { class: 'mg-hint', text: 'A link to an image works too, and gets downloaded.' }));
+      h('span', { class: 'mg-cover__lead', text: 'Drop an image here, or ' }),
+      h('span', { class: 'mg-cover__link', text: 'choose a file' })));
 
   const fileInput = h('input', { type: 'file', accept: 'image/*', class: 'mg-file' });
   zone.append(fileInput);
@@ -548,7 +547,32 @@ function coverPicker(game) {
     if (text && /^https?:\/\//i.test(text)) { e.preventDefault(); send({ url: text }, 'linked image'); }
   });
 
-  const node = h('div', {}, h('div', { class: 'mg-cover' }, preview, zone), origin);
+  // A visible field for the link case.
+  //
+  // The drop zone opens a file dialog when clicked, so pasting into it was only
+  // possible by tabbing for focus first and pressing ctrl-V, which is not a
+  // thing anyone would find. A link needs somewhere to actually put it.
+  const urlInput = h('input', {
+    class: 'mg-input mg-cover__url', type: 'url',
+    placeholder: 'or paste a link to an image and download it',
+    'aria-label': 'Download a cover image from a link',
+  });
+  const grab = () => {
+    const url = urlInput.value.trim();
+    if (!url) { urlInput.focus(); return; }
+    send({ url }, 'linked image').then(() => { urlInput.value = ''; });
+  };
+  urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); grab(); }
+  });
+  const grabButton = h('button', {
+    type: 'button', class: 'mg-mini', onclick: grab,
+  }, h('span', { text: 'Download' }));
+
+  const node = h('div', {},
+    h('div', { class: 'mg-cover' }, preview, zone),
+    h('div', { class: 'mg-cover__urlrow' }, urlInput, grabButton),
+    origin);
   // The url field below edits the same value, so it needs to redraw this.
   node.refresh = paint;
   return node;

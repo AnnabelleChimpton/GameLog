@@ -2182,3 +2182,7 @@ div.minitile { cursor: default; }
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+.mg-cover__urlrow { display: flex; gap: 8px; margin-top: 9px; }
+.mg-cover__url { flex: 1; min-width: 0; }
+.mg-cover__urlrow .mg-mini { flex: 0 0 auto; }
