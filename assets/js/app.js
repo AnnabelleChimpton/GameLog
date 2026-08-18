@@ -319,16 +319,19 @@ function render() {
   el.viewStats.hidden = state.view !== 'stats';
   el.viewCompare.hidden = state.view !== 'compare';
 
-  // Platform chips and the count line only mean something where a shelf of
-  // games is on screen. Stats always describes the whole collection.
+  // Stats now describes whatever is filtered, so the chips have to stay
+  // visible there: otherwise the filter is doing work you can neither see nor
+  // undo. The count line and the dice remain shelf-and-timeline only.
   const listy = state.view === 'shelf' || state.view === 'timeline';
-  el.filters.hidden = !listy;
+  const filterable = listy || state.view === 'stats';
+  el.filters.hidden = !filterable;
   el.statline.hidden = !listy;
   el.dice.hidden = !listy;
   el.notesToggle.hidden = !listy;
   el.search.closest('.search').hidden = state.view !== 'shelf' && state.view !== 'timeline';
   el.sort.closest('.select').hidden = state.view !== 'shelf';
-  el.condition.closest('.select').hidden = !listy;
+  el.condition.closest('.select').hidden = !filterable;
+  el.status.closest('.select').hidden = !filterable;
 
   if (state.view === 'shelf') {
     renderGrid();
@@ -345,7 +348,14 @@ function render() {
       onOpen: openFromAnywhere,
     }));
   } else if (state.view === 'stats') {
-    el.viewStats.replaceChildren(renderStats(state.games, state.hardware));
+    // Stats describes whatever is filtered, not always the whole collection.
+    // With a platform selected this is that shelf's portrait, which is what
+    // "?view=stats&platform=3DO" plainly asks for and used to ignore.
+    const hardware = state.platform === 'all'
+      ? state.hardware
+      : state.hardware.filter((item) => item.platform === state.platform);
+    el.viewStats.replaceChildren(
+      renderStats(state.visible, hardware, { filtered: isFiltered(), total: state.games.length }));
   }
 
   for (const chip of el.chips.children) {

@@ -2129,3 +2129,5 @@ div.minitile { cursor: default; }
   border-color: var(--text);
   color: var(--bg);
 }
+
+.stats__scope { font-size: 0.82rem; color: var(--text-faint); margin-bottom: -6px; }

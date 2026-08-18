@@ -75,7 +75,7 @@ function rankList(title, entries, { note = null } = {}) {
         h('span', { class: 'rank__value', text: e.value })))));
 }
 
-export function renderStats(games, hardware) {
+export function renderStats(games, hardware, { filtered = false, total = 0 } = {}) {
   const withYear = games.filter((g) => g.year);
   const years = withYear.map((g) => g.year).sort((a, b) => a - b);
   const rated = games.filter((g) => typeof g.metacritic === 'number');
@@ -88,6 +88,13 @@ export function renderStats(games, hardware) {
 
   /* Headline numbers. A row of stat tiles, not a chart -- these are single
      values and a bar chart of five unrelated numbers says nothing. */
+  // Say plainly what is being counted, or a filtered page looks like a wrong
+  // total rather than a deliberate subset.
+  const scope = filtered
+    ? h('p', { class: 'stats__scope',
+        text: `Describing ${games.length} of ${total} games, matching the current filter.` })
+    : null;
+
   const kpis = h('div', { class: 'stats__kpis' },
     statTile(String(games.length), 'games', copies > games.length ? `${copies} copies` : null),
     statTile(String(platforms.size), 'platforms',
@@ -117,16 +124,19 @@ export function renderStats(games, hardware) {
     }));
   }
 
-  /* Platforms. Registry order, so consoles read chronologically by maker. */
+  /* Platforms. Registry order, so consoles read chronologically by maker.
+     Pointless once filtered to one platform: a chart of a single bar. */
   const byPlatform = tally(games, (g) => g.platform)
     .sort((a, b) => platformSortIndex(a[0]) - platformSortIndex(b[0]));
-  panels.push(barChart('By platform',
-    byPlatform.map(([name, count]) => ({
-      label: name,
-      value: count,
-      dot: platformInfo(name).color,
-      tip: `${name}: ${plural(count, 'game')}`,
-    }))));
+  if (byPlatform.length > 1) {
+    panels.push(barChart('By platform',
+      byPlatform.map(([name, count]) => ({
+        label: name,
+        value: count,
+        dot: platformInfo(name).color,
+        tip: `${name}: ${plural(count, 'game')}`,
+      }))));
+  }
 
   /* Genres. Long tail, so the top ten and an explicit note about the rest. */
   const genres = tally(games, (g) => g.genres);
@@ -193,5 +203,5 @@ export function renderStats(games, hardware) {
             h('span', { class: 'rank__value', text: String(g.metacritic) })))))));
   }
 
-  return h('div', { class: 'stats' }, kpis, h('div', { class: 'stats__grid' }, panels));
+  return h('div', { class: 'stats' }, scope, kpis, h('div', { class: 'stats__grid' }, panels));
 }
