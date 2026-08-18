@@ -10,7 +10,7 @@
 // happens to resolve, or not, right now.
 
 import { platformInfo } from './platforms.mjs';
-import { h, coverImage, titleKey, plural } from './lib.js';
+import { h, coverImage, titleKey, plural, isLocal } from './lib.js';
 
 /**
  * Work out what a list item currently points at.
@@ -146,10 +146,12 @@ export function renderLists(lists, games, { selected, onSelect, onOpen }) {
           'a wishlist, the ones you\'d save from a fire. Entries can be games ' +
           'you own or games you\'re still hunting, and a hunted game flips to ' +
           'owned by itself once it turns up in your collection.'),
-        h('p', { class: 'lists__how' }, 'Make one:'),
-        h('pre', { class: 'lists__code' }, h('code', { text: 'npm run list' })),
-        h('p', { class: 'cmp__blurb',
-          text: 'Or write data/lists.json by hand. The README has the shape.' })));
+        isLocal() ? h('p', { class: 'lists__how' }, 'Make one:') : null,
+        isLocal() ? h('pre', { class: 'lists__code' }, h('code', { text: 'npm run list' })) : null,
+        isLocal()
+          ? h('p', { class: 'cmp__blurb',
+              text: 'Or write data/lists.json by hand. The README has the shape.' })
+          : null));
   }
 
   const resolved = lists.map((list) => resolveList(list, games));

@@ -10,7 +10,7 @@
 import { platformInfo, platformSortIndex } from './platforms.mjs';
 import {
   fold, sortKey, conditionGroup, CONDITION_ORDER, coverImage, placeholderCover,
-  safeImageUrl, h, plural, playStatus, STATUS_LABEL, episodeNumbers, progressOf,
+  safeImageUrl, h, plural, playStatus, STATUS_LABEL, episodeNumbers, progressOf, isLocal,
 } from './lib.js';
 import { renderStats } from './stats.js';
 import { renderTimeline } from './timeline.js';
@@ -804,7 +804,9 @@ async function boot() {
     el.empty.hidden = false;
     el.empty.replaceChildren(
       h('strong', { text: 'Could not load the collection.' }),
-      h('span', { text: 'data/collection.json is missing or unreadable. If you opened this file directly, serve it instead: npm run serve' }));
+      h('span', { text: isLocal()
+        ? 'data/collection.json is missing or unreadable. If you opened this file directly, serve it instead: npm run serve'
+        : 'The collection data could not be loaded. Try refreshing in a moment.' }));
     console.error('GameLog:', err);
     return;
   }
@@ -842,6 +844,13 @@ async function boot() {
   renderConditionOptions();
   if (!state.games.some((g) => g.notes)) el.notesToggle.remove();
   syncControls();
+  // Hide the Lists tab from visitors when there are no lists to show. Locally
+  // it stays, because that is where you would go to make the first one.
+  if (!state.lists.length && !isLocal()) {
+    el.views.querySelector('[data-view="lists"]')?.remove();
+    if (state.view === 'lists') state.view = 'shelf';
+  }
+
   renderChips();
   renderFriends();
   render();

@@ -259,6 +259,11 @@ The About page also works out a few things on its own: how many games across
 how many platforms, the years they span, and which console you're deepest on -
 so it stays accurate as the collection grows.
 
+Setup instructions inside the site (the `npm run` hints on an empty shelf or an
+empty Lists tab) only appear when you are viewing it from localhost. A visitor
+to the published site has no terminal and no clone, so they see a plain message
+instead, and an empty Lists tab is hidden from them altogether.
+
 **Every part is optional.** Leave `profile` empty and the header falls back to
 just your site title, tagline and collection facts. Which is the default for a
 fresh fork.

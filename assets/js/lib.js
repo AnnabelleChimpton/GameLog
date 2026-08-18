@@ -41,6 +41,17 @@ export function conditionGroup(condition) {
 
 export const CONDITION_ORDER = ['New', 'CIB', 'Boxed', 'Loose', 'Other'];
 
+/**
+ * Whether this page is being served from the owner's own machine.
+ *
+ * Setup instructions are for whoever runs the repo, not for whoever visits the
+ * published site: a stranger reading "npm run list" has no terminal, no clone,
+ * and no idea what it refers to. Guidance is shown only where it can be acted
+ * on.
+ */
+export const isLocal = () =>
+  ['localhost', '127.0.0.1', '[::1]', ''].includes(window.location.hostname);
+
 /* --- Play status ---------------------------------------------------------- */
 
 /**

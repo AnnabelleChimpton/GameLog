@@ -6,7 +6,7 @@
 // explicitly so the holes in a collection stay visible.
 
 import { platformInfo } from './platforms.mjs';
-import { h, coverImage, plural } from './lib.js';
+import { h, coverImage, plural, isLocal } from './lib.js';
 
 export function renderTimeline(games, { onOpen }) {
   const dated = games.filter((g) => g.year);
@@ -15,7 +15,9 @@ export function renderTimeline(games, { onOpen }) {
   if (!dated.length) {
     return h('p', { class: 'empty' },
       h('strong', { text: 'No release years yet.' }),
-      h('span', { text: 'Run `npm run enrich` to fill them in, and this view fills itself.' }));
+      h('span', { text: isLocal()
+        ? 'Run `npm run enrich` to fill them in, and this view fills itself.'
+        : 'This view needs release years, which none of these games have yet.' }));
   }
 
   const byYear = new Map();
