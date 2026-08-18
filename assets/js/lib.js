@@ -145,7 +145,10 @@ export function safeImageUrl(url) {
   const trimmed = url.trim();
   if (/^(https?:)?\/\//i.test(trimmed)) return trimmed;
   if (/^data:image\//i.test(trimmed)) return trimmed;
-  if (/^[\w./-]+$/.test(trimmed) && !trimmed.startsWith('//')) return trimmed; // local path
+  // A relative path, optionally with a cache-busting query. Anything with a
+  // scheme, a protocol-relative "//", or a parent-directory hop is refused.
+  if (/^[\w./-]+(\?[\w=&.-]*)?$/.test(trimmed)
+      && !trimmed.startsWith('//') && !trimmed.includes('..')) return trimmed;
   return null;
 }
 

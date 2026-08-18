@@ -419,6 +419,106 @@ function renderLists() {
 
 /* --- Games tab ------------------------------------------------------------ */
 
+/**
+ * Getting box art onto a game that has none.
+ *
+ * Four ways in, because the answer depends on where the picture is: drop a file,
+ * pick one, paste an image straight off the clipboard, or paste the address of
+ * one you found. All four end the same way, with the file saved into
+ * assets/covers and the path filled in, so nobody has to know where it went.
+ *
+ * A pasted address is downloaded rather than linked. Hotlinking works right up
+ * until the day somebody else deletes their file.
+ */
+function coverPicker(game) {
+  const preview = h('div', { class: 'mg-cover__art' });
+  // Replacing a cover reuses the same filename, so the browser would keep
+  // showing the old one. The buster lives on this element only, never in the
+  // stored path, which has to stay a plain relative path.
+  let bust = 0;
+  const paint = () => {
+    if (game.cover) {
+      const img = coverImage(game);
+      img.className = 'mg-cover__img';
+      if (bust && !/^https?:/i.test(game.cover)) img.src = `${game.cover}?v=${bust}`;
+      preview.replaceChildren(img);
+    } else {
+      preview.replaceChildren(h('span', { class: 'mg-cover__none', text: 'no art' }));
+    }
+  };
+  paint();
+
+  const zone = h('div', {
+    class: 'mg-cover__zone', tabindex: '0', role: 'button',
+    'aria-label': `Set cover art for ${game.title}`,
+  },
+    h('span', {},
+      h('span', { class: 'mg-cover__lead', text: 'Drop an image, paste, or ' }),
+      h('span', { class: 'mg-cover__link', text: 'choose a file' })),
+    h('span', { class: 'mg-hint', text: 'A link to an image works too.' }));
+
+  const fileInput = h('input', { type: 'file', accept: 'image/*', class: 'mg-file' });
+  zone.append(fileInput);
+
+  const send = async (payload, what) => {
+    try {
+      status(`Saving ${what}…`);
+      const res = await fetch('/api/cover', {
+        method: 'PUT', headers: API.headers,
+        body: JSON.stringify({ id: game.id, ...payload }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Could not save that image.');
+      game.cover = json.path;
+      markDirty('collection');
+      bust = Date.now();
+      paint();
+      renderGames();
+      status(`Cover saved to ${json.path} (${Math.round(json.bytes / 1024)} KB).`);
+    } catch (err) {
+      status(err.message, 'error');
+    }
+  };
+
+  const fromFile = async (file) => {
+    if (!file || !file.type.startsWith('image/')) {
+      status('That is not an image file.', 'error');
+      return;
+    }
+    send({ dataUrl: await downscaleImage(file, 600) }, 'image');
+  };
+
+  fileInput.addEventListener('change', () => fromFile(fileInput.files?.[0]));
+  zone.addEventListener('click', (e) => { if (e.target !== fileInput) fileInput.click(); });
+  zone.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+  });
+
+  for (const type of ['dragenter', 'dragover']) {
+    zone.addEventListener(type, (e) => { e.preventDefault(); zone.classList.add('is-over'); });
+  }
+  for (const type of ['dragleave', 'drop']) {
+    zone.addEventListener(type, () => zone.classList.remove('is-over'));
+  }
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer?.files?.[0];
+    if (file) { fromFile(file); return; }
+    // Dragging an image between browser tabs hands over a url, not a file.
+    const url = e.dataTransfer?.getData('text/uri-list') || e.dataTransfer?.getData('text');
+    if (url) send({ url: url.trim() }, 'linked image');
+  });
+
+  zone.addEventListener('paste', (e) => {
+    const item = [...(e.clipboardData?.items || [])].find((i) => i.type.startsWith('image/'));
+    if (item) { e.preventDefault(); fromFile(item.getAsFile()); return; }
+    const text = e.clipboardData?.getData('text')?.trim();
+    if (text && /^https?:\/\//i.test(text)) { e.preventDefault(); send({ url: text }, 'linked image'); }
+  });
+
+  return h('div', { class: 'mg-cover' }, preview, zone);
+}
+
 function gameEditor(game) {
   const set = (key) => (v) => {
     game[key] = v === '' ? null : v;
@@ -511,6 +611,7 @@ function gameEditor(game) {
       game.genres = v.split(',').map((s) => s.trim()).filter(Boolean);
       markDirty('collection');
     }),
+    coverPicker(game),
     field('Cover image url', game.cover, set('cover'),
       { placeholder: 'https://…  or  assets/covers/foo.jpg' }),
     field('Description', game.description, set('description'), { rows: 4 }),

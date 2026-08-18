@@ -46,6 +46,81 @@ const PHOTO_TYPES = {
 };
 const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
 
+/** Game covers live here, one file per game id. */
+const COVER_DIR = join(ROOT, 'assets', 'covers');
+
+/**
+ * Decode a base64 image data url and write it, replacing any other extension
+ * the same name previously had. Shared by profile photos and game covers.
+ */
+async function writeImage(dataUrl, dir, basename, maxBytes) {
+  const match = /^data:([a-z]+\/[a-z+]+);base64,(.+)$/i.exec(String(dataUrl || ''));
+  if (!match) throw new Error('Expected a base64 image data url.');
+
+  const ext = PHOTO_TYPES[match[1].toLowerCase()];
+  if (!ext) throw new Error(`${match[1]} isn't an image type this accepts (jpg, png, webp, gif).`);
+
+  const bytes = Buffer.from(match[2], 'base64');
+  if (!bytes.length) throw new Error('That image is empty.');
+  if (bytes.length > maxBytes) {
+    throw new Error(`That image is larger than ${Math.round(maxBytes / 1024 / 1024)} MB.`);
+  }
+
+  await mkdir(dir, { recursive: true });
+  await Promise.all(Object.values(PHOTO_TYPES)
+    .filter((other) => other !== ext)
+    .map((other) => rm(join(dir, `${basename}.${other}`), { force: true })));
+
+  const tmp = join(dir, `${basename}.${ext}.tmp`);
+  await writeFile(tmp, bytes);
+  await rename(tmp, join(dir, `${basename}.${ext}`));
+  return { ext, bytes: bytes.length };
+}
+
+/** Hosts a fetch from this machine should never be pointed at. */
+const PRIVATE_HOST =
+  /^(localhost$|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|\[?::1\]?$|0\.)/i;
+
+/**
+ * Download a remote image so it lives in the repo rather than being hotlinked.
+ *
+ * Pasting an address is how anyone actually finds box art: you search, you
+ * right-click, you copy the image address. Fetching it here also fixes the
+ * quieter problem that a hotlinked url is somebody else's to delete.
+ */
+async function fetchImageAsDataUrl(url) {
+  let parsed;
+  try {
+    parsed = new URL(String(url).trim());
+  } catch {
+    throw new Error('That is not a web address.');
+  }
+  if (!/^https?:$/.test(parsed.protocol)) {
+    throw new Error('Only http and https addresses can be fetched.');
+  }
+  // This server runs on your machine, so a fetch from it reaches your network.
+  if (PRIVATE_HOST.test(parsed.hostname)) {
+    throw new Error('That address points back at this machine or a private network.');
+  }
+
+  const res = await fetch(parsed, {
+    redirect: 'follow',
+    signal: AbortSignal.timeout(15000),
+    headers: { 'User-Agent': 'GameLog/1.0 (collection manager)' },
+  }).catch(() => { throw new Error('Could not reach that address.'); });
+
+  if (!res.ok) throw new Error(`That address answered with HTTP ${res.status}.`);
+
+  const type = (res.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+  if (!PHOTO_TYPES[type]) {
+    throw new Error(`That link is ${type || 'not an image'}, not a jpg, png, webp or gif.`);
+  }
+
+  const buf = Buffer.from(await res.arrayBuffer());
+  if (buf.length > MAX_PHOTO_BYTES) throw new Error('That image is larger than 3 MB.');
+  return `data:${type};base64,${buf.toString('base64')}`;
+}
+
 function validateCollection(data) {
   if (!data || typeof data !== 'object') throw new Error('Expected an object.');
   if (!Array.isArray(data.games)) throw new Error('Expected a "games" list.');
@@ -438,32 +513,21 @@ export async function handleApi(req, res, { port }) {
 
     if (route === 'photo' && req.method === 'PUT') {
       const { dataUrl } = await readJsonBody(req);
-      const match = /^data:([a-z]+\/[a-z+]+);base64,(.+)$/i.exec(String(dataUrl || ''));
-      if (!match) throw new Error('Expected a base64 image data url.');
+      const { ext, bytes } = await writeImage(dataUrl, PHOTO_DIR, 'avatar', MAX_PHOTO_BYTES);
+      send(res, 200, { ok: true, path: `assets/profile/avatar.${ext}`, bytes });
+      return true;
+    }
 
-      const ext = PHOTO_TYPES[match[1].toLowerCase()];
-      if (!ext) {
-        throw new Error(`${match[1]} isn't an image type this accepts (jpg, png, webp, gif).`);
+    if (route === 'cover' && req.method === 'PUT') {
+      const body = await readJsonBody(req);
+      const id = String(body?.id || '').trim();
+      // The id becomes a filename, so it may only ever be an id.
+      if (!/^[a-z0-9][a-z0-9-]*$/i.test(id)) {
+        throw new Error('That game has no usable id yet. Save it first.');
       }
-
-      const bytes = Buffer.from(match[2], 'base64');
-      if (!bytes.length) throw new Error('That image is empty.');
-      if (bytes.length > MAX_PHOTO_BYTES) {
-        throw new Error('That image is larger than 3 MB even after resizing.');
-      }
-
-      await mkdir(PHOTO_DIR, { recursive: true });
-      // Drop the other extensions, or an old avatar.png would linger in the
-      // repo forever after switching to a jpg.
-      await Promise.all(Object.values(PHOTO_TYPES)
-        .filter((other) => other !== ext)
-        .map((other) => rm(join(PHOTO_DIR, `avatar.${other}`), { force: true })));
-
-      const tmp = join(PHOTO_DIR, `avatar.${ext}.tmp`);
-      await writeFile(tmp, bytes);
-      await rename(tmp, join(PHOTO_DIR, `avatar.${ext}`));
-
-      send(res, 200, { ok: true, path: `assets/profile/avatar.${ext}`, bytes: bytes.length });
+      const dataUrl = body.url ? await fetchImageAsDataUrl(body.url) : body.dataUrl;
+      const { ext, bytes } = await writeImage(dataUrl, COVER_DIR, id, MAX_PHOTO_BYTES);
+      send(res, 200, { ok: true, path: `assets/covers/${id}.${ext}`, bytes });
       return true;
     }
 

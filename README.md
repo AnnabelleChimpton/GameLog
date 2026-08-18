@@ -388,8 +388,18 @@ It's very good on anything emulated: 95% of games on the platforms it covers -
 and **has nothing for current-gen**, because nobody scans PlayStation 5 or
 Switch boxes for an emulation project.
 
-For those, open `npm run manage` and drop an image straight onto the game. No
-API, no account, and you get the exact cover you want.
+For those, open `npm run manage`, find the game, and use the cover box. Four
+ways in, whichever suits where the picture is:
+
+- **drop** an image file onto it
+- **click** it and pick a file
+- **paste** an image straight from the clipboard
+- **paste a link** to one, which gets downloaded rather than hotlinked
+
+Whatever you give it is resized to 600px, written to `assets/covers/<game-id>`,
+and the path is filled in for you. No API, no account, and you get the exact
+cover you want. Because the file is downloaded rather than linked, it also
+cannot vanish later when somebody else tidies up their server.
 
 <details>
 <summary>Using IGDB instead, if you want current-gen filled in automatically</summary>
