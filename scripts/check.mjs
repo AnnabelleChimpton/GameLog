@@ -51,6 +51,15 @@ for (const [kind, items] of [['game', games], ['hardware', hardware]]) {
     if (item.copies != null && (!Number.isInteger(item.copies) || item.copies < 1)) {
       problems.push(`${label}: "copies" should be a whole number of 1 or more`);
     }
+    if (kind === 'hardware' && item.kind
+        && !['console', 'controller', 'memory', 'accessory'].includes(item.kind)) {
+      warnings.push(`${label}: "${item.kind}" is not a known kind, so it will show `
+        + 'as an accessory (console, controller, memory, accessory)');
+    }
+    if (item.quantity != null
+        && (!Number.isInteger(item.quantity) || item.quantity < 1)) {
+      problems.push(`${label}: "quantity" should be a whole number of at least 1`);
+    }
     if (kind === 'game' && item.status
         && !['playing', 'beaten', 'dropped'].includes(item.status)) {
       problems.push(`${label}: "${item.status}" is not a status `

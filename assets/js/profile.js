@@ -7,7 +7,7 @@
 // It scrolls away. The controls below it are what stays pinned, because once
 // you're browsing, the search box matters more than the biography.
 
-import { h, safeImageUrl, plural } from './lib.js';
+import { h, safeImageUrl, plural, hardwareCounts } from './lib.js';
 
 /** True when there's a person to introduce, rather than just a site title. */
 export function hasProfile(profile) {
@@ -99,11 +99,14 @@ function prose(text) {
 /** "184 games · 10 platforms · 5 consoles · 1983-2024" */
 function factLine(games, hardware) {
   const platforms = new Set(games.map((g) => g.platform)).size;
+  const hw = hardwareCounts(hardware);
   const years = games.map((g) => g.year).filter(Boolean).sort((a, b) => a - b);
   return [
     plural(games.length, 'game'),
     plural(platforms, 'platform'),
-    hardware.length ? plural(hardware.length, 'console') : null,
+    // Counted by kind, or four controllers would read as four consoles.
+    hw.console ? plural(hw.console, 'console') : null,
+    hw.peripherals ? `${hw.peripherals} peripheral${hw.peripherals === 1 ? '' : 's'}` : null,
     years.length ? `${years[0]}-${years[years.length - 1]}` : null,
   ].filter(Boolean).join(' · ');
 }

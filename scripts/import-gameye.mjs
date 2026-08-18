@@ -131,6 +131,10 @@ async function main() {
     if (category === 'systems' || category === 'hardware' || category === 'accessories') {
       hardware.push({
         name: title,
+        // Gameye separates systems from accessories, so keep that rather than
+        // flattening everything into one undifferentiated pile.
+        kind: category === 'accessories' ? 'accessory' : null,
+        quantity: null,
         year: null,
         image: null,
         description: null,

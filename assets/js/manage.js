@@ -8,7 +8,8 @@
 // reloading rather than by digging through git.
 
 import { PLATFORMS, platformFromIgdbId, platformSortIndex } from './platforms.mjs';
-import { h, coverImage, titleKey, plural, STATUSES, STATUS_LABEL, playStatus } from './lib.js';
+import { h, coverImage, titleKey, plural, STATUSES, STATUS_LABEL, playStatus,
+  HARDWARE_KINDS, KIND_LABEL, KIND_PLURAL, hardwareKind, hardwareQuantity } from './lib.js';
 import { labelFor } from './profile.js';
 import { resolveList } from './lists.js';
 
@@ -430,7 +431,7 @@ function renderLists() {
  * A pasted address is downloaded rather than linked. Hotlinking works right up
  * until the day somebody else deletes their file.
  */
-function coverPicker(game) {
+function coverPicker(game, { field: imageField = 'cover', label = 'cover' } = {}) {
   const preview = h('div', { class: 'mg-cover__art' });
   const origin = h('p', { class: 'mg-cover__origin' });
 
@@ -440,13 +441,15 @@ function coverPicker(game) {
   let bust = 0;
 
   const paintPreview = () => {
-    if (!game.cover) {
+    if (!game[imageField]) {
       preview.replaceChildren(h('span', { class: 'mg-cover__none', text: 'no art' }));
       return;
     }
-    const img = coverImage(game);
+    const img = coverImage({ cover: game[imageField], platform: game.platform });
     img.className = 'mg-cover__img';
-    if (bust && !/^https?:/i.test(game.cover)) img.src = `${game.cover}?v=${bust}`;
+    if (bust && !/^https?:/i.test(game[imageField])) {
+      img.src = `${game[imageField]}?v=${bust}`;
+    }
     preview.replaceChildren(img);
   };
 
@@ -459,7 +462,7 @@ function coverPicker(game) {
    * difference was invisible, so it is spelled out, with one click to change it.
    */
   const paintOrigin = () => {
-    const cover = game.cover || '';
+    const cover = game[imageField] || '';
     if (!cover) { origin.replaceChildren(); return; }
 
     if (!/^https?:\/\//i.test(cover)) {
@@ -473,7 +476,7 @@ function coverPicker(game) {
       h('span', { class: 'mg-hint', text: `Linked from ${host}, not stored here. ` }),
       h('button', {
         type: 'button', class: 'mg-linkbtn',
-        onclick: () => send({ url: game.cover }, 'a copy'),
+        onclick: () => send({ url: game[imageField] }, 'a copy'),
       }, h('span', { text: 'Save a local copy' })));
   };
 
@@ -482,7 +485,7 @@ function coverPicker(game) {
 
   const zone = h('div', {
     class: 'mg-cover__zone', tabindex: '0', role: 'button',
-    'aria-label': `Choose a cover image file for ${game.title}`,
+    'aria-label': `Choose a ${label} image for ${game.title || game.name}`,
   },
     h('span', {},
       h('span', { class: 'mg-cover__lead', text: 'Drop an image here, or ' }),
@@ -500,12 +503,14 @@ function coverPicker(game) {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Could not save that image.');
-      game.cover = json.path;
+      game[imageField] = json.path;
       markDirty('collection');
       bust = Date.now();
       paint();
-      renderGames();
-      status(`Cover saved to ${json.path} (${Math.round(json.bytes / 1024)} KB).`);
+      // Games and hardware live on different tabs, so the picker is told how
+      // to redraw rather than assuming which list it belongs to.
+      if (imageField === 'cover') renderGames(); else renderHardware();
+      status(`Image saved to ${json.path} (${Math.round(json.bytes / 1024)} KB).`);
     } catch (err) {
       status(err.message, 'error');
     }
@@ -773,32 +778,69 @@ function renderHardware() {
   const wrap = $('#tab-hardware');
   const items = state.collection.hardware;
 
-  const rows = items.map((item, i) => h('div', { class: 'mg-card' },
-    h('div', { class: 'mg-row' },
-      field('Name', item.name, (v) => { item.name = v; markDirty('collection'); }),
-      platformField(item.platform, (v) => { item.platform = v; markDirty('collection'); })),
-    h('div', { class: 'mg-row' },
-      field('Condition', item.condition, (v) => {
-        item.condition = v || null; markDirty('collection');
+  const rows = items.map((item, i) => {
+    const photo = coverPicker(item, { field: 'image', label: 'photo' });
+    return h('div', { class: 'mg-card' },
+      h('div', { class: 'mg-row' },
+        field('Name', item.name, (v) => { item.name = v; markDirty('collection'); }),
+        platformField(item.platform, (v) => { item.platform = v; markDirty('collection'); })),
+
+      h('div', { class: 'mg-row mg-row--tight' },
+        h('span', { class: 'mg-field__label', text: 'Kind' }),
+        ...HARDWARE_KINDS.map((kind) => h('button', {
+          type: 'button',
+          class: hardwareKind(item) === kind ? 'mg-mini mg-statuspick is-on' : 'mg-mini mg-statuspick',
+          onclick: () => {
+            // console is the default, so storing it would be noise in the file.
+            item.kind = kind === 'console' ? null : kind;
+            markDirty('collection');
+            renderHardware();
+          },
+        }, h('span', { text: KIND_LABEL[kind] })))),
+
+      h('div', { class: 'mg-row' },
+        field('How many', String(hardwareQuantity(item)), (v) => {
+          const n = Math.max(1, Math.floor(Number(v) || 1));
+          item.quantity = n > 1 ? n : null;
+          markDirty('collection');
+        }, { type: 'number' }),
+        field('Condition', item.condition, (v) => {
+          item.condition = v || null; markDirty('collection');
+        })),
+
+      photo,
+      field('Photo path or url', item.image, (v) => {
+        item.image = v || null; markDirty('collection'); photo.refresh();
       }),
-      field('Image url', item.image, (v) => {
-        item.image = v || null; markDirty('collection');
+      field('Note', item.notes, (v) => {
+        item.notes = v || null; markDirty('collection');
       }),
-      h('div', { class: 'mg-field' },
-        h('span', { class: 'mg-field__label', text: ' ' }),
+
+      h('div', { class: 'mg-row' },
+        h('span', { class: 'mg-grow' }),
         iconButton('Remove', () => {
           items.splice(i, 1); markDirty('collection'); renderHardware();
-        }, { danger: true })))));
+        }, { danger: true })));
+  });
+
+  const counts = HARDWARE_KINDS
+    .map((kind) => {
+      const n = items.filter((x) => hardwareKind(x) === kind)
+        .reduce((sum, x) => sum + hardwareQuantity(x), 0);
+      // "memory and expansion" does not take an s, so use the proper plurals.
+      return n ? `${n} ${n === 1 ? KIND_LABEL[kind].toLowerCase() : KIND_PLURAL[kind]}` : null;
+    })
+    .filter(Boolean);
 
   wrap.replaceChildren(
     h('div', { class: 'mg-listbar' },
-      h('span', { class: 'mg-hint', text: `${plural(items.length, 'console')} and accessories` }),
+      h('span', { class: 'mg-hint', text: counts.join(' · ') || 'Nothing yet' }),
       h('span', { class: 'mg-grow' }),
       h('button', {
         type: 'button', class: 'pillbutton pillbutton--accent',
         onclick: () => {
-          items.push({ id: `hardware-${Date.now()}`, name: 'New item', platform: '',
-            image: null, condition: null, notes: null });
+          items.push({ id: `hardware-${Date.now()}`, name: 'New item', kind: null,
+            platform: '', quantity: null, image: null, condition: null, notes: null });
           markDirty('collection'); renderHardware();
         },
       }, h('span', { text: '+ Add hardware' }))),

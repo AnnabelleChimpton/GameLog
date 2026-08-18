@@ -11,6 +11,7 @@ import { platformInfo, platformSortIndex } from './platforms.mjs';
 import {
   fold, sortKey, conditionGroup, CONDITION_ORDER, coverImage, placeholderCover,
   safeImageUrl, h, plural, playStatus, STATUS_LABEL, episodeNumbers, progressOf, isLocal,
+  hardwareKind, hardwareQuantity, HARDWARE_KINDS, KIND_LABEL,
 } from './lib.js';
 import { renderStats } from './stats.js';
 import { renderTimeline } from './timeline.js';
@@ -277,9 +278,9 @@ function renderHardware() {
   if (!list.length) { el.hardwareSection.hidden = true; return; }
   el.hardwareSection.hidden = false;
 
-  el.hardwareGrid.replaceChildren(...list.map((item) => {
+  const card = (item) => {
     const info = platformInfo(item.platform);
-    const card = h('div', { class: 'hw-card' });
+    const node = h('div', { class: 'hw-card' });
     const art = h('div', { class: 'hw-card__art' });
 
     const src = safeImageUrl(item.image);
@@ -295,11 +296,31 @@ function renderHardware() {
       art.append(h('span', { class: 'hw-card__initials', text: info.short }));
     }
 
-    card.append(art, h('div', {},
+    const quantity = hardwareQuantity(item);
+    node.append(art, h('div', { class: 'hw-card__body' },
       h('p', { class: 'hw-card__name', text: item.name }),
       h('p', { class: 'hw-card__meta',
         text: [item.platform, item.condition].filter(Boolean).join(' · ') })));
-    return card;
+    if (quantity > 1) {
+      node.append(h('span', { class: 'hw-card__qty', title: `${quantity} of these`,
+        text: `×${quantity}` }));
+    }
+    return node;
+  };
+
+  // Grouped by kind, in a fixed order. A flat grid is fine for five consoles
+  // and unreadable once controllers and memory cards are in there too.
+  const groups = HARDWARE_KINDS
+    .map((kind) => [kind, list.filter((item) => hardwareKind(item) === kind)])
+    .filter(([, items]) => items.length);
+
+  el.hardwareGrid.replaceChildren(...groups.flatMap(([kind, items]) => {
+    const total = items.reduce((n, item) => n + hardwareQuantity(item), 0);
+    // A single group needs no heading: the section is already called Hardware.
+    const heading = groups.length > 1
+      ? h('h3', { class: 'hw-group', text: `${KIND_LABEL[kind]}${total > items.length ? ` (${total})` : ''}` })
+      : null;
+    return [heading, h('div', { class: 'hardware__row' }, items.map(card))].filter(Boolean);
   }));
 }
 

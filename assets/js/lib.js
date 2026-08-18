@@ -52,6 +52,63 @@ export const CONDITION_ORDER = ['New', 'CIB', 'Boxed', 'Loose', 'Other'];
 export const isLocal = () =>
   ['localhost', '127.0.0.1', '[::1]', ''].includes(window.location.hostname);
 
+/* --- Hardware ------------------------------------------------------------- */
+
+/**
+ * What a piece of hardware is.
+ *
+ * Four buckets, not a taxonomy. Anything unrecognised falls back to accessory
+ * the same way an unknown platform falls back to a generated label, so an entry
+ * typed by hand can never disappear from the page.
+ *
+ * Entries written before this existed have no kind at all, and those are
+ * consoles: that is all the hardware list held until peripherals arrived.
+ */
+export const HARDWARE_KINDS = ['console', 'controller', 'memory', 'accessory'];
+
+export const KIND_LABEL = {
+  console: 'Console',
+  controller: 'Controller',
+  memory: 'Memory and expansion',
+  accessory: 'Accessory',
+};
+
+/** Plural forms, for counting lines. */
+export const KIND_PLURAL = {
+  console: 'consoles',
+  controller: 'controllers',
+  memory: 'memory cards',
+  accessory: 'accessories',
+};
+
+export function hardwareKind(item) {
+  if (!item?.kind) return 'console';
+  const kind = String(item.kind).toLowerCase();
+  return HARDWARE_KINDS.includes(kind) ? kind : 'accessory';
+}
+
+/** How many physical things this row represents. */
+export const hardwareQuantity = (item) => {
+  const n = Number(item?.quantity);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1;
+};
+
+/**
+ * Counts by kind, summing quantity rather than rows: four controllers on one
+ * row are four controllers, and saying "1 controller" would be a lie the
+ * quantity field was added to prevent.
+ */
+export function hardwareCounts(hardware) {
+  const counts = { console: 0, controller: 0, memory: 0, accessory: 0, total: 0 };
+  for (const item of hardware || []) {
+    const n = hardwareQuantity(item);
+    counts[hardwareKind(item)] += n;
+    counts.total += n;
+  }
+  counts.peripherals = counts.total - counts.console;
+  return counts;
+}
+
 /* --- Play status ---------------------------------------------------------- */
 
 /**

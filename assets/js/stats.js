@@ -6,7 +6,8 @@
 // which is why a ten-platform chart needs no ten-colour palette.
 
 import { platformInfo, platformSortIndex } from './platforms.mjs';
-import { h, tally, attachTip, conditionGroup, CONDITION_ORDER, plural } from './lib.js';
+import { h, tally, attachTip, conditionGroup, CONDITION_ORDER, plural,
+  hardwareCounts, hardwareKind, hardwareQuantity, KIND_PLURAL } from './lib.js';
 
 /** One horizontal bar row: label, bar, value. */
 function barRow(label, value, max, { dot = null, tip = null } = {}) {
@@ -82,6 +83,8 @@ export function renderStats(games, hardware, { filtered = false, total = 0 } = {
   const copies = games.reduce((sum, g) => sum + (g.copies || 1), 0);
   const platforms = new Set(games.map((g) => g.platform));
 
+  const hw = hardwareCounts(hardware);
+
   const avgScore = rated.length
     ? (rated.reduce((s, g) => s + g.metacritic, 0) / rated.length).toFixed(1)
     : '-';
@@ -98,7 +101,7 @@ export function renderStats(games, hardware, { filtered = false, total = 0 } = {
   const kpis = h('div', { class: 'stats__kpis' },
     statTile(String(games.length), 'games', copies > games.length ? `${copies} copies` : null),
     statTile(String(platforms.size), 'platforms',
-      hardware.length ? plural(hardware.length, 'console') : null),
+      hw.console ? plural(hw.console, 'console') : null),
     statTile(years.length ? `${years[0]}-${years[years.length - 1]}` : '-', 'years covered',
       years.length ? `median ${years[Math.floor(years.length / 2)]}` : null),
     statTile(String(avgScore), 'avg metascore',
@@ -175,6 +178,19 @@ export function renderStats(games, hardware, { filtered = false, total = 0 } = {
       conditions.map(([name, count]) => ({ label: name, value: count,
         tip: `${name}: ${plural(count, 'game')}` })),
       { note: 'Grouped from however you wrote it: "CIB+" and "CIB" count together.' }));
+  }
+
+  /* Hardware, but only once it is more than a list of consoles. */
+  const kindsPresent = Object.entries(hw)
+    .filter(([key, n]) => KIND_PLURAL[key] && n > 0);
+  if (kindsPresent.length > 1) {
+    panels.push(barChart('Hardware',
+      kindsPresent.map(([key, n]) => ({
+        label: KIND_PLURAL[key].replace(/^./, (c) => c.toUpperCase()),
+        value: n,
+        tip: `${n} ${KIND_PLURAL[key]}`,
+      })),
+      { note: 'Counting how many you own, not how many rows there are.' }));
   }
 
   /* Ranked lists, where a chart would add nothing. */

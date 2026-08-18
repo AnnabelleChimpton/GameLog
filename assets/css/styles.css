@@ -2186,3 +2186,33 @@ div.minitile { cursor: default; }
 .mg-cover__urlrow { display: flex; gap: 8px; margin-top: 9px; }
 .mg-cover__url { flex: 1; min-width: 0; }
 .mg-cover__urlrow .mg-mini { flex: 0 0 auto; }
+
+/* Hardware grouped by kind */
+.hardware__grid { display: block; }
+.hardware__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+}
+.hw-group {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 22px 0 10px;
+}
+.hw-group:first-child { margin-top: 0; }
+.hw-card { position: relative; }
+.hw-card__body { min-width: 0; }
+.hw-card__qty {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  padding: 1px 7px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+}

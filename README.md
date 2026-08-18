@@ -111,7 +111,30 @@ npm run add "Hades"
 npm run import:gameye -- ~/Downloads/your-export.csv
 ```
 
-### 5. Change the name and colour
+### 5. Consoles and peripherals
+
+`hardware` is a second list alongside `games`, for the things you play on rather
+than play:
+
+```json
+"hardware": [
+  { "id": "n64", "name": "Nintendo 64 System", "platform": "Nintendo 64" },
+  { "id": "n64-pad", "name": "Controller [Grey]", "kind": "controller",
+    "platform": "Nintendo 64", "quantity": 4, "condition": "Loose" }
+]
+```
+
+`kind` is `console`, `controller`, `memory` or `accessory`, and defaults to
+`console` when left out. `quantity` defaults to 1, so four identical controllers
+are one row with `"quantity": 4` rather than four rows, and show as ×4.
+
+The shelf groups them under headings, and the counts on your page follow the
+kind, so peripherals never get counted as consoles.
+
+No database covers peripherals, so photos are yours to add. The manager's
+hardware tab has the same drop-or-paste picker the games use.
+
+### 6. Change the name and colour
 
 `data/config.json` holds everything about the site's identity:
 
@@ -130,7 +153,7 @@ npm run import:gameye -- ~/Downloads/your-export.csv
 accepts links and `**bold**`. The manager's **Site** and **Profile** tabs edit
 all of this without touching the file.
 
-### 6. Publish
+### 7. Publish
 
 Press **Publish…** in the manager. It shows exactly which files are about to go
 out, lets you describe the change, then commits and pushes.
@@ -181,7 +204,7 @@ Open the address it prints and you get a proper editor:
 
 - **Lists**: make them, rename them, drag entries up and down, add notes.
 - **Games**: edit any field on any game, or add one by searching IGDB.
-- **Hardware**: your consoles.
+- **Hardware**: consoles, controllers, memory cards and accessories.
 - **Profile**: your photo, bio and links.
 - **Site**: title, tagline, accent colour (with a colour picker), and the
   shelves you follow.

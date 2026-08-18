@@ -26,8 +26,8 @@ const GAME_KEYS = [
 ];
 
 const HARDWARE_KEYS = [
-  'id', 'name', 'platform', 'year', 'image', 'description', 'manufacturer',
-  'region', 'release', 'condition', 'notes', 'added',
+  'id', 'name', 'kind', 'platform', 'quantity', 'year', 'image', 'description',
+  'manufacturer', 'region', 'release', 'condition', 'notes', 'added',
 ];
 
 function orderKeys(obj, order) {
