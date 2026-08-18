@@ -432,20 +432,52 @@ function renderLists() {
  */
 function coverPicker(game) {
   const preview = h('div', { class: 'mg-cover__art' });
+  const origin = h('p', { class: 'mg-cover__origin' });
+
   // Replacing a cover reuses the same filename, so the browser would keep
   // showing the old one. The buster lives on this element only, never in the
   // stored path, which has to stay a plain relative path.
   let bust = 0;
-  const paint = () => {
-    if (game.cover) {
-      const img = coverImage(game);
-      img.className = 'mg-cover__img';
-      if (bust && !/^https?:/i.test(game.cover)) img.src = `${game.cover}?v=${bust}`;
-      preview.replaceChildren(img);
-    } else {
+
+  const paintPreview = () => {
+    if (!game.cover) {
       preview.replaceChildren(h('span', { class: 'mg-cover__none', text: 'no art' }));
+      return;
     }
+    const img = coverImage(game);
+    img.className = 'mg-cover__img';
+    if (bust && !/^https?:/i.test(game.cover)) img.src = `${game.cover}?v=${bust}`;
+    preview.replaceChildren(img);
   };
+
+  /**
+   * Say where this cover actually lives.
+   *
+   * The box downloads what you give it; the url field below stores whatever you
+   * type. Both are reasonable, since most covers here are IGDB links and
+   * downloading hundreds of them would bloat the repo for nothing. But the
+   * difference was invisible, so it is spelled out, with one click to change it.
+   */
+  const paintOrigin = () => {
+    const cover = game.cover || '';
+    if (!cover) { origin.replaceChildren(); return; }
+
+    if (!/^https?:\/\//i.test(cover)) {
+      origin.replaceChildren(h('span', { class: 'mg-hint', text: `Stored in your repo at ${cover}` }));
+      return;
+    }
+
+    let host = cover;
+    try { host = new URL(cover).hostname.replace(/^www\./, ''); } catch { /* keep the raw value */ }
+    origin.replaceChildren(
+      h('span', { class: 'mg-hint', text: `Linked from ${host}, not stored here. ` }),
+      h('button', {
+        type: 'button', class: 'mg-linkbtn',
+        onclick: () => send({ url: game.cover }, 'a copy'),
+      }, h('span', { text: 'Save a local copy' })));
+  };
+
+  const paint = () => { paintPreview(); paintOrigin(); };
   paint();
 
   const zone = h('div', {
@@ -455,7 +487,7 @@ function coverPicker(game) {
     h('span', {},
       h('span', { class: 'mg-cover__lead', text: 'Drop an image, paste, or ' }),
       h('span', { class: 'mg-cover__link', text: 'choose a file' })),
-    h('span', { class: 'mg-hint', text: 'A link to an image works too.' }));
+    h('span', { class: 'mg-hint', text: 'A link to an image works too, and gets downloaded.' }));
 
   const fileInput = h('input', { type: 'file', accept: 'image/*', class: 'mg-file' });
   zone.append(fileInput);
@@ -516,10 +548,14 @@ function coverPicker(game) {
     if (text && /^https?:\/\//i.test(text)) { e.preventDefault(); send({ url: text }, 'linked image'); }
   });
 
-  return h('div', { class: 'mg-cover' }, preview, zone);
+  const node = h('div', {}, h('div', { class: 'mg-cover' }, preview, zone), origin);
+  // The url field below edits the same value, so it needs to redraw this.
+  node.refresh = paint;
+  return node;
 }
 
 function gameEditor(game) {
+  const cover = coverPicker(game);
   const set = (key) => (v) => {
     game[key] = v === '' ? null : v;
     markDirty('collection');
@@ -611,8 +647,8 @@ function gameEditor(game) {
       game.genres = v.split(',').map((s) => s.trim()).filter(Boolean);
       markDirty('collection');
     }),
-    coverPicker(game),
-    field('Cover image url', game.cover, set('cover'),
+    cover,
+    field('Cover image path or url', game.cover, (v) => { set('cover')(v); cover.refresh(); },
       { placeholder: 'https://…  or  assets/covers/foo.jpg' }),
     field('Description', game.description, set('description'), { rows: 4 }),
     field('Your note', game.notes, set('notes'),

@@ -2169,3 +2169,16 @@ div.minitile { cursor: default; }
 }
 .mg-cover__lead { font-size: 0.85rem; color: var(--text-soft); }
 .mg-cover__link { font-size: 0.85rem; font-weight: 600; color: var(--accent); }
+
+.mg-cover__origin { margin-top: 7px; display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+.mg-linkbtn {
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

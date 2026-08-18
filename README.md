@@ -397,7 +397,14 @@ ways in, whichever suits where the picture is:
 - **paste a link** to one, which gets downloaded rather than hotlinked
 
 Whatever you give it is resized to 600px, written to `assets/covers/<game-id>`,
-and the path is filled in for you. No API, no account, and you get the exact
+and the path is filled in for you.
+
+The **Cover image path or url** field underneath is the raw value, and it does
+something different on purpose: whatever you type there is stored as-is, so a
+url stays a link rather than being downloaded. That is usually what you want,
+since most covers come from IGDB and downloading hundreds of them would bloat
+the repo for nothing. A line under the box always says which you have, with a
+**Save a local copy** button when it is a link. No API, no account, and you get the exact
 cover you want. Because the file is downloaded rather than linked, it also
 cannot vanish later when somebody else tidies up their server.
 
