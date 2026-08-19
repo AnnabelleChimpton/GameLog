@@ -24,9 +24,9 @@ import { loadEnv, getToken, createClient, searchGames, coverUrl, tidySummary, re
 import { searchFree, coverFor } from './freelookup.mjs';
 import { findBoxart } from './libretro.mjs';
 import {
-  PHOTO_DIR, COVER_DIR, MAX_IMAGE_BYTES, writeImage, fetchImageAsDataUrl,
+  PHOTO_DIR, COVER_DIR, BOXART_DIR, MAX_IMAGE_BYTES, writeImage, fetchImageAsDataUrl,
 } from './images.mjs';
-import { vendorArt, artSummary } from './vendor.mjs';
+import { vendorArt, artSummary, usableId } from './vendor.mjs';
 import { loadCollection as loadCollectionForVendor, saveCollection as saveCollectionFromVendor }
   from './collection.mjs';
 
@@ -443,12 +443,17 @@ export async function handleApi(req, res, { port }) {
       const body = await readJsonBody(req);
       const id = String(body?.id || '').trim();
       // The id becomes a filename, so it may only ever be an id.
-      if (!/^[a-z0-9][a-z0-9-]*$/i.test(id)) {
+      if (!usableId(id)) {
         throw new Error('That game has no usable id yet. Save it first.');
       }
+      // Covers and box scans are two pictures of the same game, so they are
+      // told apart by which directory they land in rather than by name.
+      const box = body.field === 'boxart';
+      const dir = box ? BOXART_DIR : COVER_DIR;
+      const prefix = box ? 'assets/boxart' : 'assets/covers';
       const dataUrl = body.url ? await fetchImageAsDataUrl(body.url) : body.dataUrl;
-      const { ext, bytes } = await writeImage(dataUrl, COVER_DIR, id, MAX_IMAGE_BYTES);
-      send(res, 200, { ok: true, path: `assets/covers/${id}.${ext}`, bytes });
+      const { ext, bytes } = await writeImage(dataUrl, dir, id, MAX_IMAGE_BYTES);
+      send(res, 200, { ok: true, path: `${prefix}/${id}.${ext}`, bytes });
       return true;
     }
 

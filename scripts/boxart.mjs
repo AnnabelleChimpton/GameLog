@@ -15,6 +15,7 @@
 // arrives, and a shelf of a few hundred would reflow the whole way down.
 
 import { loadCollection, saveCollection } from './lib/collection.mjs';
+import { vendorEntry } from './lib/vendor.mjs';
 import { findBoxart, coverage } from './lib/libretro.mjs';
 
 const args = process.argv.slice(2);
@@ -52,10 +53,12 @@ async function main() {
     if (box) {
       game.boxart = box.url;
       game.boxartRatio = box.ratio;
+      // Straight into the repo, so this never leaves a shelf full of hotlinks.
+      await vendorEntry(game);
       found += 1;
       console.log(`  ✓ [${String(done).padStart(3)}/${targets.length}] ${game.title} (${box.ratio})`);
     } else {
-      console.log(`  ·  ${game.title} — no scan`);
+      console.log(`  ·  ${game.title}: no scan`);
     }
 
     if (done % 20 === 0) await saveCollection(collection);

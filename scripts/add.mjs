@@ -20,6 +20,7 @@ import {
 } from './lib/igdb.mjs';
 import { searchFree, coverFor, hasFreeArt } from './lib/freelookup.mjs';
 import { findBoxart } from './lib/libretro.mjs';
+import { vendorEntry } from './lib/vendor.mjs';
 
 function parseArgs(argv) {
   const opts = { positional: [] };
@@ -199,6 +200,10 @@ async function main() {
     }
   }
 
+  // Store the art now, while we know the id. A game added today should not be
+  // waiting on a backup somebody has to remember to run.
+  const art = await vendorEntry(entry);
+
   collection.games.push(entry);
   collection.games.sort((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }));
   await saveCollection(collection);
@@ -206,8 +211,14 @@ async function main() {
   const p = platformInfo(platform);
   console.log(`\n  Added "${entry.title}" [${p.short}]${entry.year ? ` (${entry.year})` : ''}`);
   if (!entry.cover) console.log('  No cover art yet: run `npm run enrich` later, or paste a url into "cover".');
+  if (entry.boxart) console.log(`  Box scan too, at ${entry.boxartRatio} for the ${p.short} shelf.`);
+  if (art.stored) console.log(`  ${art.stored} image(s) stored in your repo.`);
+  if (art.failed) {
+    console.log(`  ${art.failed} image(s) could not be downloaded and stayed linked. `
+      + 'Run `npm run vendor` to try again.');
+  }
   console.log('\n  Commit and push to publish:');
-  console.log(`    git add data/collection.json && git commit -m "Add ${entry.title}" && git push`);
+  console.log(`    git add data assets && git commit -m "Add ${entry.title}" && git push`);
 }
 
 main()

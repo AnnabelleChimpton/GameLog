@@ -19,6 +19,7 @@
 // rather than refusing to run.
 
 import { loadCollection, saveCollection } from './lib/collection.mjs';
+import { vendorEntry } from './lib/vendor.mjs';
 import { platformInfo } from '../assets/js/platforms.mjs';
 import {
   loadEnv, getToken, createClient, findGame, coverUrl, tidySummary, releaseYear,
@@ -87,6 +88,10 @@ async function enrichWithIgdb(collection, targets) {
     if (publisher && !game.publisher) { game.publisher = publisher; changes.push('publisher'); }
     if (match.id && (force || !game.igdbId)) game.igdbId = match.id;
 
+    // Art that was just found is stored before the run moves on, so a finished
+    // enrich leaves nothing hotlinked for someone to clean up afterwards.
+    if (!dryRun && changes.includes('cover')) await vendorEntry(game);
+
     if (changes.length) updated += 1;
 
     const confident = match._matchScore >= 90;
@@ -150,6 +155,8 @@ async function enrichFree(collection, targets) {
       }
       if (page.wikidata && !game.wikidataId) game.wikidataId = page.wikidata;
     }
+
+    if (!dryRun && changes.includes('cover')) await vendorEntry(game);
 
     if (changes.length) updated += 1;
     else if (!game.cover && !game.description) unmatched.push(game);

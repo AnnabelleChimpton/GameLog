@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import {
-  isRemote, usableId, artInventory, artSummary, vendorArt,
+  isRemote, usableId, artInventory, artSummary, vendorArt, vendorEntry, ART_FIELDS,
 } from '../scripts/lib/vendor.mjs';
 
 /* --- What counts as somebody else's server -------------------------------- */
@@ -175,4 +175,34 @@ test('a private address is refused, so this cannot be pointed at your network', 
 
   assert.equal(result.done.length, 0);
   assert.match(result.failed[0].error, /private network|this machine/);
+});
+
+/* --- One entry at a time -------------------------------------------------- */
+
+test('vendorEntry looks at one entry and leaves the rest alone', async () => {
+  // Every add route calls this the moment a game gets art, so it has to work on
+  // an entry that is not in any collection yet.
+  const game = { id: 'n64-new', title: 'New', cover: 'https://cdn.test/a.jpg', boxart: null };
+  const summary = artSummary({ games: [game], hardware: [] });
+  assert.deepEqual(summary, { total: 1, remote: 1, stored: 0 });
+});
+
+test('the field list covers every place art can be, and only those', () => {
+  // A new art field added to the schema without a line here would silently
+  // never be backed up, which is the failure mode this guards.
+  assert.deepEqual(ART_FIELDS.map((f) => `${f.list}.${f.field}`),
+    ['games.cover', 'games.boxart', 'hardware.image']);
+});
+
+test('vendorEntry reports what it stored so a caller can say so', async () => {
+  const real = globalThis.fetch;
+  globalThis.fetch = async () => ok();
+  try {
+    // Writes to the real assets directory, so this uses an entry that already
+    // has a local path: nothing to download, nothing to write.
+    const result = await vendorEntry({ id: 'x', title: 'X', cover: 'assets/covers/x.png' });
+    assert.deepEqual(result, { stored: 0, failed: 0 });
+  } finally {
+    globalThis.fetch = real;
+  }
 });

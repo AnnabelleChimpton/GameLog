@@ -424,12 +424,11 @@ and the path is filled in for you.
 
 The **Cover image path or url** field underneath is the raw value, and it does
 something different on purpose: whatever you type there is stored as-is, so a
-url stays a link rather than being downloaded. That is usually what you want,
-since most covers come from IGDB and downloading hundreds of them would bloat
-the repo for nothing. A line under the box always says which you have, with a
-**Save a local copy** button when it is a link. No API, no account, and you get the exact
-cover you want. Because the file is downloaded rather than linked, it also
-cannot vanish later when somebody else tidies up their server.
+url stays a link rather than being downloaded. That is the one way to keep a
+hotlink on purpose. A line under the box always says which you have, with a
+**Save a local copy** button when it is a link. No API, no account, and you get
+the exact cover you want. Because the file is downloaded rather than linked, it
+also cannot vanish later when somebody else tidies up their server.
 
 <details>
 <summary>Using IGDB instead, if you want current-gen filled in automatically</summary>
@@ -459,19 +458,22 @@ those tiles show their title permanently, so the shelf still reads properly.
 npm run vendor
 ```
 
-Everything above finds art by handing you a link to somebody else's server. That
-works right up until the day that server reorganises a directory, and then your
-shelf is placeholders and there is no local copy to fall back on.
+Art is found by handing you a link to somebody else's server, and a link works
+right up until the day that server reorganises a directory. So every route that
+finds art also stores it: `npm run add`, `npm run enrich`, `npm run boxart`, and
+adding a game in the manager all download the picture into `assets/covers` or
+`assets/boxart` and point `collection.json` at the copy. You do not have to do
+anything for this, and it is why a published GameLog owns its own pictures.
 
-This downloads every linked image into `assets/covers` and `assets/boxart` and
-repoints `collection.json` at the copies, so a published GameLog owns its own
-pictures. It is safe to re-run, and it is not destructive: anything it cannot
-download keeps the link it had, so the worst case is a game that stays linked
-rather than one that loses its art. `--dry-run` shows what it would fetch.
+`npm run vendor` is the catch-up pass for a collection that predates that, or
+for anything a run could not fetch at the time. It is safe to re-run, and it is
+not destructive: anything it cannot download keeps the link it had, so the worst
+case is a game that stays linked rather than one that loses its art. `--dry-run`
+shows what it would fetch.
 
-The manager has the same thing as a button, under **Site → Artwork backup**, and
-`npm run check` tells you how many images are still linked. Expect roughly
-150 KB per game with a cover and a box scan.
+The manager has the same as a button under **Site → Artwork backup**, the
+publish dialog warns when anything is still hotlinked, and `npm run check`
+reports the count. Expect roughly 300 KB per game with a cover and a box scan.
 
 ### True box shapes
 

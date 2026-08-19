@@ -648,7 +648,9 @@ function gameEditor(game) {
               game.boxartRatio = found.boxartRatio ?? null;
             }
             if (found.cover || found.boxart) {
-              status('Found box art for that platform.');
+              // Same rule as adding: art found for you goes into the repo now.
+              if (game.id) await storeArtFor(game);
+              status('Found box art for that platform, and stored it.');
               renderGames();
             }
           }
@@ -759,6 +761,7 @@ function renderGames() {
           igdbId: g.igdbId ?? null, wikidataId: g.wikidataId ?? null,
         };
         game.id = uniqueGameId(game);
+        await storeArtFor(game);
         state.collection.games.push(game);
         state.collection.games.sort((a, b) =>
           a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }));
@@ -890,6 +893,34 @@ function renderHardware() {
 }
 
 /* --- Site tab ------------------------------------------------------------- */
+
+/**
+ * Pull a newly added game's art into the repo straight away.
+ *
+ * The id only exists once the game is built, and the filename is the id, so
+ * this is the first moment the download can happen. Doing it here rather than
+ * leaving it for the backup button is the difference between a collection that
+ * owns its pictures and one that owns them whenever somebody remembers.
+ *
+ * Quiet on failure: the entry keeps its link, which still displays, and both
+ * the Site tab and the publish dialog will say it is still linked.
+ */
+async function storeArtFor(game) {
+  const jobs = [['cover', game.cover], ['boxart', game.boxart]]
+    .filter(([, url]) => /^https?:\/\//i.test(String(url ?? '')));
+  if (!jobs.length) return;
+
+  await Promise.all(jobs.map(async ([field, url]) => {
+    try {
+      const res = await fetch('/api/cover', {
+        method: 'PUT', headers: API.headers,
+        body: JSON.stringify({ id: game.id, url, field }),
+      });
+      const json = await res.json();
+      if (res.ok && json.path) game[field] = json.path;
+    } catch { /* keep the link: the backup card will offer it again */ }
+  }));
+}
 
 /* --- Artwork backup ------------------------------------------------------- */
 

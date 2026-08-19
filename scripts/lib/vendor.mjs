@@ -116,6 +116,23 @@ export async function vendorArt(
   return { done, failed, bytes, attempted: pending.length };
 }
 
+/**
+ * Store one entry's art, right when the entry gets it.
+ *
+ * Every route that puts art on a game -- the CLI, the manager, enrich, boxart --
+ * calls this, so a picture is in the repo from the moment it is found. Waiting
+ * until someone remembers to run the backup is how a collection ends up half
+ * hotlinked, and the person most likely to forget is the one this is for.
+ *
+ * A failure here is not worth stopping an add over: the entry keeps the link,
+ * which still displays, and the next backup picks it up.
+ */
+export async function vendorEntry(entry, list = 'games') {
+  const one = { games: [], hardware: [], [list]: [entry] };
+  const { done, failed } = await vendorArt(one);
+  return { stored: done.length, failed: failed.length };
+}
+
 /** What the stored art weighs, for the report at the end of a run. */
 export async function artOnDisk(collection) {
   const local = artInventory(collection).filter((i) => !i.remote);
