@@ -1511,6 +1511,8 @@ div.minitile { cursor: default; }
 
 .mg-body { padding-bottom: 60px; }
 
+:root { --mg-header: 131px; }
+
 .mg-top {
   position: sticky;
   top: 0;
@@ -1663,7 +1665,7 @@ div.minitile { cursor: default; }
    game is not a thousand-pixel climb back to the top. */
 .mg-listbar--sticky {
   position: sticky;
-  top: 131px;
+  top: var(--mg-header);
   z-index: 5;
   padding: 10px 0;
   margin-bottom: 2px;
@@ -1931,26 +1933,6 @@ div.minitile { cursor: default; }
 }
 .plink__icon { width: 15px; height: 15px; fill: currentColor; flex: 0 0 auto; }
 
-/* The platform spread, under the shelf rather than in the hero. */
-.platsum {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 34px;
-  padding-top: 22px;
-  border-top: 1px solid var(--border);
-}
-.platsum__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 12px;
-  font-size: 0.8rem;
-  color: var(--text-soft);
-  background: var(--surface-sunk);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-}
 
 @media (max-width: 620px) {
   .hero { padding-top: 22px; }
@@ -2231,9 +2213,9 @@ div.minitile { cursor: default; }
 }
 
 /* A newly added game, so it is findable after the list scrolls to it. */
-/* Clears the sticky manager header (131px) plus a little breathing room, so a
-   row scrolled to does not sit tucked underneath it. */
-.mg-gamerow { scroll-margin-top: 148px; }
+/* Clears the sticky manager header plus breathing room, so a row scrolled to
+   does not sit tucked underneath it. */
+.mg-gamerow { scroll-margin-top: calc(var(--mg-header) + 17px); }
 
 .mg-gamerow.is-new {
   border-radius: var(--radius-ui);
@@ -2245,9 +2227,9 @@ div.minitile { cursor: default; }
 }
 @media (prefers-reduced-motion: reduce) {
   /* No pulse, but still mark it: the row has to be identifiable either way. */
-  /* Clears the sticky manager header (131px) plus a little breathing room, so a
-   row scrolled to does not sit tucked underneath it. */
-.mg-gamerow { scroll-margin-top: 148px; }
+  /* Clears the sticky manager header plus breathing room, so a row scrolled to
+   does not sit tucked underneath it. */
+.mg-gamerow { scroll-margin-top: calc(var(--mg-header) + 17px); }
 
 .mg-gamerow.is-new { animation: none; box-shadow: 0 0 0 2px var(--accent); }
 }

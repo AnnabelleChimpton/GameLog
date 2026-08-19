@@ -23,7 +23,12 @@ export function resolveCollectionUrl(input) {
   if (!raw) throw new Error('Paste a GameLog address first.');
 
   // "user/repo" shorthand -> that user's project page.
-  if (/^[\w.-]+\/[\w.-]+$/.test(raw)) {
+  //
+  // The username may not contain a dot, or a bare host and path like
+  // "someone.github.io/GameLog" matches this and gets rebuilt as
+  // "someone.github.io.github.io/GameLog". Repository names can contain dots,
+  // so only the first segment is restricted.
+  if (/^[\w-]+\/[\w.-]+$/.test(raw)) {
     const [user, repo] = raw.split('/');
     return `https://${user}.github.io/${repo}/data/collection.json`;
   }

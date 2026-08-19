@@ -9,15 +9,6 @@
 
 import { h, safeImageUrl, plural, hardwareCounts } from './lib.js';
 
-/** True when there's a person to introduce, rather than just a site title. */
-export function hasProfile(profile) {
-  if (!profile || typeof profile !== 'object') return false;
-  return Boolean(
-    profile.name || profile.photo || profile.about
-    || (Array.isArray(profile.links) && profile.links.some((l) => l?.url))
-  );
-}
-
 /**
  * Brand glyphs for the handful of places collectors actually link to. Anything
  * unrecognised gets the globe, which is why this list can stay short instead of

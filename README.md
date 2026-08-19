@@ -519,6 +519,7 @@ data/collection.json     your games and hardware
 data/lists.json          your lists (optional)
 data/config.json         site title, tagline, accent colour, friends
 scripts/                 the optional Node helpers (start-fresh, add, enrich, …)
+tests/                   `npm test`, no dependencies
 ```
 
 `data/collection.json` is the only file you need to touch day to day.
