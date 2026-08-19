@@ -7,6 +7,8 @@
 // and how much is still waiting on `npm run enrich`.
 
 import { loadCollection, loadLists, COLLECTION_PATH } from './lib/collection.mjs';
+import { artSummary, artInventory } from './lib/vendor.mjs';
+import { sizeOf } from './lib/images.mjs';
 import { PLATFORMS, platformInfo } from '../assets/js/platforms.mjs';
 
 const problems = [];
@@ -122,6 +124,18 @@ for (const list of lists.lists) {
   }
 }
 
+// Artwork. A path in the JSON with no file behind it is the one art problem
+// the page cannot recover from, because the original link is gone.
+const art = artSummary(collection);
+const missingArt = [];
+for (const item of artInventory(collection)) {
+  if (!item.remote && !(await sizeOf(item.url))) missingArt.push(item);
+}
+for (const item of missingArt) {
+  problems.push(`${item.name}: "${item.url}" is not in the repo. `
+    + 'Restore it from git, or clear the field and run `npm run enrich`');
+}
+
 const beaten = games.filter((g) => g.status === 'beaten');
 const noCover = games.filter((g) => !g.cover);
 const noDescription = games.filter((g) => !g.description);
@@ -154,6 +168,15 @@ if (noCover.length || noDescription.length || noYear.length) {
   if (noDescription.length) console.log(`  ${noDescription.length} without a description`);
   if (noYear.length) console.log(`  ${noYear.length} without a release year`);
   console.log('');
+}
+
+if (art.total) {
+  if (art.remote) {
+    console.log(`Artwork: ${art.remote} of ${art.total} images are linked to other sites.`);
+    console.log('  They will vanish if that site reorganises. `npm run vendor` stores them.\n');
+  } else if (!missingArt.length) {
+    console.log(`Artwork: all ${art.total} images are stored in this repo.\n`);
+  }
 }
 
 if (beaten.length) {

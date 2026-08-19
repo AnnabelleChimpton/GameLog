@@ -453,6 +453,26 @@ automatically; `--source free` forces the keyless path either way.
 A game with no art keeps a generated placeholder in its platform's colour, and
 those tiles show their title permanently, so the shelf still reads properly.
 
+### Keeping the art
+
+```bash
+npm run vendor
+```
+
+Everything above finds art by handing you a link to somebody else's server. That
+works right up until the day that server reorganises a directory, and then your
+shelf is placeholders and there is no local copy to fall back on.
+
+This downloads every linked image into `assets/covers` and `assets/boxart` and
+repoints `collection.json` at the copies, so a published GameLog owns its own
+pictures. It is safe to re-run, and it is not destructive: anything it cannot
+download keeps the link it had, so the worst case is a game that stays linked
+rather than one that loses its art. `--dry-run` shows what it would fetch.
+
+The manager has the same thing as a button, under **Site → Artwork backup**, and
+`npm run check` tells you how many images are still linked. Expect roughly
+150 KB per game with a cover and a box scan.
+
 ### True box shapes
 
 Filter the shelf to a single console and the tiles stop being uniform

@@ -891,6 +891,92 @@ function renderHardware() {
 
 /* --- Site tab ------------------------------------------------------------- */
 
+/* --- Artwork backup ------------------------------------------------------- */
+
+/**
+ * How much of the collection's art is a link to somebody else's server.
+ *
+ * Counted here rather than asked for, so the card is right the moment you add
+ * a game rather than after a round trip.
+ */
+function artCounts() {
+  const remote = (url) => /^https?:\/\//i.test(String(url ?? ''));
+  let total = 0;
+  let linked = 0;
+  const bump = (url) => { if (url) { total += 1; if (remote(url)) linked += 1; } };
+  for (const game of state.collection.games) { bump(game.cover); bump(game.boxart); }
+  for (const item of state.collection.hardware) bump(item.image);
+  return { total, linked };
+}
+
+/**
+ * Download every linked image into the repo.
+ *
+ * The server reads and writes data/collection.json itself, so anything unsaved
+ * here would be overwritten by the next save. Rather than merging two versions
+ * of the truth, this saves first and reloads afterwards.
+ */
+async function backupArt(button) {
+  const { linked } = artCounts();
+  if (!linked) { status('Every image is already stored in your repo.'); return; }
+
+  if (state.dirty.size) await save();
+  if (state.dirty.size) return; // The save failed and already said so.
+
+  button.disabled = true;
+  const previous = button.textContent;
+  button.textContent = `Downloading ${linked}…`;
+  status(`Downloading ${plural(linked, 'image')}. This can take a minute.`);
+
+  try {
+    const res = await fetch('/api/vendor', { method: 'POST', headers: API.headers });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.error || 'Could not download the artwork.');
+
+    // Adopt what the server wrote, or the next save would put the links back.
+    const fresh = await fetch('/api/state', { headers: API.headers }).then((r) => r.json());
+    state.collection = fresh.collection?.games ? fresh.collection : state.collection;
+    state.collection.hardware = state.collection.hardware || [];
+
+    const stored = `Stored ${plural(json.stored, 'image')}, ${(json.bytes / 1024 / 1024).toFixed(1)} MB.`;
+    status(json.failed.length
+      ? `${stored} ${plural(json.failed.length, 'image')} could not be downloaded and `
+        + 'kept the link: try again, or replace them by hand.'
+      : `${stored} Your art is all in the repo now.`,
+      json.failed.length ? 'warn' : 'info');
+    renderTab();
+  } catch (err) {
+    status(err.message, 'error');
+  } finally {
+    button.disabled = false;
+    button.textContent = previous;
+  }
+}
+
+function artCard() {
+  const { total, linked } = artCounts();
+  const button = h('span', {
+    text: linked ? `Download ${plural(linked, 'image')}` : 'Nothing to download',
+  });
+  const go = h('button', {
+    type: 'button', class: linked ? 'pillbutton pillbutton--accent' : 'pillbutton',
+    onclick: () => backupArt(button),
+  }, button);
+  go.disabled = !linked;
+
+  return h('div', { class: 'mg-card' },
+    h('h2', { class: 'mg-card__title', text: 'Artwork backup' }),
+    h('p', { class: 'mg-hint',
+      text: linked
+        ? `${linked} of your ${total} images ${linked === 1 ? 'is a link' : 'are links'} to `
+          + 'other sites. A link works until the day that site reorganises, and then the '
+          + 'art is gone with no copy of your own. Downloading them puts every picture in '
+          + 'your repo, where it is yours and it is published with the rest of the site.'
+        : `All ${total} of your images are stored in your repo. Nothing here `
+          + 'depends on anybody else staying online.' }),
+    go);
+}
+
 function renderSite() {
   const wrap = $('#tab-site');
   const config = state.config;
@@ -907,6 +993,8 @@ function renderSite() {
   const friends = Array.isArray(config.friends) ? config.friends : (config.friends = []);
 
   wrap.replaceChildren(
+    artCard(),
+
     h('div', { class: 'mg-card' },
       h('h2', { class: 'mg-card__title', text: 'Identity' }),
       h('div', { class: 'mg-row' },
@@ -1113,6 +1201,16 @@ async function openPublisher() {
   if (state.dirty.size) {
     parts.push(h('p', { class: 'mg-pub__warn',
       text: 'You have unsaved edits. Save them first, or they will not be included.' }));
+  }
+
+  // Publishing is the moment linked art matters: from here on, the site is
+  // being read by people whose browsers have to reach that other server too.
+  const art = artCounts();
+  if (art.linked) {
+    parts.push(h('p', { class: 'mg-pub__warn',
+      text: `${art.linked} of your ${art.total} images ${art.linked === 1 ? 'is' : 'are'} `
+        + 'hotlinked rather than stored in your repo. Your site will publish fine, but '
+        + 'that art is not yours to keep. The Site tab has a one-click backup.' }));
   }
 
   if (git.mine.length) {

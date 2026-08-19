@@ -14,7 +14,7 @@
 //   * writes go to a temp file and are renamed, so an interrupted save cannot
 //     leave a half-written collection behind
 
-import { writeFile, rename, readFile, mkdir, rm } from 'node:fs/promises';
+import { writeFile, rename, readFile } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import { join } from 'node:path';
 import {
@@ -23,6 +23,12 @@ import {
 import { loadEnv, getToken, createClient, searchGames, coverUrl, tidySummary, releaseYear, companies } from './igdb.mjs';
 import { searchFree, coverFor } from './freelookup.mjs';
 import { findBoxart } from './libretro.mjs';
+import {
+  PHOTO_DIR, COVER_DIR, MAX_IMAGE_BYTES, writeImage, fetchImageAsDataUrl,
+} from './images.mjs';
+import { vendorArt, artSummary } from './vendor.mjs';
+import { loadCollection as loadCollectionForVendor, saveCollection as saveCollectionFromVendor }
+  from './collection.mjs';
 
 /** The only files the manager may ever write. */
 const WRITABLE = {
@@ -32,95 +38,6 @@ const WRITABLE = {
 };
 
 const MAX_BODY_BYTES = 12 * 1024 * 1024;
-
-/**
- * Profile photos land here, under a fixed name per type. The extension comes
- * from an allowlist keyed off the data url's declared type, never from anything
- * the request chooses to call the file.
- */
-const PHOTO_DIR = join(ROOT, 'assets', 'profile');
-const PHOTO_TYPES = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-  'image/gif': 'gif',
-};
-const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
-
-/** Game covers live here, one file per game id. */
-const COVER_DIR = join(ROOT, 'assets', 'covers');
-
-/**
- * Decode a base64 image data url and write it, replacing any other extension
- * the same name previously had. Shared by profile photos and game covers.
- */
-async function writeImage(dataUrl, dir, basename, maxBytes) {
-  const match = /^data:([a-z]+\/[a-z+]+);base64,(.+)$/i.exec(String(dataUrl || ''));
-  if (!match) throw new Error('Expected a base64 image data url.');
-
-  const ext = PHOTO_TYPES[match[1].toLowerCase()];
-  if (!ext) throw new Error(`${match[1]} isn't an image type this accepts (jpg, png, webp, gif).`);
-
-  const bytes = Buffer.from(match[2], 'base64');
-  if (!bytes.length) throw new Error('That image is empty.');
-  if (bytes.length > maxBytes) {
-    throw new Error(`That image is larger than ${Math.round(maxBytes / 1024 / 1024)} MB.`);
-  }
-
-  await mkdir(dir, { recursive: true });
-  await Promise.all(Object.values(PHOTO_TYPES)
-    .filter((other) => other !== ext)
-    .map((other) => rm(join(dir, `${basename}.${other}`), { force: true })));
-
-  const tmp = join(dir, `${basename}.${ext}.tmp`);
-  await writeFile(tmp, bytes);
-  await rename(tmp, join(dir, `${basename}.${ext}`));
-  return { ext, bytes: bytes.length };
-}
-
-/** Hosts a fetch from this machine should never be pointed at. */
-const PRIVATE_HOST =
-  /^(localhost$|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|\[?::1\]?$|0\.)/i;
-
-/**
- * Download a remote image so it lives in the repo rather than being hotlinked.
- *
- * Pasting an address is how anyone actually finds box art: you search, you
- * right-click, you copy the image address. Fetching it here also fixes the
- * quieter problem that a hotlinked url is somebody else's to delete.
- */
-async function fetchImageAsDataUrl(url) {
-  let parsed;
-  try {
-    parsed = new URL(String(url).trim());
-  } catch {
-    throw new Error('That is not a web address.');
-  }
-  if (!/^https?:$/.test(parsed.protocol)) {
-    throw new Error('Only http and https addresses can be fetched.');
-  }
-  // This server runs on your machine, so a fetch from it reaches your network.
-  if (PRIVATE_HOST.test(parsed.hostname)) {
-    throw new Error('That address points back at this machine or a private network.');
-  }
-
-  const res = await fetch(parsed, {
-    redirect: 'follow',
-    signal: AbortSignal.timeout(15000),
-    headers: { 'User-Agent': 'GameLog/1.0 (collection manager)' },
-  }).catch(() => { throw new Error('Could not reach that address.'); });
-
-  if (!res.ok) throw new Error(`That address answered with HTTP ${res.status}.`);
-
-  const type = (res.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
-  if (!PHOTO_TYPES[type]) {
-    throw new Error(`That link is ${type || 'not an image'}, not a jpg, png, webp or gif.`);
-  }
-
-  const buf = Buffer.from(await res.arrayBuffer());
-  if (buf.length > MAX_PHOTO_BYTES) throw new Error('That image is larger than 3 MB.');
-  return `data:${type};base64,${buf.toString('base64')}`;
-}
 
 function validateCollection(data) {
   if (!data || typeof data !== 'object') throw new Error('Expected an object.');
@@ -517,7 +434,7 @@ export async function handleApi(req, res, { port }) {
 
     if (route === 'photo' && req.method === 'PUT') {
       const { dataUrl } = await readJsonBody(req);
-      const { ext, bytes } = await writeImage(dataUrl, PHOTO_DIR, 'avatar', MAX_PHOTO_BYTES);
+      const { ext, bytes } = await writeImage(dataUrl, PHOTO_DIR, 'avatar', MAX_IMAGE_BYTES);
       send(res, 200, { ok: true, path: `assets/profile/avatar.${ext}`, bytes });
       return true;
     }
@@ -530,8 +447,30 @@ export async function handleApi(req, res, { port }) {
         throw new Error('That game has no usable id yet. Save it first.');
       }
       const dataUrl = body.url ? await fetchImageAsDataUrl(body.url) : body.dataUrl;
-      const { ext, bytes } = await writeImage(dataUrl, COVER_DIR, id, MAX_PHOTO_BYTES);
+      const { ext, bytes } = await writeImage(dataUrl, COVER_DIR, id, MAX_IMAGE_BYTES);
       send(res, 200, { ok: true, path: `assets/covers/${id}.${ext}`, bytes });
+      return true;
+    }
+
+    if (route === 'vendor' && req.method === 'GET') {
+      send(res, 200, artSummary(await loadCollectionForVendor()));
+      return true;
+    }
+
+    if (route === 'vendor' && req.method === 'POST') {
+      // Downloading a whole collection's art is slow, so this answers once with
+      // the outcome rather than streaming progress. The UI says what it is
+      // doing and the counts come back at the end.
+      const collection = await loadCollectionForVendor();
+      const result = await vendorArt(collection);
+      if (result.done.length) await saveCollectionFromVendor(collection);
+      send(res, 200, {
+        ok: true,
+        stored: result.done.length,
+        bytes: result.bytes,
+        failed: result.failed.map((f) => ({ name: f.name, label: f.spec.label, error: f.error })),
+        remaining: artSummary(collection).remote,
+      });
       return true;
     }
 
