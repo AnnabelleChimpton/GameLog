@@ -21,6 +21,8 @@ const GAME_KEYS = [
   'id', 'title', 'platform', 'year', 'cover', 'description', 'genres',
   'developer', 'publisher', 'region', 'release', 'condition', 'copies',
   'metacritic', 'notes', 'added', 'igdbId', 'wikidataId',
+  // True-shape box scan, used only on single-platform views.
+  'boxart', 'boxartRatio',
   // Play-through tracking, kept last so a catalogue entry reads as one first.
   'status', 'beatenOn', 'video', 'verdict',
 ];

@@ -107,15 +107,25 @@ function score(entry, wanted, region) {
   const tags = entry.tags.join(' ').toLowerCase();
 
   if (/\b(beta|proto|demo|sample|debug)\b/.test(tags)) points -= 60;
+
+  // A plain release beats an alternate scan or a re-release of the same game.
+  // These are usually the same box photographed or cropped differently, and
+  // preferring them is how four different 3DO games ended up sharing one odd
+  // 482x680 framing while their plain (USA) scans sat unused at longbox
+  // proportions.
+  if (/\balt\b/.test(tags)) points -= 25;
+  if (/\bre\d\b/.test(tags)) points -= 20;
   if (/\b(usa)\b/.test(tags)) points += region === 'USA' ? 30 : 20;
   else if (/\bworld\b/.test(tags)) points += 18;
   else if (/\b(europe|pal)\b/.test(tags)) points += region === 'EU' ? 30 : 12;
   else if (/\bjapan\b/.test(tags)) points += region === 'JP' ? 30 : 6;
   // A plain name with no region tag at all is still a perfectly good match.
   if (!entry.tags.length) points += 10;
-  // Prefer the newest revision when several exist.
-  const rev = /rev\s*(\d+)/.exec(tags);
-  if (rev) points += Math.min(Number(rev[1]), 5);
+  // A revision tag is not a better scan, just a later pressing.
+  if (/\brev\s*\d/.test(tags)) points -= 12;
+
+  // Fewer qualifiers is a better default: "(USA)" over "(USA) (Alt)".
+  points -= Math.max(0, entry.tags.length - 1) * 6;
 
   return points;
 }

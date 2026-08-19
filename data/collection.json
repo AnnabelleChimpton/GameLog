@@ -42,7 +42,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3328
+      "igdbId": 3328,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/1080%20Snowboarding%20(Japan%2C%20USA)%20(En%2CJa).png",
+      "boxartRatio": 1.434
     },
     {
       "id": "3do-advanced-dungeons-and-dragons-deathkeep",
@@ -64,7 +66,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-08",
-      "igdbId": 4270
+      "igdbId": 4270,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Advanced%20Dungeons%20_%20Dragons%20-%20Deathkeep%20(USA).png",
+      "boxartRatio": 0.527
     },
     {
       "id": "nintendo-gamecube-animal-crossing",
@@ -153,7 +157,9 @@
       "metacritic": 92,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2148
+      "igdbId": 2148,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Banjo-Kazooie%20(USA).png",
+      "boxartRatio": 1.434
     },
     {
       "id": "snes-super-famicom-bass-masters-classic",
@@ -196,7 +202,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-17",
-      "igdbId": 3420
+      "igdbId": 3420,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Bassmasters%202000%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "nintendo-64-bio-freaks",
@@ -217,7 +225,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-14",
-      "igdbId": 3366
+      "igdbId": 3366,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Bio%20F.R.E.A.K.S.%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "nintendo-64-blast-corps",
@@ -239,7 +249,9 @@
       "metacritic": 90,
       "notes": null,
       "added": "2026-08-14",
-      "igdbId": 3424
+      "igdbId": 3424,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Blast%20Corps%20(USA).png",
+      "boxartRatio": 1.434
     },
     {
       "id": "microsoft-xbox-buffy-the-vampire-slayer",
@@ -328,7 +340,9 @@
       "notes": null,
       "added": "2026-08-11",
       "igdbId": 366631,
-      "wikidataId": "Q2948513"
+      "wikidataId": "Q2948513",
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Chameleon%20Twist%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "nintendo-64-command-and-conquer",
@@ -349,7 +363,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-14",
-      "igdbId": 647
+      "igdbId": 647,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Command%20_%20Conquer%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "nintendo-64-conker-s-bad-fur-day",
@@ -373,7 +389,9 @@
       "metacritic": 92,
       "notes": null,
       "added": "2026-08-11",
-      "igdbId": 1286
+      "igdbId": 1286,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Conker's%20Bad%20Fur%20Day%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "microsoft-xbox-counter-strike",
@@ -415,7 +433,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 37114
+      "igdbId": 37114,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Coven%2C%20The%20(USA).png",
+      "boxartRatio": 1.169
     },
     {
       "id": "3do-daedalus-encounter",
@@ -436,7 +456,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-08",
-      "igdbId": 4237
+      "igdbId": 4237,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Daedalus%20Encounter%2C%20The%20(USA)%20(Disc%201).png",
+      "boxartRatio": 0.518
     },
     {
       "id": "microsoft-xbox-dance-dance-revolution-ultramix-2",
@@ -606,7 +628,9 @@
       "metacritic": 88,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2723
+      "igdbId": 2723,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Diddy%20Kong%20Racing%20(USA)%20(En%2CFr).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "snes-super-famicom-donkey-kong-country-2-diddy-s-kong-quest",
@@ -692,7 +716,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 4248
+      "igdbId": 4248,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Dragon's%20Lair%20(USA).png",
+      "boxartRatio": 0.509
     },
     {
       "id": "game-dreamworks-shark-tale",
@@ -755,7 +781,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 4335
+      "igdbId": 4335,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Fatty%20Bear's%20Birthday%20Surprise%20(USA).png",
+      "boxartRatio": 0.518
     },
     {
       "id": "3do-fifa-international-soccer",
@@ -776,7 +804,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 240238
+      "igdbId": 240238,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/FIFA%20International%20Soccer%20(USA).png",
+      "boxartRatio": 0.518
     },
     {
       "id": "sony-playstation-5-final-fantasy-xvi",
@@ -884,7 +914,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 322267
+      "igdbId": 322267,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Gauntlet%20Legends%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "3do-gex",
@@ -906,7 +938,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-08",
-      "igdbId": 4309
+      "igdbId": 4309,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Gex%20(USA%2C%20Europe).png",
+      "boxartRatio": 0.709
     },
     {
       "id": "nintendo-gamecube-godzilla-destroy-all-monsters-melee",
@@ -950,7 +984,9 @@
       "metacritic": 96,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1638
+      "igdbId": 1638,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/GoldenEye%20007%20(USA).png",
+      "boxartRatio": 1.434
     },
     {
       "id": "nintendo-gamecube-goldeneye-rogue-agent",
@@ -1038,7 +1074,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4314
+      "igdbId": 4314,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Guardian%20War%20(USA).png",
+      "boxartRatio": 0.528
     },
     {
       "id": "microsoft-xbox-halo-2",
@@ -1103,7 +1141,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4297
+      "igdbId": 4297,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Hell%20-%20A%20Cyberpunk%20Thriller%20(USA).png",
+      "boxartRatio": 0.491
     },
     {
       "id": "nintendo-64-hey-you-pikachu",
@@ -1124,7 +1164,9 @@
       "metacritic": 57,
       "notes": null,
       "added": "2026-08-11",
-      "igdbId": 2642
+      "igdbId": 2642,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Hey%20You%2C%20Pikachu!%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "sony-playstation-4-horizon-zero-dawn",
@@ -1169,7 +1211,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 4332
+      "igdbId": 4332,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Icebreaker%20(USA).png",
+      "boxartRatio": 1.008
     },
     {
       "id": "3do-immercenary",
@@ -1191,7 +1235,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4296
+      "igdbId": 4296,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Immercenary%20(USA).png",
+      "boxartRatio": 0.491
     },
     {
       "id": "snes-super-famicom-incredible-crash-dummies",
@@ -1233,7 +1279,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 13240
+      "igdbId": 13240,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/John%20Madden%20Football%20(USA).png",
+      "boxartRatio": 0.518
     },
     {
       "id": "nintendo-switch-jojo-siwa-worldwide-party",
@@ -1403,7 +1451,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-08",
-      "igdbId": 4287
+      "igdbId": 4287,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Last%20Bounty%20Hunter%2C%20The%20(USA).png",
+      "boxartRatio": 0.491
     },
     {
       "id": "sony-playstation-4-last-of-us-part-ii",
@@ -1541,7 +1591,9 @@
       "metacritic": 95,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1030
+      "igdbId": 1030,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Legend%20of%20Zelda%2C%20The%20-%20Majora's%20Mask%20(USA).png",
+      "boxartRatio": 1.434
     },
     {
       "id": "nintendo-64-legend-of-zelda-ocarina-of-time",
@@ -1566,7 +1618,9 @@
       "metacritic": 99,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1029
+      "igdbId": 1029,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Legend%20of%20Zelda%2C%20The%20-%20Ocarina%20of%20Time%20(USA).png",
+      "boxartRatio": 1.434
     },
     {
       "id": "nintendo-gamecube-legend-of-zelda-the-wind-waker",
@@ -1721,7 +1775,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 254451
+      "igdbId": 254451,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Love%20Bites%20(USA).png",
+      "boxartRatio": 1.145
     },
     {
       "id": "3do-lucienne-s-quest",
@@ -1742,7 +1798,9 @@
       "metacritic": null,
       "notes": "Reproduction",
       "added": "2026-08-09",
-      "igdbId": 4300
+      "igdbId": 4300,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Lucienne's%20Quest%20(USA).png",
+      "boxartRatio": 0.531
     },
     {
       "id": "nintendo-gamecube-luigi-s-mansion-player-s-choice",
@@ -1827,7 +1885,9 @@
       "metacritic": 83,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2342
+      "igdbId": 2342,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Mario%20Kart%2064%20(USA).png",
+      "boxartRatio": 1.434
     },
     {
       "id": "nintendo-switch-mario-kart-8-deluxe",
@@ -1911,7 +1971,9 @@
       "metacritic": 91,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3406
+      "igdbId": 3406,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Mario%20Tennis%20(USA).png",
+      "boxartRatio": 1.434
     },
     {
       "id": "nintendo-switch-mario-tennis-aces",
@@ -2067,7 +2129,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-17",
-      "igdbId": 3411
+      "igdbId": 3411,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Milo's%20Astro%20Lanes%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "3do-mind-teazzer",
@@ -2088,7 +2152,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4306
+      "igdbId": 4306,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Mind%20Teazzer%20(USA).png",
+      "boxartRatio": 0.634
     },
     {
       "id": "nintendo-64-mission-impossible",
@@ -2110,7 +2176,9 @@
       "metacritic": 61,
       "notes": null,
       "added": "2026-08-14",
-      "igdbId": 3123
+      "igdbId": 3123,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Mission%20-%20Impossible%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "microsoft-xbox-mojo",
@@ -2263,7 +2331,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4121
+      "igdbId": 4121,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Mortal%20Kombat%20Trilogy%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "sony-playstation-4-mortal-kombat-x",
@@ -2410,7 +2480,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-08",
-      "igdbId": 4273
+      "igdbId": 4273,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Pebble%20Beach%20Golf%20Links%20(USA).png",
+      "boxartRatio": 0.518
     },
     {
       "id": "nintendo-64-perfect-dark",
@@ -2433,7 +2505,9 @@
       "metacritic": 97,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1463
+      "igdbId": 1463,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Perfect%20Dark%20(USA).png",
+      "boxartRatio": 1.434
     },
     {
       "id": "3do-perfect-general",
@@ -2454,7 +2528,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4328
+      "igdbId": 4328,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Perfect%20General%2C%20The%20(USA).png",
+      "boxartRatio": 0.491
     },
     {
       "id": "3do-plumbers-don-t-wear-ties",
@@ -2475,7 +2551,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4251
+      "igdbId": 4251,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Plumbers%20Don't%20Wear%20Ties%20(USA).png",
+      "boxartRatio": 0.491
     },
     {
       "id": "3do-po-ed",
@@ -2496,7 +2574,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4327
+      "igdbId": 4327,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/PO'ed%20(USA%2C%20Europe).png",
+      "boxartRatio": 0.518
     },
     {
       "id": "microsoft-xbox-360-pocketbike-racer",
@@ -2607,7 +2687,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-08",
-      "igdbId": 4258
+      "igdbId": 4258,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Psychic%20Detective%20(USA).png",
+      "boxartRatio": 0.506
     },
     {
       "id": "nintendo-switch-quake-deluxe-edition",
@@ -2718,7 +2800,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 4339
+      "igdbId": 4339,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Return%20Fire%20(USA).png",
+      "boxartRatio": 0.526
     },
     {
       "id": "microsoft-xbox-return-to-castle-wolfenstein-tides-of-war",
@@ -2808,7 +2892,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 141271
+      "igdbId": 141271,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Road%20Rash%20(USA).png",
+      "boxartRatio": 0.523
     },
     {
       "id": "nintendo-gamecube-rocket-power-beach-bandits",
@@ -2854,7 +2940,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 4260
+      "igdbId": 4260,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Samurai%20Shodown%20(USA).png",
+      "boxartRatio": 0.491
     },
     {
       "id": "nintendo-64-shadowgate-64-trials-of-the-four-towers",
@@ -2875,7 +2963,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3600
+      "igdbId": 3600,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Shadowgate%2064%20-%20Trials%20of%20the%20Four%20Towers%20(USA)%20(En%2CEs).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "microsoft-xbox-shamu-s-deep-sea-adventures",
@@ -2917,7 +3007,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4310
+      "igdbId": 4310,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Shock%20Wave%20-%20Operation%20Jump%20Gate%20(USA).png",
+      "boxartRatio": 0.491
     },
     {
       "id": "nintendo-gamecube-shrek-extra-large",
@@ -3047,7 +3139,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 26745
+      "igdbId": 26745,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Star%20Fighter%20(USA%2C%20Europe).png",
+      "boxartRatio": 0.491
     },
     {
       "id": "snes-super-famicom-star-fox",
@@ -3090,7 +3184,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 154
+      "igdbId": 154,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Star%20Wars%20Episode%20I%20-%20Racer%20(USA).png",
+      "boxartRatio": 1.373
     },
     {
       "id": "microsoft-xbox-star-wars-episode-iii-revenge-of-the-sith",
@@ -3245,7 +3341,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 164
+      "igdbId": 164,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Star%20Wars%20-%20Shadows%20of%20the%20Empire%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "microsoft-xbox-star-wars-the-clone-wars",
@@ -3289,7 +3387,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-17",
-      "igdbId": 9067
+      "igdbId": 9067,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/StarCraft%2064%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "nintendo-switch-stardew-valley",
@@ -3379,7 +3479,9 @@
       "metacritic": 94,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1074
+      "igdbId": 1074,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Super%20Mario%2064%20(USA).png",
+      "boxartRatio": 1.434
     },
     {
       "id": "snes-super-famicom-super-mario-all-stars",
@@ -3576,7 +3678,9 @@
       "metacritic": 79,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1626
+      "igdbId": 1626,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Super%20Smash%20Bros.%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "nintendo-wii-super-smash-bros-brawl",
@@ -3664,7 +3768,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 4238
+      "igdbId": 4238,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Super%20Street%20Fighter%20II%20Turbo%20(USA).png",
+      "boxartRatio": 0.502
     },
     {
       "id": "nintendo-64-superman-the-new-superman-adventures",
@@ -3709,7 +3815,9 @@
       "notes": null,
       "added": "2026-08-19",
       "igdbId": 19421,
-      "wikidataId": null
+      "wikidataId": null,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Powerpuff%20Girls%2C%20The%20-%20Chemical%20X-Traction%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "3do-theme-park",
@@ -3730,7 +3838,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-08",
-      "igdbId": 283
+      "igdbId": 283,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Theme%20Park%20(USA).png",
+      "boxartRatio": 0.491
     },
     {
       "id": "microsoft-xbox-toca-race-driver-2",
@@ -3885,7 +3995,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 210451
+      "igdbId": 210451,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Tony%20Hawk's%20Pro%20Skater%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "sony-playstation-4-tony-hawk-s-pro-skater-1-2-collector-s-edition",
@@ -3969,7 +4081,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1327
+      "igdbId": 1327,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Turok%20-%20Rage%20Wars%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "nintendo-64-twisted-edge-extreme-snowboarding",
@@ -3990,7 +4104,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3622
+      "igdbId": 3622,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Twisted%20Edge%20-%20Extreme%20Snowboarding%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "3do-twisted-the-game-show",
@@ -4011,7 +4127,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-08",
-      "igdbId": 4321
+      "igdbId": 4321,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Twisted%20-%20The%20Game%20Show%20(USA).png",
+      "boxartRatio": 0.491
     },
     {
       "id": "snes-super-famicom-wario-s-woods",
@@ -4095,7 +4213,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3647
+      "igdbId": 3647,
+      "boxart": "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/Xena%20-%20Warrior%20Princess%20-%20The%20Talisman%20of%20Fate%20(USA).png",
+      "boxartRatio": 1.369
     },
     {
       "id": "game-yu-gi-oh-the-falsebound-kingdom",
@@ -4162,7 +4282,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4298
+      "igdbId": 4298,
+      "boxart": "https://thumbnails.libretro.com/The%203DO%20Company%20-%203DO/Named_Boxarts/Zhadnost%20-%20The%20People's%20Party%20(USA%2C%20Europe).png",
+      "boxartRatio": 0.491
     }
   ],
   "hardware": [

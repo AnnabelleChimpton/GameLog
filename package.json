@@ -9,6 +9,7 @@
     "start-fresh": "node scripts/start-fresh.mjs",
     "list": "node scripts/list.mjs",
     "enrich": "node scripts/enrich.mjs",
+    "boxart": "node scripts/boxart.mjs",
     "import:gameye": "node scripts/import-gameye.mjs",
     "check": "node scripts/check.mjs",
     "test": "node --test tests/*.test.mjs",

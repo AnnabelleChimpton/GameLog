@@ -12,6 +12,7 @@ import {
   fold, sortKey, conditionGroup, CONDITION_ORDER, coverImage, placeholderCover,
   safeImageUrl, h, plural, playStatus, STATUS_LABEL, episodeNumbers, progressOf, isLocal,
   hardwareKind, hardwareQuantity, HARDWARE_KINDS, KIND_LABEL,
+  shelfShape, boxRatio, safeImageUrl as safeUrl,
 } from './lib.js';
 import { renderStats } from './stats.js';
 import { renderTimeline } from './timeline.js';
@@ -153,6 +154,16 @@ const isFiltered = () =>
 function renderGrid() {
   const fragment = document.createDocumentFragment();
 
+  // On a single-platform view the boxes are drawn at their real proportions,
+  // which only works because every box on that shelf is the same shape.
+  const shape = shelfShape(state.visible);
+  el.grid.classList.toggle('shelf--boxes', Boolean(shape));
+  el.grid.style.removeProperty('--box-h');
+  if (shape) {
+    // Landscape boxes need less height than tall ones to take similar room.
+    el.grid.style.setProperty('--box-h', shape.median > 1 ? '150px' : '250px');
+  }
+
   state.visible.forEach((game, i) => {
     const info = platformInfo(game.platform);
 
@@ -165,8 +176,18 @@ function renderGrid() {
     tile.setAttribute('aria-label',
       `${game.title}${game.year ? `, ${game.year}` : ''}, ${game.platform}`);
 
-    const img = coverImage(game, { eager: i < 12 });
+    // The box scan is only used in shape mode; everywhere else keeps the
+    // normalised key art, which is what makes the mixed grid read cleanly.
+    const boxSrc = shape ? safeUrl(game.boxart) : null;
+    const img = coverImage(boxSrc ? { ...game, cover: boxSrc } : game, { eager: i < 12 });
     img.className = 'tile__cover';
+    if (shape) {
+      const ratio = boxRatio(game, shape);
+      tile.style.setProperty('--ratio', ratio.toFixed(3));
+      // A game with no scan is shown at the shelf's shape rather than its own,
+      // so one missing box does not punch a different-sized hole in the row.
+      if (!boxSrc) tile.classList.add('tile--noscan');
+    }
 
     const badge = document.createElement('span');
     badge.className = 'tile__badge';

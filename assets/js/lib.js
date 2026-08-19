@@ -52,6 +52,38 @@ export const CONDITION_ORDER = ['New', 'CIB', 'Boxed', 'Loose', 'Other'];
 export const isLocal = () =>
   ['localhost', '127.0.0.1', '[::1]', ''].includes(window.location.hostname);
 
+/* --- Box shapes ----------------------------------------------------------- */
+
+/**
+ * Whether a set of games should be drawn as boxes rather than as a uniform
+ * grid, and at what proportions.
+ *
+ * Only ever true for a single platform. A shelf of one console shares a box
+ * shape, so true proportions read as a set; mixing an N64 box at 1.37 with a
+ * 3DO longbox at 0.50 just looks broken, and the plain grid is better there.
+ *
+ * A platform also has to be mostly scanned. A handful of true shapes among
+ * mostly fallbacks is worse than no true shapes at all.
+ */
+const SHAPE_COVERAGE = 0.6;
+
+export function shelfShape(games) {
+  if (!games.length) return null;
+  const platforms = new Set(games.map((g) => g.platform));
+  if (platforms.size !== 1) return null;
+
+  const scanned = games.filter((g) => g.boxart && g.boxartRatio > 0);
+  if (scanned.length / games.length < SHAPE_COVERAGE) return null;
+
+  const ratios = scanned.map((g) => g.boxartRatio).sort((a, b) => a - b);
+  const median = ratios[Math.floor(ratios.length / 2)];
+  return { median, scanned: scanned.length, total: games.length };
+}
+
+/** The proportions to draw one game at, falling back to the shelf's median. */
+export const boxRatio = (game, shape) =>
+  (game.boxart && game.boxartRatio > 0 ? game.boxartRatio : shape.median);
+
 /* --- Hardware ------------------------------------------------------------- */
 
 /**

@@ -2448,3 +2448,51 @@ div.minitile { cursor: default; }
 @media (min-width: 701px) {
   .sheet[open] { display: none; }
 }
+
+/* ==========================================================================
+   Box shelf
+   --------------------------------------------------------------------------
+   Only on a single-platform view. Every box on one console's shelf shares a
+   shape, so drawing them at true proportions reads as a set: a wall of N64
+   boxes with matching banners, or a row of 3DO longboxes. Mixed platforms keep
+   the uniform grid, because a 1.37 box beside a 0.50 longbox looks like a
+   mistake rather than a collection.
+   ========================================================================== */
+
+.shelf--boxes {
+  display: flex;
+  flex-wrap: wrap;
+  /* Boxes stand on a common line, the way objects on a shelf do. */
+  align-items: flex-end;
+  gap: clamp(12px, 1.6vw, 20px);
+}
+
+.shelf--boxes .tile {
+  aspect-ratio: auto;
+  height: var(--box-h, 250px);
+  width: calc(var(--box-h, 250px) * var(--ratio, 0.75));
+  flex: 0 0 auto;
+}
+
+/* The scan is the whole point, so show all of it rather than cropping to fill. */
+.shelf--boxes .tile__cover { object-fit: fill; }
+
+/* A game with no scan borrows the shelf's shape and keeps its key art, which
+   has to be cropped to fit a box it was never drawn for. */
+.shelf--boxes .tile--noscan .tile__cover { object-fit: cover; }
+
+/* Every game on this shelf is the same platform, so the badge says nothing and
+   covers part of the box design it is sitting on. */
+.shelf--boxes .tile__badge { display: none; }
+
+/* The title plate is sized for a portrait tile and crowds a short landscape
+   one, so it stays out of the way until asked for. */
+.shelf--boxes .tile__plate { padding-top: 18px; }
+.shelf--boxes .tile__name { -webkit-line-clamp: 2; line-clamp: 2; }
+
+@media (max-width: 700px) {
+  /* Two landscape boxes will not fit side by side on a phone, so give the
+     shelf its own smaller height rather than letting one box fill the screen. */
+  .shelf--boxes { --box-h: 108px; }
+  .shelf--boxes[style*="250px"] { --box-h: 170px; }
+}
