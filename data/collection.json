@@ -21,7 +21,9 @@
       "metacritic": 73,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3774
+      "igdbId": 3774,
+      "boxart": "assets/boxart/nintendo-gamecube-1080-avalanche.png",
+      "boxartRatio": 0.705
     },
     {
       "id": "nintendo-64-1080-snowboarding",
@@ -91,7 +93,9 @@
       "metacritic": 87,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2655
+      "igdbId": 2655,
+      "boxart": "assets/boxart/nintendo-gamecube-animal-crossing.png",
+      "boxartRatio": 0.717
     },
     {
       "id": "microsoft-xbox-arctic-thunder",
@@ -112,7 +116,9 @@
       "metacritic": 57,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3703
+      "igdbId": 3703,
+      "boxart": "assets/boxart/microsoft-xbox-arctic-thunder.png",
+      "boxartRatio": 0.715
     },
     {
       "id": "sony-playstation-5-astro-bot",
@@ -180,7 +186,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 357181
+      "igdbId": 357181,
+      "boxart": "assets/boxart/snes-super-famicom-bass-masters-classic.png",
+      "boxartRatio": 1.407
     },
     {
       "id": "game-bassmasters-2000",
@@ -275,7 +283,9 @@
       "metacritic": 79,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 5760
+      "igdbId": 5760,
+      "boxart": "assets/boxart/microsoft-xbox-buffy-the-vampire-slayer.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-buffy-the-vampire-slayer-chaos-bleeds",
@@ -297,7 +307,9 @@
       "metacritic": 73,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3837
+      "igdbId": 3837,
+      "boxart": "assets/boxart/microsoft-xbox-buffy-the-vampire-slayer-chaos-bleeds.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-call-of-duty-3",
@@ -318,7 +330,9 @@
       "metacritic": 83,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 949
+      "igdbId": 949,
+      "boxart": "assets/boxart/microsoft-xbox-call-of-duty-3.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "nintendo-64-chameleon-twist",
@@ -412,7 +426,9 @@
       "metacritic": 74,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 266357
+      "igdbId": 266357,
+      "boxart": "assets/boxart/microsoft-xbox-counter-strike.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "3do-coven",
@@ -479,7 +495,9 @@
       "metacritic": 78,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 5800
+      "igdbId": 5800,
+      "boxart": "assets/boxart/microsoft-xbox-dance-dance-revolution-ultramix-2.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-dark-summit",
@@ -500,7 +518,9 @@
       "metacritic": 71,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3869
+      "igdbId": 3869,
+      "boxart": "assets/boxart/microsoft-xbox-dark-summit.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-dead-or-alive-ultimate",
@@ -521,7 +541,9 @@
       "metacritic": 83,
       "notes": "First game sealed, second game has pld printout of cheats/unlockables from gamefaq",
       "added": "2024-10-09",
-      "igdbId": 318500
+      "igdbId": 318500,
+      "boxart": "assets/boxart/microsoft-xbox-dead-or-alive-ultimate.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-dead-or-alive-xtreme-beach-volleyball",
@@ -542,7 +564,9 @@
       "metacritic": 73,
       "notes": "Original purchase receipts",
       "added": "2024-10-09",
-      "igdbId": 1390
+      "igdbId": 1390,
+      "boxart": "assets/boxart/microsoft-xbox-dead-or-alive-xtreme-beach-volleyball.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-delta-force-black-hawk-down",
@@ -563,7 +587,9 @@
       "metacritic": 61,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 5812
+      "igdbId": 5812,
+      "boxart": "assets/boxart/microsoft-xbox-delta-force-black-hawk-down.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "sony-playstation-5-demon-s-souls",
@@ -607,7 +633,9 @@
       "metacritic": 74,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2652
+      "igdbId": 2652,
+      "boxart": "assets/boxart/microsoft-xbox-destroy-all-humans-2.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "nintendo-64-diddy-kong-racing",
@@ -651,7 +679,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 1092
+      "igdbId": 1092,
+      "boxart": "assets/boxart/snes-super-famicom-donkey-kong-country-2-diddy-s-kong-quest.png",
+      "boxartRatio": 1.434
     },
     {
       "id": "nintendo-switch-donkey-kong-country-tropical-freeze",
@@ -739,7 +769,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-17",
-      "igdbId": 4148
+      "igdbId": 4148,
+      "boxart": "assets/boxart/game-dreamworks-shark-tale.png",
+      "boxartRatio": 0.693
     },
     {
       "id": "snes-super-famicom-espn-baseball-tonight",
@@ -760,7 +792,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 5380
+      "igdbId": 5380,
+      "boxart": "assets/boxart/snes-super-famicom-espn-baseball-tonight.png",
+      "boxartRatio": 1.407
     },
     {
       "id": "3do-fatty-bear-s-birthday-surprise",
@@ -872,7 +906,9 @@
       "metacritic": 92,
       "notes": "Old xbox live trial - appears to be unclaimed",
       "added": "2024-10-09",
-      "igdbId": 3073
+      "igdbId": 3073,
+      "boxart": "assets/boxart/microsoft-xbox-forza-motorsport-not-for-resale.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-furious-karting",
@@ -893,7 +929,9 @@
       "metacritic": 63,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 47310
+      "igdbId": 47310,
+      "boxart": "assets/boxart/microsoft-xbox-furious-karting.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "nintendo-64-gauntlet-legends",
@@ -961,7 +999,9 @@
       "metacritic": 73,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3935
+      "igdbId": 3935,
+      "boxart": "assets/boxart/nintendo-gamecube-godzilla-destroy-all-monsters-melee.png",
+      "boxartRatio": 0.702
     },
     {
       "id": "nintendo-64-goldeneye-007",
@@ -1008,7 +1048,9 @@
       "metacritic": 60,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1632
+      "igdbId": 1632,
+      "boxart": "assets/boxart/nintendo-gamecube-goldeneye-rogue-agent.png",
+      "boxartRatio": 0.693
     },
     {
       "id": "sony-playstation-5-gran-turismo-7-25th-anniversary-edition",
@@ -1053,7 +1095,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 730
+      "igdbId": 730,
+      "boxart": "assets/boxart/microsoft-xbox-grand-theft-auto-iii-the-xbox-collection.png",
+      "boxartRatio": 0.702
     },
     {
       "id": "3do-guardian-war",
@@ -1098,7 +1142,9 @@
       "metacritic": 95,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 986
+      "igdbId": 986,
+      "boxart": "assets/boxart/microsoft-xbox-halo-2.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-halo-combat-evolved",
@@ -1120,7 +1166,9 @@
       "metacritic": 97,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 740
+      "igdbId": 740,
+      "boxart": "assets/boxart/microsoft-xbox-halo-combat-evolved.png",
+      "boxartRatio": 0.697
     },
     {
       "id": "3do-hell-a-cyberpunk-thriller",
@@ -1258,7 +1306,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 2160
+      "igdbId": 2160,
+      "boxart": "assets/boxart/snes-super-famicom-incredible-crash-dummies.png",
+      "boxartRatio": 1.407
     },
     {
       "id": "3do-john-madden-football",
@@ -1323,7 +1373,9 @@
       "metacritic": 49,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2704
+      "igdbId": 2704,
+      "boxart": "assets/boxart/nintendo-wii-just-dance.png",
+      "boxartRatio": 0.706
     },
     {
       "id": "nintendo-wii-just-dance-2",
@@ -1344,7 +1396,9 @@
       "metacritic": 74,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2664
+      "igdbId": 2664,
+      "boxart": "assets/boxart/nintendo-wii-just-dance-2.png",
+      "boxartRatio": 0.706
     },
     {
       "id": "nintendo-wii-just-dance-3",
@@ -1365,7 +1419,9 @@
       "metacritic": 74,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 288945
+      "igdbId": 288945,
+      "boxart": "assets/boxart/nintendo-wii-just-dance-3.png",
+      "boxartRatio": 0.706
     },
     {
       "id": "nintendo-switch-katamari-damacy-reroll",
@@ -1523,7 +1579,9 @@
       "metacritic": 95,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 45139
+      "igdbId": 45139,
+      "boxart": "assets/boxart/nintendo-gamecube-legend-of-zelda-collector-s-edition.png",
+      "boxartRatio": 0.721
     },
     {
       "id": "nintendo-switch-legend-of-zelda-echoes-of-wisdom",
@@ -1645,7 +1703,9 @@
       "metacritic": 96,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1033
+      "igdbId": 1033,
+      "boxart": "assets/boxart/nintendo-gamecube-legend-of-zelda-the-wind-waker.png",
+      "boxartRatio": 0.701
     },
     {
       "id": "microsoft-xbox-lego-star-wars-the-video-game",
@@ -1667,7 +1727,9 @@
       "metacritic": 76,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2681
+      "igdbId": 2681,
+      "boxart": "assets/boxart/microsoft-xbox-lego-star-wars-the-video-game.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-lord-of-the-rings-the-fellowship-of-the-ring",
@@ -1689,7 +1751,9 @@
       "metacritic": 59,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2972
+      "igdbId": 2972,
+      "boxart": "assets/boxart/microsoft-xbox-lord-of-the-rings-the-fellowship-of-the-ring.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-lord-of-the-rings-the-return-of-the-king",
@@ -1710,7 +1774,9 @@
       "metacritic": 84,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2973
+      "igdbId": 2973,
+      "boxart": "assets/boxart/microsoft-xbox-lord-of-the-rings-the-return-of-the-king.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "nintendo-gamecube-lord-of-the-rings-the-return-of-the-king-player-s-choice",
@@ -1732,7 +1798,9 @@
       "metacritic": 84,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2973
+      "igdbId": 2973,
+      "boxart": "assets/boxart/nintendo-gamecube-lord-of-the-rings-the-return-of-the-king-player-s-choice.png",
+      "boxartRatio": 0.693
     },
     {
       "id": "nintendo-gamecube-lord-of-the-rings-the-two-towers",
@@ -1754,7 +1822,9 @@
       "metacritic": 82,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2965
+      "igdbId": 2965,
+      "boxart": "assets/boxart/nintendo-gamecube-lord-of-the-rings-the-two-towers.png",
+      "boxartRatio": 0.702
     },
     {
       "id": "3do-love-bites",
@@ -1822,7 +1892,9 @@
       "metacritic": 78,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2485
+      "igdbId": 2485,
+      "boxart": "assets/boxart/nintendo-gamecube-luigi-s-mansion-player-s-choice.png",
+      "boxartRatio": 0.711
     },
     {
       "id": "nintendo-switch-mario-golf-super-rush",
@@ -1864,7 +1936,9 @@
       "metacritic": 81,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3403
+      "igdbId": 3403,
+      "boxart": "assets/boxart/nintendo-gamecube-mario-golf-toadstool-tour.png",
+      "boxartRatio": 0.717
     },
     {
       "id": "nintendo-64-mario-kart-64",
@@ -1929,7 +2003,9 @@
       "metacritic": 87,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2344
+      "igdbId": 2344,
+      "boxart": "assets/boxart/nintendo-gamecube-mario-kart-double-dash-not-for-resale.png",
+      "boxartRatio": 0.715
     },
     {
       "id": "nintendo-gamecube-mario-superstar-baseball",
@@ -1950,7 +2026,9 @@
       "metacritic": 76,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3986
+      "igdbId": 3986,
+      "boxart": "assets/boxart/nintendo-gamecube-mario-superstar-baseball.png",
+      "boxartRatio": 0.702
     },
     {
       "id": "nintendo-64-mario-tennis",
@@ -2015,7 +2093,9 @@
       "metacritic": 81,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 5911
+      "igdbId": 5911,
+      "boxart": "assets/boxart/microsoft-xbox-mechassault-2-lone-wolf-limited-edition.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-mega-man-anniversary-collection",
@@ -2038,7 +2118,9 @@
       "metacritic": 80,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1728
+      "igdbId": 1728,
+      "boxart": "assets/boxart/microsoft-xbox-mega-man-anniversary-collection.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "nintendo-switch-metroid-dread-special-edition",
@@ -2085,7 +2167,9 @@
       "metacritic": 97,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1105
+      "igdbId": 1105,
+      "boxart": "assets/boxart/nintendo-gamecube-metroid-prime.png",
+      "boxartRatio": 0.715
     },
     {
       "id": "nintendo-gamecube-metroid-prime-2-echoes-bonus-disc",
@@ -2199,7 +2283,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 5931
+      "igdbId": 5931,
+      "boxart": "assets/boxart/microsoft-xbox-mojo.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "snes-super-famicom-monopoly",
@@ -2222,7 +2308,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 122241
+      "igdbId": 122241,
+      "boxart": "assets/boxart/snes-super-famicom-monopoly.png",
+      "boxartRatio": 1.407
     },
     {
       "id": "nintendo-switch-monster-hunter-generations-ultimate",
@@ -2289,7 +2377,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 242151
+      "igdbId": 242151,
+      "boxart": "assets/boxart/snes-super-famicom-mortal-kombat.png",
+      "boxartRatio": 1.407
     },
     {
       "id": "sony-playstation-5-mortal-kombat-1-premium-edition",
@@ -2375,7 +2465,9 @@
       "metacritic": 38,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 5932
+      "igdbId": 5932,
+      "boxart": "assets/boxart/microsoft-xbox-motocross-mania-3.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "snes-super-famicom-nba-jam",
@@ -2396,7 +2488,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 8995
+      "igdbId": 8995,
+      "boxart": "assets/boxart/snes-super-famicom-nba-jam.png",
+      "boxartRatio": 1.407
     },
     {
       "id": "microsoft-xbox-nba-live-07",
@@ -2417,7 +2511,9 @@
       "metacritic": 69,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 248770
+      "igdbId": 248770,
+      "boxart": "assets/boxart/microsoft-xbox-nba-live-07.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-need-for-speed-carbon",
@@ -2438,7 +2534,9 @@
       "metacritic": 74,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 248118
+      "igdbId": 248118,
+      "boxart": "assets/boxart/microsoft-xbox-need-for-speed-carbon.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "snes-super-famicom-nhl-95",
@@ -2459,7 +2557,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 4509
+      "igdbId": 4509,
+      "boxart": "assets/boxart/snes-super-famicom-nhl-95.png",
+      "boxartRatio": 1.407
     },
     {
       "id": "3do-pebble-beach-golf-links",
@@ -2597,7 +2697,9 @@
       "metacritic": 54,
       "notes": null,
       "added": "2026-08-17",
-      "wikidataId": "Q7206363"
+      "wikidataId": "Q7206363",
+      "boxart": "assets/boxart/microsoft-xbox-360-pocketbike-racer.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "nintendo-switch-pokemon-shield",
@@ -2779,7 +2881,9 @@
       "metacritic": 91,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 21533
+      "igdbId": 21533,
+      "boxart": "assets/boxart/nintendo-wii-resident-evil-4-wii-edition.png",
+      "boxartRatio": 0.715
     },
     {
       "id": "3do-return-fire",
@@ -2824,7 +2928,9 @@
       "metacritic": 84,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 77220
+      "igdbId": 77220,
+      "boxart": "assets/boxart/microsoft-xbox-return-to-castle-wolfenstein-tides-of-war.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "sony-playstation-5-returnal",
@@ -3031,7 +3137,9 @@
       "metacritic": 36,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3675
+      "igdbId": 3675,
+      "boxart": "assets/boxart/nintendo-gamecube-shrek-extra-large.png",
+      "boxartRatio": 0.69
     },
     {
       "id": "3do-snow-job",
@@ -3074,7 +3182,9 @@
       "metacritic": 92,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 227989
+      "igdbId": 227989,
+      "boxart": "assets/boxart/microsoft-xbox-soulcalibur-ii.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "nintendo-switch-spongebob-squarepants-battle-for-bikini-bottom-rehydrated",
@@ -3118,7 +3228,9 @@
       "metacritic": 87,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4176
+      "igdbId": 4176,
+      "boxart": "assets/boxart/nintendo-gamecube-ssx-tricky.png",
+      "boxartRatio": 0.702
     },
     {
       "id": "3do-star-fighter",
@@ -3163,7 +3275,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 8581
+      "igdbId": 8581,
+      "boxart": "assets/boxart/snes-super-famicom-star-fox.png",
+      "boxartRatio": 1.434
     },
     {
       "id": "nintendo-64-star-wars-episode-i-racer",
@@ -3208,7 +3322,9 @@
       "metacritic": 61,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 6159
+      "igdbId": 6159,
+      "boxart": "assets/boxart/microsoft-xbox-star-wars-episode-iii-revenge-of-the-sith.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "sony-playstation-4-star-wars-jedi-fallen-order",
@@ -3253,7 +3369,9 @@
       "metacritic": 83,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 142
+      "igdbId": 142,
+      "boxart": "assets/boxart/microsoft-xbox-star-wars-battlefront-ii.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-star-wars-knights-of-the-old-republic",
@@ -3275,7 +3393,9 @@
       "metacritic": 94,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 116
+      "igdbId": 116,
+      "boxart": "assets/boxart/microsoft-xbox-star-wars-knights-of-the-old-republic.png",
+      "boxartRatio": 0.705
     },
     {
       "id": "nintendo-switch-star-wars-knights-of-the-old-republic",
@@ -3320,7 +3440,9 @@
       "metacritic": 86,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 118
+      "igdbId": 118,
+      "boxart": "assets/boxart/microsoft-xbox-star-wars-knights-of-the-old-republic-ii-the-sith-lords.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "nintendo-64-star-wars-shadows-of-the-empire",
@@ -3365,7 +3487,9 @@
       "metacritic": 71,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 3760
+      "igdbId": 3760,
+      "boxart": "assets/boxart/microsoft-xbox-star-wars-the-clone-wars.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "game-starcraft-64",
@@ -3502,7 +3626,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 5199
+      "igdbId": 5199,
+      "boxart": "assets/boxart/snes-super-famicom-super-mario-all-stars.png",
+      "boxartRatio": 1.434
     },
     {
       "id": "nintendo-wii-super-mario-galaxy",
@@ -3525,7 +3651,9 @@
       "metacritic": 97,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1077
+      "igdbId": 1077,
+      "boxart": "assets/boxart/nintendo-wii-super-mario-galaxy.png",
+      "boxartRatio": 0.711
     },
     {
       "id": "nintendo-switch-super-mario-odyssey",
@@ -3593,7 +3721,9 @@
       "metacritic": 76,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2256
+      "igdbId": 2256,
+      "boxart": "assets/boxart/nintendo-gamecube-super-mario-strikers.png",
+      "boxartRatio": 0.708
     },
     {
       "id": "snes-super-famicom-super-mario-world",
@@ -3614,7 +3744,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 1070
+      "igdbId": 1070,
+      "boxart": "assets/boxart/snes-super-famicom-super-mario-world.png",
+      "boxartRatio": 1.434
     },
     {
       "id": "nintendo-gamecube-super-monkey-ball",
@@ -3635,7 +3767,9 @@
       "metacritic": 87,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2927
+      "igdbId": 2927,
+      "boxart": "assets/boxart/nintendo-gamecube-super-monkey-ball.png",
+      "boxartRatio": 0.705
     },
     {
       "id": "nintendo-gamecube-super-monkey-ball-2-players-choice",
@@ -3657,7 +3791,9 @@
       "metacritic": 87,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2928
+      "igdbId": 2928,
+      "boxart": "assets/boxart/nintendo-gamecube-super-monkey-ball-2-players-choice.png",
+      "boxartRatio": 0.709
     },
     {
       "id": "nintendo-64-super-smash-bros",
@@ -3701,7 +3837,9 @@
       "metacritic": 93,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1628
+      "igdbId": 1628,
+      "boxart": "assets/boxart/nintendo-wii-super-smash-bros-brawl.png",
+      "boxartRatio": 0.712
     },
     {
       "id": "nintendo-gamecube-super-smash-bros-melee-best-seller",
@@ -3724,7 +3862,9 @@
       "metacritic": 92,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1627
+      "igdbId": 1627,
+      "boxart": "assets/boxart/nintendo-gamecube-super-smash-bros-melee-best-seller.png",
+      "boxartRatio": 0.718
     },
     {
       "id": "nintendo-switch-super-smash-bros-ultimate",
@@ -3882,7 +4022,9 @@
       "metacritic": 84,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 1294
+      "igdbId": 1294,
+      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-ghost-recon.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "nintendo-gamecube-tom-clancy-s-splinter-cell",
@@ -3905,7 +4047,9 @@
       "metacritic": 89,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 290167
+      "igdbId": 290167,
+      "boxart": "assets/boxart/nintendo-gamecube-tom-clancy-s-splinter-cell.png",
+      "boxartRatio": 0.702
     },
     {
       "id": "microsoft-xbox-tom-clancy-s-splinter-cell",
@@ -3928,7 +4072,9 @@
       "metacritic": 93,
       "notes": "Old blockbuster game",
       "added": "2024-10-09",
-      "igdbId": 910
+      "igdbId": 910,
+      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-splinter-cell.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-tom-clancy-s-splinter-cell-chaos-theory",
@@ -3950,7 +4096,9 @@
       "metacritic": 94,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 911
+      "igdbId": 911,
+      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-splinter-cell-chaos-theory.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "microsoft-xbox-tom-clancy-s-splinter-cell-pandora-tomorrow",
@@ -3974,7 +4122,9 @@
       "metacritic": 93,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 874
+      "igdbId": 874,
+      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-splinter-cell-pandora-tomorrow.png",
+      "boxartRatio": 0.714
     },
     {
       "id": "nintendo-64-tony-hawk-s-pro-skater",
@@ -4039,7 +4189,9 @@
       "metacritic": 89,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2698
+      "igdbId": 2698,
+      "boxart": "assets/boxart/nintendo-gamecube-tony-hawk-s-underground.png",
+      "boxartRatio": 0.693
     },
     {
       "id": "nintendo-gamecube-tony-hawk-s-underground-2",
@@ -4060,7 +4212,9 @@
       "metacritic": 82,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2699
+      "igdbId": 2699,
+      "boxart": "assets/boxart/nintendo-gamecube-tony-hawk-s-underground-2.png",
+      "boxartRatio": 0.705
     },
     {
       "id": "nintendo-64-turok-rage-wars",
@@ -4150,7 +4304,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-09",
-      "igdbId": 190013
+      "igdbId": 190013,
+      "boxart": "assets/boxart/snes-super-famicom-wario-s-woods.png",
+      "boxartRatio": 1.407
     },
     {
       "id": "nintendo-wii-wii-play",
@@ -4171,7 +4327,9 @@
       "metacritic": 58,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 2185
+      "igdbId": 2185,
+      "boxart": "assets/boxart/nintendo-wii-wii-play.png",
+      "boxartRatio": 0.713
     },
     {
       "id": "nintendo-gamecube-x-men-next-dimension",
@@ -4192,7 +4350,9 @@
       "metacritic": 63,
       "notes": null,
       "added": "2024-10-09",
-      "igdbId": 4577
+      "igdbId": 4577,
+      "boxart": "assets/boxart/nintendo-gamecube-x-men-next-dimension.png",
+      "boxartRatio": 0.693
     },
     {
       "id": "nintendo-64-xena-warrior-princess-the-talisman-of-fate",
@@ -4239,7 +4399,9 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-17",
-      "igdbId": 4582
+      "igdbId": 4582,
+      "boxart": "assets/boxart/game-yu-gi-oh-the-falsebound-kingdom.png",
+      "boxartRatio": 0.703
     },
     {
       "id": "microsoft-xbox-zapper-one-wicked-cricket",
