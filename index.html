@@ -54,6 +54,18 @@
         <kbd class="search__hint">/</kbd>
       </div>
 
+      <button id="filters-toggle" class="pillbutton tools__toggle" type="button"
+              aria-expanded="false" aria-controls="tool-selects">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <line x1="4" y1="7" x2="20" y2="7"></line>
+          <line x1="7" y1="12" x2="17" y2="12"></line>
+          <line x1="10" y1="17" x2="14" y2="17"></line>
+        </svg>
+        <span>Sort and filter</span>
+        <span class="tools__dot" id="filters-dot" hidden></span>
+      </button>
+
+      <div class="tools__selects" id="tool-selects">
       <label class="select">
         <span class="select__label">Sort</span>
         <select id="sort" aria-label="Sort games">
@@ -83,6 +95,7 @@
           <option value="all">Any condition</option>
         </select>
       </label>
+      </div>
 
       <button id="theme-toggle" class="icon-button" type="button"
               aria-label="Switch colour theme" title="Switch colour theme">

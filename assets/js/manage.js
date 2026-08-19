@@ -723,7 +723,7 @@ function renderGames() {
         g.title.toLowerCase().includes(term) || g.platform.toLowerCase().includes(term))
     : state.collection.games;
 
-  const search = h('div', { class: 'mg-listbar' },
+  const search = h('div', { class: 'mg-listbar mg-listbar--sticky' },
     h('input', {
       class: 'cmp__input', type: 'search', placeholder: 'Filter your games…',
       value: state.gameQuery,

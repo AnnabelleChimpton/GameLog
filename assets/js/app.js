@@ -25,6 +25,9 @@ const el = {
   search: $('#search'),
   sort: $('#sort'),
   condition: $('#condition'),
+  filtersToggle: $('#filters-toggle'),
+  toolSelects: $('#tool-selects'),
+  filtersDot: $('#filters-dot'),
   status: $('#status'),
   progress: $('#progress'),
   progressFill: $('#progress-fill'),
@@ -240,6 +243,11 @@ function renderCount() {
   } else {
     el.progress.hidden = true;
   }
+
+  // A folded-away filter still needs to announce that it is doing something.
+  const secondaryActive = state.sort !== (state.config.defaultSort || 'title')
+    || state.status !== 'all' || state.condition !== 'all';
+  el.filtersDot.hidden = !secondaryActive;
 
   el.clear.hidden = !isFiltered();
   el.empty.hidden = shown > 0;
@@ -710,6 +718,14 @@ function attachEvents() {
     state.condition = el.condition.value;
     writeUrl();
     render();
+  });
+
+  // On a phone the sort and filter selects are folded away behind a button:
+  // three of them side by side either overflow or truncate to "Any con...",
+  // and they are secondary to just seeing the shelf.
+  el.filtersToggle.addEventListener('click', () => {
+    const open = el.toolSelects.classList.toggle('is-open');
+    el.filtersToggle.setAttribute('aria-expanded', String(open));
   });
 
   el.status.addEventListener('change', () => {

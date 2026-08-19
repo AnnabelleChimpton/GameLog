@@ -1658,6 +1658,19 @@ div.minitile { cursor: default; }
 }
 .mg-listbar .cmp__input { flex: 1 1 220px; max-width: 340px; }
 
+/* The games list runs to hundreds of rows, and adding one leaves you scrolled
+   deep into it. Pinning the filter and the add button means adding a second
+   game is not a thousand-pixel climb back to the top. */
+.mg-listbar--sticky {
+  position: sticky;
+  top: 131px;
+  z-index: 5;
+  padding: 10px 0;
+  margin-bottom: 2px;
+  background: var(--bg);
+  box-shadow: 0 8px 12px -10px rgba(0, 0, 0, 0.35);
+}
+
 .mg-items { display: grid; gap: 9px; }
 
 .mg-empty {
@@ -2237,4 +2250,109 @@ div.minitile { cursor: default; }
 .mg-gamerow { scroll-margin-top: 148px; }
 
 .mg-gamerow.is-new { animation: none; box-shadow: 0 0 0 2px var(--accent); }
+}
+
+/* ==========================================================================
+   Phones
+   --------------------------------------------------------------------------
+   The controls were built as one row of a desktop header and simply did not
+   fit: at 375px the toolbar alone was 619px wide, so the whole page slid
+   sideways, and the platform chips were left 109px to live in because the
+   quick actions took the rest of their row.
+
+   Everything here is about giving each group its own full width and letting
+   the long ones scroll sideways on purpose, rather than the page doing it by
+   accident.
+   ========================================================================== */
+
+@media (max-width: 700px) {
+  .masthead__bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding-bottom: 4px;
+  }
+
+  /* Five tabs do not fit; scrolling them is fine, scrolling the page is not. */
+  .views {
+    overflow-x: auto;
+    scrollbar-width: none;
+    justify-content: flex-start;
+  }
+  .views::-webkit-scrollbar { display: none; }
+  .viewtab { flex: 0 0 auto; }
+
+  .masthead__tools {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  /* Search earns a full line: it is the control people reach for first. */
+  .search { flex: 1 1 100%; max-width: none; order: -1; }
+
+  /* Sort, status and condition fold away behind a button. Three of them side
+     by side either overflow or truncate to "Any con...", and none of them is
+     what someone opening a phone came for. Opened, they get a readable row of
+     their own. */
+  .masthead__tools .icon-button { flex: 0 0 auto; }
+
+  /* There is no keyboard to press it on. */
+  .search__hint { display: none; }
+  .search__input { padding-right: 14px; }
+
+  /* The introduction is worth less room once you are on a phone. */
+  .hero { padding-top: 20px; padding-bottom: 16px; }
+
+  /* Chips and quick actions stop competing for one row. */
+  .masthead__nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 9px;
+    padding-bottom: 12px;
+  }
+  .masthead__nav .filters { width: 100%; }
+  .quickacts { justify-content: flex-start; }
+  .quickacts .pillbutton { flex: 1 1 auto; justify-content: center; }
+
+  /* Three across at 375px keeps the art big enough to recognise. */
+  .shelf { --shelf-min: 104px; gap: 10px; }
+
+  .statline { padding-top: 14px; }
+  .progress { max-width: none; }
+}
+
+@media (max-width: 420px) {
+  /* Two across below 420px: three would make the covers unreadable. */
+  .shelf { --shelf-min: 132px; }
+}
+
+/* The fold-away only exists on phones: there is room for the real controls on
+   anything wider, where a button hiding three dropdowns would be worse. */
+.tools__toggle { display: none; }
+.tools__selects { display: contents; }
+
+@media (max-width: 700px) {
+  .tools__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    flex: 1 1 auto;
+  }
+  .tools__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* Folded away until asked for. These have to come after the desktop
+     defaults above, or `display: contents` wins on specificity ties and the
+     selects stay on screen with a button uselessly added above them. */
+  .tools__selects { display: none; flex: 1 1 100%; gap: 8px; }
+  .tools__selects.is-open { display: flex; flex-wrap: wrap; }
+  .tools__selects .select { flex: 1 1 150px; min-width: 0; }
+  .tools__selects .select select { width: 100%; }
 }

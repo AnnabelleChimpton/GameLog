@@ -2811,6 +2811,30 @@
       "igdbId": 141271
     },
     {
+      "id": "nintendo-gamecube-rocket-power-beach-bandits",
+      "title": "Rocket Power: Beach Bandits",
+      "platform": "Nintendo GameCube",
+      "year": 2002,
+      "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co1oza.jpg",
+      "description": "It's summer time at Ocean Shores, but the sand at the beach has magically disappeared. Otto, Reggie, Twister and Sam from Rocket Power are surprised by the sands disappearance, and now want to get the sand back. You have to help them by by going around Ocean Shores to get answers about the places the sand could have been taken, getting help from other residents of Ocean Shores. Use your Hockey Stick to fight robots and destroy the robot panels and collect items like smoke bombs, by riding your skateboard and grinding rails as well.",
+      "genres": [
+        "Sport",
+        "Strategy",
+        "Adventure"
+      ],
+      "developer": "Evolution Games",
+      "publisher": "THQ",
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-19",
+      "igdbId": 4092,
+      "wikidataId": null
+    },
+    {
       "id": "3do-samurai-shodown",
       "title": "Samurai Shodown",
       "platform": "3DO",
@@ -3663,6 +3687,29 @@
       "notes": null,
       "added": "2026-08-14",
       "igdbId": 3005
+    },
+    {
+      "id": "nintendo-64-the-powerpuff-girls-chemical-x-traction",
+      "title": "The Powerpuff Girls: Chemical X-Traction",
+      "platform": "Nintendo 64",
+      "year": 2001,
+      "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co2f14.jpg",
+      "description": "Join the Powerpuff Girls to stop the villains from eating their Chemical X pie in an action packed adventure.",
+      "genres": [
+        "Fighting",
+        "Platform"
+      ],
+      "developer": "Asylum Entertainment Ltd.,, VIS Entertainment",
+      "publisher": "BAM! Entertainment",
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-19",
+      "igdbId": 19421,
+      "wikidataId": null
     },
     {
       "id": "3do-theme-park",
