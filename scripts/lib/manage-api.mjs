@@ -22,6 +22,7 @@ import {
 } from './collection.mjs';
 import { loadEnv, getToken, createClient, searchGames, coverUrl, tidySummary, releaseYear, companies } from './igdb.mjs';
 import { searchFree, coverFor } from './freelookup.mjs';
+import { findBoxart } from './libretro.mjs';
 
 /** The only files the manager may ever write. */
 const WRITABLE = {
@@ -502,12 +503,15 @@ export async function handleApi(req, res, { port }) {
       // the search. This lets the UI fill the gap once it knows both.
       const title = (url.searchParams.get('title') || '').trim();
       const platform = (url.searchParams.get('platform') || '').trim();
-      if (!title || !platform) { send(res, 200, { cover: null }); return true; }
-      send(res, 200, {
-        cover: await coverFor(title, platform, {
-          region: url.searchParams.get('region') || 'USA',
-        }),
-      });
+      if (!title || !platform) { send(res, 200, { cover: null, boxart: null }); return true; }
+      const region = url.searchParams.get('region') || 'USA';
+      // Both pictures at once: the cover for the mixed grid, the box scan and
+      // its shape for the single-platform shelf.
+      const [cover, box] = await Promise.all([
+        coverFor(title, platform, { region }),
+        findBoxart(title, platform, { region }),
+      ]);
+      send(res, 200, { cover, boxart: box?.url ?? null, boxartRatio: box?.ratio ?? null });
       return true;
     }
 

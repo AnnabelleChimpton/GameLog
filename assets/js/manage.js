@@ -242,11 +242,17 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
             renderPlatformStep(found, results, async (chosenPlatform) => {
               dialog.close();
               // Keyless art is per-platform, so it can only be resolved now.
-              if (!found.cover && chosenPlatform) {
+              // The box scan is asked for even when the search already found a
+              // cover: they are two different pictures for two different views,
+              // and fetching both here is what stops a new game from looking
+              // wrong on its console's shelf until someone runs `npm run boxart`.
+              if (chosenPlatform) {
                 const params = new URLSearchParams({ title: found.title, platform: chosenPlatform });
                 const got = await fetch(`/api/cover?${params}`, { headers: API.headers })
                   .then((r) => r.json()).catch(() => ({}));
-                found.cover = got.cover || null;
+                if (!found.cover) found.cover = got.cover || null;
+                found.boxart = got.boxart || null;
+                found.boxartRatio = got.boxartRatio || null;
               }
               pickerResolve?.({ kind: 'new', game: found, platform: chosenPlatform });
             });
@@ -631,13 +637,17 @@ function gameEditor(game) {
           markDirty('collection');
           // Keyless art is chosen per platform, so a game added before a
           // platform was picked can only get its cover at this moment.
-          if (!game.cover && v) {
+          if ((!game.cover || !game.boxart) && v) {
             const params = new URLSearchParams({ title: game.title, platform: v });
             if (game.region) params.set('region', game.region);
             const found = await fetch(`/api/cover?${params}`, { headers: API.headers })
               .then((r) => r.json()).catch(() => ({}));
-            if (found.cover && !game.cover) {
-              game.cover = found.cover;
+            if (found.cover && !game.cover) game.cover = found.cover;
+            if (found.boxart) {
+              game.boxart = found.boxart;
+              game.boxartRatio = found.boxartRatio ?? null;
+            }
+            if (found.cover || found.boxart) {
               status('Found box art for that platform.');
               renderGames();
             }
@@ -744,8 +754,9 @@ function renderGames() {
           description: g.description, genres: g.genres || [], developer: g.developer,
           publisher: g.publisher, region: null, release: null, condition: null,
           copies: 1, metacritic: null, notes: null,
-          added: new Date().toISOString().slice(0, 10), igdbId: g.igdbId ?? null,
-          wikidataId: g.wikidataId ?? null,
+          added: new Date().toISOString().slice(0, 10),
+          boxart: g.boxart ?? null, boxartRatio: g.boxartRatio ?? null,
+          igdbId: g.igdbId ?? null, wikidataId: g.wikidataId ?? null,
         };
         game.id = uniqueGameId(game);
         state.collection.games.push(game);

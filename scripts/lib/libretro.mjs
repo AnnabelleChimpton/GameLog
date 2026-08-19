@@ -184,6 +184,42 @@ export async function findCover(title, platform, { region = 'USA' } = {}) {
 }
 
 /**
+ * A PNG's dimensions live in its IHDR, inside the first 24 bytes.
+ *
+ * Asking for a byte range rather than the file keeps this to a few KB per game
+ * instead of a few hundred. Pulling whole images for thirty games in a row is
+ * what made libretro close the connection mid-run.
+ */
+async function ratioOf(url, attempt = 0) {
+  try {
+    const res = await fetch(url, { headers: { Range: 'bytes=0-33', 'User-Agent': UA } });
+    if (!res.ok && res.status !== 206) return null;
+    const b = Buffer.from(await res.arrayBuffer());
+    if (b.length < 24 || b[0] !== 0x89) return null;
+    const w = b.readUInt32BE(16);
+    const h = b.readUInt32BE(20);
+    return w && h ? Math.round((w / h) * 1000) / 1000 : null;
+  } catch {
+    if (attempt >= 2) return null;
+    await new Promise((r) => setTimeout(r, 1200 * (attempt + 1)));
+    return ratioOf(url, attempt + 1);
+  }
+}
+
+/**
+ * The box scan and its proportions together.
+ *
+ * Every path that adds a game uses this, so a game arrives with its shape
+ * already known rather than waiting for someone to remember `npm run boxart`.
+ */
+export async function findBoxart(title, platform, { region = 'USA' } = {}) {
+  const url = await findCover(title, platform, { region });
+  if (!url) return null;
+  const ratio = await ratioOf(url);
+  return ratio ? { url, ratio } : null;
+}
+
+/**
  * Which platforms have a keyless art source worth trying.
  *
  * A directory existing is not the same as it being populated -- PlayStation 4

@@ -19,6 +19,7 @@ import {
   loadEnv, getToken, createClient, searchGames, coverUrl, tidySummary, releaseYear, companies,
 } from './lib/igdb.mjs';
 import { searchFree, coverFor, hasFreeArt } from './lib/freelookup.mjs';
+import { findBoxart } from './lib/libretro.mjs';
 
 function parseArgs(argv) {
   const opts = { positional: [] };
@@ -151,6 +152,11 @@ async function main() {
     chosen.cover = await coverFor(finalTitle, platform, { region: opts.region || 'USA' });
   }
 
+  // The box scan is a second, differently shaped picture used on single-platform
+  // shelves. Fetching it here means a new game arrives complete, rather than
+  // looking wrong until someone remembers to run `npm run boxart`.
+  const box = await findBoxart(finalTitle, platform, { region: opts.region || 'USA' });
+
   const entry = {
     id,
     title: finalTitle,
@@ -168,6 +174,8 @@ async function main() {
     metacritic: null,
     notes: notes || null,
     added: new Date().toISOString().slice(0, 10),
+    boxart: box?.url ?? null,
+    boxartRatio: box?.ratio ?? null,
     igdbId: chosen?.igdbId ?? null,
     wikidataId: chosen?.wikidataId ?? null,
   };

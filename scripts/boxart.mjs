@@ -15,34 +15,12 @@
 // arrives, and a shelf of a few hundred would reflow the whole way down.
 
 import { loadCollection, saveCollection } from './lib/collection.mjs';
-import { findCover, coverage } from './lib/libretro.mjs';
+import { findBoxart, coverage } from './lib/libretro.mjs';
 
 const args = process.argv.slice(2);
 const force = args.includes('--force');
 const onlyIndex = args.indexOf('--platform');
 const onlyPlatform = onlyIndex !== -1 ? args[onlyIndex + 1] : null;
-
-/**
- * A PNG's dimensions live in its IHDR, inside the first 24 bytes. Asking for a
- * range rather than the file keeps this to a few KB per game instead of a few
- * hundred, which matters because libretro closed the connection on us when we
- * pulled whole images for thirty games in a row.
- */
-async function ratioOf(url, attempt = 0) {
-  try {
-    const res = await fetch(url, { headers: { Range: 'bytes=0-33' } });
-    if (!res.ok && res.status !== 206) return null;
-    const b = Buffer.from(await res.arrayBuffer());
-    if (b.length < 24 || b[0] !== 0x89) return null;
-    const w = b.readUInt32BE(16);
-    const h = b.readUInt32BE(20);
-    return w && h ? Math.round((w / h) * 1000) / 1000 : null;
-  } catch {
-    if (attempt >= 2) return null;
-    await new Promise((r) => setTimeout(r, 1200 * (attempt + 1)));
-    return ratioOf(url, attempt + 1);
-  }
-}
 
 async function main() {
   const collection = await loadCollection();
@@ -69,14 +47,13 @@ async function main() {
 
   for (const game of targets) {
     done += 1;
-    const url = await findCover(game.title, game.platform, { region: game.region || 'USA' });
-    const ratio = url ? await ratioOf(url) : null;
+    const box = await findBoxart(game.title, game.platform, { region: game.region || 'USA' });
 
-    if (url && ratio) {
-      game.boxart = url;
-      game.boxartRatio = ratio;
+    if (box) {
+      game.boxart = box.url;
+      game.boxartRatio = box.ratio;
       found += 1;
-      console.log(`  ✓ [${String(done).padStart(3)}/${targets.length}] ${game.title} (${ratio})`);
+      console.log(`  ✓ [${String(done).padStart(3)}/${targets.length}] ${game.title} (${box.ratio})`);
     } else {
       console.log(`  ·  ${game.title} — no scan`);
     }

@@ -453,6 +453,27 @@ automatically; `--source free` forces the keyless path either way.
 A game with no art keeps a generated placeholder in its platform's colour, and
 those tiles show their title permanently, so the shelf still reads properly.
 
+### True box shapes
+
+Filter the shelf to a single console and the tiles stop being uniform
+rectangles: each one takes the proportions of the real box. A Nintendo 64
+cartridge box is wider than it is tall, a 3DO longbox is narrow and
+tall, and lined up along one shelf they look like the shelf they came from.
+
+This needs a second picture, because the covers most databases serve are
+normalised to one size. `npm run add` and the manager fetch it while you add a
+game, so there is usually nothing to do. To backfill games added before this
+existed:
+
+```bash
+npm run boxart
+```
+
+It reads a few bytes of each scan to learn its proportions rather than
+downloading the image, and takes `--platform "Nintendo 64"` to do one console
+at a time, or `--force` to redo ones already filled in. Anything it can't find
+falls back to the console's usual shape, so a shelf never ends up ragged.
+
 ## Preview before you push
 
 ```bash
