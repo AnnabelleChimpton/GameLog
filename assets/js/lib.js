@@ -80,9 +80,31 @@ export function shelfShape(games) {
   return { median, scanned: scanned.length, total: games.length };
 }
 
-/** The proportions to draw one game at, falling back to the shelf's median. */
-export const boxRatio = (game, shape) =>
-  (game.boxart && game.boxartRatio > 0 ? game.boxartRatio : shape.median);
+/**
+ * How tall to draw a shelf of this shape.
+ *
+ * Landscape boxes need less height than tall ones to take up similar room, or
+ * a row of cartridge boxes reads as enormous next to a row of disc cases.
+ */
+export const boxHeight = (shape) => (shape.median > 1 ? 150 : 250);
+
+/**
+ * How one game is drawn on a true-shape shelf: which picture, what proportions,
+ * and whether it has a scan of its own at all.
+ *
+ * A game with no usable scan is drawn at the shelf's shape with its normalised
+ * cover, so one missing box does not punch a differently-sized hole in the row.
+ * The url is sanitised first and the ratio follows that decision, so art this
+ * page would refuse to load can never set a tile's width either.
+ */
+export function boxTile(game, shape) {
+  const src = safeImageUrl(game.boxart);
+  return {
+    src,
+    ratio: src && game.boxartRatio > 0 ? game.boxartRatio : shape.median,
+    scanned: Boolean(src),
+  };
+}
 
 /* --- Hardware ------------------------------------------------------------- */
 
