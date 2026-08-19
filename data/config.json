@@ -1,14 +1,14 @@
 {
-  "title": "My Game Collection",
-  "tagline": "A shelf of everything I've collected.",
+  "title": null,
+  "tagline": null,
   "siteUrl": "https://annabellechimpton.github.io/GameLog",
   "accent": "#f0a04b",
   "defaultSort": "title",
   "showHardware": true,
   "profile": {
-    "name": "Annabelle",
+    "name": "AnnabelleChimpton",
     "photo": "assets/profile/avatar.jpg",
-    "about": "This is me",
+    "about": "Welcome to my game collection! These are all of the physical copies of games I currently own. I also developed this site, and it's open source if you'd like to copy it and use it yourself :)",
     "links": []
   },
   "friends": [],
