@@ -28,6 +28,11 @@ const el = {
   filtersToggle: $('#filters-toggle'),
   toolSelects: $('#tool-selects'),
   filtersDot: $('#filters-dot'),
+  sheet: $('#filter-sheet'),
+  sheetBody: $('#sheet-body'),
+  sheetClose: $('#sheet-close'),
+  sheetClear: $('#sheet-clear'),
+  sheetApply: $('#sheet-apply'),
   status: $('#status'),
   progress: $('#progress'),
   progressFill: $('#progress-fill'),
@@ -247,7 +252,10 @@ function renderCount() {
   // A folded-away filter still needs to announce that it is doing something.
   const secondaryActive = state.sort !== (state.config.defaultSort || 'title')
     || state.status !== 'all' || state.condition !== 'all';
-  el.filtersDot.hidden = !secondaryActive;
+  el.filtersDot.hidden = !(secondaryActive || state.platform !== 'all' || state.notesOnly);
+  el.sheetApply.textContent = isFiltered()
+    ? `Show ${shown} of ${total}`
+    : `Show all ${total}`;
 
   el.clear.hidden = !isFiltered();
   el.empty.hidden = shown > 0;
@@ -643,6 +651,43 @@ function renderFriends() {
       }, h('span', { text: f.name || f.url }))));
 }
 
+/* --- Phone layout --------------------------------------------------------- */
+
+/**
+ * On a phone the filters live in a sheet; on a desktop they live in the header.
+ *
+ * The controls are *moved* between the two rather than duplicated, so there is
+ * still one platform chip strip, one sort select and one notes toggle in the
+ * document. Duplicating them would mean two sets of listeners and two things to
+ * keep in step with the state, which is how filter bars end up disagreeing with
+ * themselves.
+ */
+const phone = window.matchMedia('(max-width: 700px)');
+const homes = new Map();
+
+function rememberHome(node) {
+  if (!homes.has(node)) homes.set(node, { parent: node.parentNode, next: node.nextSibling });
+}
+
+function placeFilters() {
+  const movable = [el.filters, el.toolSelects, el.notesToggle].filter(Boolean);
+  movable.forEach(rememberHome);
+  if (el.dice) rememberHome(el.dice);
+
+  if (phone.matches) {
+    for (const node of movable) el.sheetBody.append(node);
+    // Surprise me is an action rather than a filter, so it stays in the header
+    // beside the search box instead of being buried in the sheet.
+    if (el.dice) el.themeToggle.before(el.dice);
+  } else {
+    if (el.sheet.open) el.sheet.close();
+    for (const node of [...movable, el.dice].filter(Boolean)) {
+      const home = homes.get(node);
+      if (home?.parent) home.parent.insertBefore(node, home.next);
+    }
+  }
+}
+
 /* --- URL and theme -------------------------------------------------------- */
 
 function readUrl() {
@@ -720,12 +765,22 @@ function attachEvents() {
     render();
   });
 
-  // On a phone the sort and filter selects are folded away behind a button:
-  // three of them side by side either overflow or truncate to "Any con...",
-  // and they are secondary to just seeing the shelf.
-  el.filtersToggle.addEventListener('click', () => {
-    const open = el.toolSelects.classList.toggle('is-open');
-    el.filtersToggle.setAttribute('aria-expanded', String(open));
+  el.filtersToggle.addEventListener('click', () => el.sheet.showModal());
+  el.sheetClose.addEventListener('click', () => el.sheet.close());
+  el.sheetApply.addEventListener('click', () => el.sheet.close());
+  el.sheet.addEventListener('click', (event) => {
+    // The backdrop is the dialog element itself.
+    if (event.target === el.sheet) el.sheet.close();
+  });
+  el.sheetClear.addEventListener('click', () => {
+    state.query = '';
+    state.platform = 'all';
+    state.condition = 'all';
+    state.status = 'all';
+    state.notesOnly = false;
+    syncControls();
+    writeUrl();
+    render();
   });
 
   el.status.addEventListener('change', () => {
@@ -897,6 +952,9 @@ async function boot() {
     el.views.querySelector('[data-view="lists"]')?.remove();
     if (state.view === 'lists') state.view = 'shelf';
   }
+
+  placeFilters();
+  phone.addEventListener('change', () => { placeFilters(); render(); });
 
   renderChips();
   renderFriends();

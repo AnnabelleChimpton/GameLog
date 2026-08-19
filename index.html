@@ -54,14 +54,13 @@
         <kbd class="search__hint">/</kbd>
       </div>
 
-      <button id="filters-toggle" class="pillbutton tools__toggle" type="button"
-              aria-expanded="false" aria-controls="tool-selects">
+      <button id="filters-toggle" class="pillbutton tools__toggle" type="button">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <line x1="4" y1="7" x2="20" y2="7"></line>
           <line x1="7" y1="12" x2="17" y2="12"></line>
           <line x1="10" y1="17" x2="14" y2="17"></line>
         </svg>
-        <span>Sort and filter</span>
+        <span>Filter</span>
         <span class="tools__dot" id="filters-dot" hidden></span>
       </button>
 
@@ -213,6 +212,25 @@
 <footer class="colophon">
   <p id="colophon-text"></p>
 </footer>
+
+<!-- Phones only. The filters are moved in here rather than duplicated, so the
+     controls, their listeners and their state stay the single originals. -->
+<dialog id="filter-sheet" class="sheet" aria-label="Filter games">
+  <div class="sheet__head">
+    <h2 class="sheet__title">Filter</h2>
+    <button id="sheet-close" class="icon-button" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  <div class="sheet__body" id="sheet-body"></div>
+  <div class="sheet__foot">
+    <button id="sheet-clear" class="pillbutton" type="button">Clear all</button>
+    <button id="sheet-apply" class="cmp__go" type="button">Show all</button>
+  </div>
+</dialog>
 
 <dialog id="detail" class="detail" aria-label="Game details">
   <div class="detail__inner">

@@ -2292,11 +2292,25 @@ div.minitile { cursor: default; }
   /* Search earns a full line: it is the control people reach for first. */
   .search { flex: 1 1 100%; max-width: none; order: -1; }
 
-  /* Sort, status and condition fold away behind a button. Three of them side
-     by side either overflow or truncate to "Any con...", and none of them is
-     what someone opening a phone came for. Opened, they get a readable row of
-     their own. */
   .masthead__tools .icon-button { flex: 0 0 auto; }
+  .tools__toggle .tools__dot { margin-left: 1px; }
+
+  /* Only the search box, Filter, Surprise me and the theme switch remain in
+     the header. Everything else moved into the sheet.
+
+     The dice is moved out of .quickacts into the toolbar, so it has to be
+     targeted by id: its label wrapped onto two lines and made the whole row
+     taller than the buttons beside it. */
+  #dice { flex: 0 0 auto; padding: 9px 13px; }
+  #dice span:not(.tools__dot) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .masthead__nav:empty,
+  .masthead__nav:not(:has(> *:not(:empty))) { display: none; }
 
   /* There is no keyboard to press it on. */
   .search__hint { display: none; }
@@ -2348,11 +2362,107 @@ div.minitile { cursor: default; }
     background: var(--accent);
   }
 
-  /* Folded away until asked for. These have to come after the desktop
-     defaults above, or `display: contents` wins on specificity ties and the
-     selects stay on screen with a button uselessly added above them. */
-  .tools__selects { display: none; flex: 1 1 100%; gap: 8px; }
-  .tools__selects.is-open { display: flex; flex-wrap: wrap; }
-  .tools__selects .select { flex: 1 1 150px; min-width: 0; }
-  .tools__selects .select select { width: 100%; }
+  /* Inside the sheet these are stacked and full width, which is the point of
+     moving them there: room to be legible. */
+  .tools__selects { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+  .tools__selects .select { width: 100%; }
+  .tools__selects .select select { width: 100%; padding-top: 11px; padding-bottom: 11px; }
+  .tools__selects .select__label {
+    position: static;
+    width: auto;
+    height: auto;
+    clip-path: none;
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .tools__selects .select { display: block; }
+  .tools__selects .select::after { top: auto; bottom: 20px; }
+}
+
+/* ==========================================================================
+   Filter sheet (phones)
+   --------------------------------------------------------------------------
+   The conventional mobile pattern: one Filter button, a sheet from the bottom,
+   a count on the way out. Filling the top of a shelf with controls costs the
+   rows of covers people came to look at.
+   ========================================================================== */
+
+.sheet {
+  width: 100%;
+  max-width: 100%;
+  max-height: 86vh;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: none;
+  border-radius: 16px 16px 0 0;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-modal);
+  position: fixed;
+  bottom: 0;
+  top: auto;
+}
+.sheet::backdrop {
+  background: rgba(6, 6, 9, 0.5);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.sheet__title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.sheet__body {
+  display: grid;
+  gap: 18px;
+  padding: 16px 18px;
+  overflow-y: auto;
+  max-height: calc(86vh - 148px);
+}
+
+/* Chips wrap in the sheet rather than scrolling: the whole point of opening it
+   is to see every platform at once. */
+.sheet__body .chips {
+  flex-wrap: wrap;
+  overflow: visible;
+  mask-image: none;
+}
+.sheet__body .filters { padding: 0; }
+.sheet__body .pillbutton { justify-content: flex-start; }
+.sheet__body .pillbutton span:not(.tools__dot) { display: inline; }
+
+.sheet__foot {
+  display: flex;
+  gap: 10px;
+  padding: 12px 18px calc(14px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border);
+}
+.sheet__foot .cmp__go { flex: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .sheet[open] { animation: sheet-up 0.24s var(--ease); }
+  @keyframes sheet-up {
+    from { transform: translateY(100%); }
+    to { transform: none; }
+  }
+}
+
+/* Never on a desktop: there is room for the real controls there. */
+@media (min-width: 701px) {
+  .sheet[open] { display: none; }
 }
