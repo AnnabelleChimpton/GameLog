@@ -1353,6 +1353,24 @@ div.minitile { cursor: default; }
   border-left: 2.5px solid #d1553f;
 }
 
+.cmp__confirm {
+  display: grid;
+  gap: 13px;
+  justify-items: start;
+  padding: 16px 18px;
+  max-width: 70ch;
+  background: var(--surface-sunk);
+  border-radius: var(--radius-ui);
+  border-left: 2.5px solid var(--accent);
+}
+.cmp__confirmtext {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+.cmp__confirmtext strong { color: var(--text); font-weight: 650; }
+
 .cmp__results { display: grid; gap: 30px; margin-top: 6px; }
 
 .cmp__summary {

@@ -14,6 +14,55 @@ import { h, coverImage, titleKey, plural } from './lib.js';
 
 const MAX_ENTRIES = 20000;
 
+// A compared collection is someone else's file, so its size is theirs to
+// choose. Reading it whole before the entry cap can apply means a hostile or
+// broken host could hang the tab with a multi-gigabyte body; this ceiling is
+// where we stop reading instead. Comfortably above any real collection: even
+// 20,000 richly-filled entries land well under this.
+const MAX_BYTES = 16 * 1024 * 1024;
+
+/**
+ * Read a response body as text, refusing to buffer more than MAX_BYTES.
+ *
+ * A `Content-Length` is trusted as an early out when present, but not relied
+ * on -- it can lie or be absent, so the running total is what actually stops
+ * the read. Streams the body and abandons it the moment the cap is crossed.
+ */
+async function readCapped(response) {
+  const declared = Number(response.headers.get('content-length'));
+  if (Number.isFinite(declared) && declared > MAX_BYTES) {
+    throw new Error('TOO_BIG');
+  }
+
+  // No readable stream (very old browsers): fall back to text(), which at least
+  // still gets checked below before it is parsed.
+  if (!response.body?.getReader) {
+    const text = await response.text();
+    if (text.length > MAX_BYTES) throw new Error('TOO_BIG');
+    return text;
+  }
+
+  const reader = response.body.getReader();
+  const chunks = [];
+  let total = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.length;
+      if (total > MAX_BYTES) throw new Error('TOO_BIG');
+      chunks.push(value);
+    }
+  } finally {
+    reader.cancel().catch(() => {});
+  }
+
+  const bytes = new Uint8Array(total);
+  let at = 0;
+  for (const chunk of chunks) { bytes.set(chunk, at); at += chunk.length; }
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
 /**
  * Work out where a collection.json lives from whatever the user pasted.
  * Accepts a site root, a direct json url, a github repo url, or "user/repo".
@@ -93,9 +142,22 @@ export async function loadCollection(input) {
     );
   }
 
+  let text;
+  try {
+    text = await readCapped(response);
+  } catch (err) {
+    if (err.message === 'TOO_BIG') {
+      throw new Error(
+        `${url} is larger than ${Math.round(MAX_BYTES / 1024 / 1024)} MB, `
+        + `which is far past any real collection. Refusing to load it.`
+      );
+    }
+    throw new Error(`Couldn't finish reading ${url}.`);
+  }
+
   let data;
   try {
-    data = await response.json();
+    data = JSON.parse(text);
   } catch {
     throw new Error(`${url} isn't valid JSON, so it probably isn't a GameLog.`);
   }

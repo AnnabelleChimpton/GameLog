@@ -645,6 +645,34 @@ async function runComparison(input) {
   }
 }
 
+/**
+ * A `?with=` link fetches another host straight from the visitor's browser, so
+ * a crafted link would make an arbitrary stranger's site load on page open --
+ * enough to hand that host the visitor's IP before anything is shown. A link
+ * someone followed is not the same as a comparison they asked for, so an
+ * incoming target is prefilled and confirmed rather than fetched on sight.
+ *
+ * Friend chips and a pasted address are already deliberate clicks, and go
+ * straight to runComparison unchanged.
+ */
+function promptComparison(input) {
+  el.cmpUrl.value = input;
+  let host = input;
+  try { host = new URL(compare.resolveCollectionUrl(input)).host; } catch { /* show raw */ }
+
+  cmpStatus('');
+  el.cmpOutput.replaceChildren(
+    h('div', { class: 'cmp__confirm' },
+      h('p', { class: 'cmp__confirmtext' },
+        h('span', { text: 'Compare your shelf against ' }),
+        h('strong', { text: host }),
+        h('span', { text: '? This loads that site directly in your browser.' })),
+      h('button', {
+        type: 'button', class: 'pillbutton pillbutton--accent',
+        onclick: () => runComparison(input),
+      }, h('span', { text: 'Compare' }))));
+}
+
 function renderFriends() {
   const friends = Array.isArray(state.config.friends) ? state.config.friends : [];
   if (!friends.length) { el.cmpFriends.hidden = true; return; }
@@ -978,8 +1006,7 @@ async function boot() {
 
   const withParam = new URLSearchParams(location.search).get('with');
   if (withParam && state.view === 'compare') {
-    el.cmpUrl.value = withParam;
-    runComparison(withParam);
+    promptComparison(withParam);
   }
 }
 

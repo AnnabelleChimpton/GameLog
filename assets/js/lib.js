@@ -268,6 +268,10 @@ export function coverImage(game, { eager = false } = {}) {
   const img = document.createElement('img');
   img.loading = eager ? 'eager' : 'lazy';
   img.decoding = 'async';
+  // A cover url can be hotlinked to any host, and a compared collection chooses
+  // its own. Sending no referrer means loading that art can't quietly tell the
+  // host which page -- or which visitor -- pulled it.
+  img.referrerPolicy = 'no-referrer';
   img.alt = '';
   const src = safeImageUrl(game.cover);
   img.src = src || placeholderCover(game.platform);
