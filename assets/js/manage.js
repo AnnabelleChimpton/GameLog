@@ -421,6 +421,37 @@ function renderLists() {
 /* --- Games tab ------------------------------------------------------------ */
 
 /**
+ * Scroll a freshly added or edited game into view and flash it.
+ *
+ * Alphabetical order can drop a new entry anywhere in a list of hundreds, so
+ * without this you are told something was added and shown no evidence of it.
+ * The highlight matters as much as the scroll: landing mid-list with no marker
+ * leaves you working out which row is yours.
+ */
+function revealGame(id) {
+  // After renderGames() the row exists but has not been laid out, so measuring
+  // or scrolling in the same frame lands in the wrong place.
+  requestAnimationFrame(() => {
+    const row = document.querySelector(`[data-game-id="${CSS.escape(id)}"]`);
+    if (!row) return;
+
+    // Align the top, not the centre. A row whose editor is open is around a
+    // thousand pixels tall, so centring it pushes the header carrying the
+    // game's name off the top of the screen and you land in the middle of a
+    // form with nothing saying what it belongs to. scroll-margin-top in the
+    // stylesheet keeps it clear of the sticky header.
+    row.scrollIntoView({ block: 'start', behavior: 'smooth' });
+
+    row.classList.remove('is-new');
+    // Reading offsetWidth forces the class removal to take effect before it is
+    // re-added, or the animation would not restart on a second add.
+    void row.offsetWidth;
+    row.classList.add('is-new');
+    setTimeout(() => row.classList.remove('is-new'), 2200);
+  });
+}
+
+/**
  * Getting box art onto a game that has none.
  *
  * Four ways in, because the answer depends on where the picture is: drop a file,
@@ -721,21 +752,20 @@ function renderGames() {
         state.collection.games.sort((a, b) =>
           a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }));
         state.editing = game.id;
-        // Show just the game that was added, rather than dropping it into
-        // alphabetical order somewhere down a list of hundreds and scrolling
-        // after it. One row, editor already open, nothing to hunt for --
-        // clearing the filter brings everything back.
-        state.gameQuery = game.title;
+        // Keep the whole list and go to the new entry, rather than filtering
+        // down to it. Seeing it land in alphabetical order among everything
+        // else is the point: it confirms it is really in the collection.
+        state.gameQuery = '';
         markDirty('collection');
         renderGames();
-        status(`Added ${game.title}: ${game.platform}. `
-          + 'Clear the filter above to see the whole collection again.')
+        revealGame(game.id);
+        status(`Added ${game.title}: ${game.platform}.`)
       },
     }, h('span', { text: '+ Add a game' })));
 
   const rows = games.slice(0, 400).map((game) => {
     const open = state.editing === game.id;
-    return h('div', { class: 'mg-gamerow' },
+    return h('div', { class: 'mg-gamerow', dataset: { gameId: game.id } },
       h('button', {
         type: 'button',
         class: open ? 'mg-gamerow__head is-open' : 'mg-gamerow__head',

@@ -2216,3 +2216,25 @@ div.minitile { cursor: default; }
   background: var(--accent);
   border-radius: var(--radius-pill);
 }
+
+/* A newly added game, so it is findable after the list scrolls to it. */
+/* Clears the sticky manager header (131px) plus a little breathing room, so a
+   row scrolled to does not sit tucked underneath it. */
+.mg-gamerow { scroll-margin-top: 148px; }
+
+.mg-gamerow.is-new {
+  border-radius: var(--radius-ui);
+  animation: landed 2.2s var(--ease);
+}
+@keyframes landed {
+  0%, 55% { box-shadow: 0 0 0 2px var(--accent); }
+  100%    { box-shadow: 0 0 0 2px transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* No pulse, but still mark it: the row has to be identifiable either way. */
+  /* Clears the sticky manager header (131px) plus a little breathing room, so a
+   row scrolled to does not sit tucked underneath it. */
+.mg-gamerow { scroll-margin-top: 148px; }
+
+.mg-gamerow.is-new { animation: none; box-shadow: 0 0 0 2px var(--accent); }
+}
