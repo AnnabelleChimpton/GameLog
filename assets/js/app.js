@@ -569,14 +569,7 @@ function closeDetail() {
  */
 function openFromAnywhere(game) {
   const inView = state.visible.some((g) => g.id === game.id);
-  if (!inView) {
-    state.query = '';
-    state.platform = 'all';
-    state.condition = 'all';
-    state.status = 'all';
-    state.notesOnly = false;
-    syncControls();
-  }
+  if (!inView) clearFilters();
   setView('shelf');
   openByGame(game);
 }
@@ -649,6 +642,16 @@ function renderFriends() {
         type: 'button', class: 'chip',
         onclick: () => { el.cmpUrl.value = f.url; runComparison(f.url); },
       }, h('span', { text: f.name || f.url }))));
+}
+
+/** Put every filter back to its default. */
+function clearFilters() {
+  state.query = '';
+  state.platform = 'all';
+  state.condition = 'all';
+  state.status = 'all';
+  state.notesOnly = false;
+  syncControls();
 }
 
 /* --- Phone layout --------------------------------------------------------- */
@@ -773,12 +776,7 @@ function attachEvents() {
     if (event.target === el.sheet) el.sheet.close();
   });
   el.sheetClear.addEventListener('click', () => {
-    state.query = '';
-    state.platform = 'all';
-    state.condition = 'all';
-    state.status = 'all';
-    state.notesOnly = false;
-    syncControls();
+    clearFilters();
     writeUrl();
     render();
   });
@@ -818,12 +816,7 @@ function attachEvents() {
   });
 
   el.clear.addEventListener('click', () => {
-    state.query = '';
-    state.platform = 'all';
-    state.condition = 'all';
-    state.status = 'all';
-    state.notesOnly = false;
-    syncControls();
+    clearFilters();
     writeUrl();
     render();
     el.search.focus();

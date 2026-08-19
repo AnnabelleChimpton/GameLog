@@ -22,7 +22,7 @@
 
   --text: #1b1a19;
   --text-soft: #55524e;
-  --text-faint: #86827c;
+  --text-faint: #726e68;   /* 4.65:1 on --bg, AA for small text */
 
   --shadow-tile: 0 1px 2px rgba(24, 22, 20, 0.08), 0 6px 16px rgba(24, 22, 20, 0.07);
   --shadow-lift: 0 4px 10px rgba(24, 22, 20, 0.1), 0 18px 40px rgba(24, 22, 20, 0.16);
@@ -76,7 +76,7 @@
 
   --text: #eceae7;
   --text-soft: #a8a5a0;
-  --text-faint: #777470;
+  --text-faint: #827e79;   /* 4.79:1 on --bg, AA for small text */
 
   --shadow-tile: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 20px rgba(0, 0, 0, 0.4);
   --shadow-lift: 0 6px 14px rgba(0, 0, 0, 0.5), 0 22px 48px rgba(0, 0, 0, 0.55);
@@ -98,7 +98,7 @@
     --border-strong: rgba(24, 22, 20, 0.2);
     --text: #1b1a19;
     --text-soft: #55524e;
-    --text-faint: #86827c;
+    --text-faint: #726e68;   /* 4.65:1 on --bg, AA for small text */
     --shadow-tile: 0 1px 2px rgba(24, 22, 20, 0.08), 0 6px 16px rgba(24, 22, 20, 0.07);
     --shadow-lift: 0 4px 10px rgba(24, 22, 20, 0.1), 0 18px 40px rgba(24, 22, 20, 0.16);
     --shadow-modal: 0 24px 70px rgba(24, 22, 20, 0.28);
