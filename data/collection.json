@@ -215,6 +215,31 @@
       "boxartRatio": 1.369
     },
     {
+      "id": "microsoft-xbox-big-mutha-truckers",
+      "title": "Big Mutha Truckers",
+      "platform": "Microsoft Xbox",
+      "year": 2002,
+      "cover": "assets/covers/microsoft-xbox-big-mutha-truckers.jpg",
+      "description": "Big Mutha Truckers is a truck racing game where you are one of Ma Jackson's four kids. You have to make money for 60 days. The one who earns most money in that period will get Ma's business. There are plenty obstacles to change your success to failure. Players make cash by trading various commodities in the five cities that make up Hick State County, by taking on special jobs (some legal, some not so legal), by wagering with other rival drivers and by causing as much chaos as possible!",
+      "genres": [
+        "Racing",
+        "Simulator"
+      ],
+      "developer": "Eutechnyx, Raylight Studios",
+      "publisher": "THQ, Zoo Digital, Empire Interactive, Destination Software",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-20",
+      "boxart": "assets/boxart/microsoft-xbox-big-mutha-truckers.png",
+      "boxartRatio": 0.715,
+      "igdbId": 3809,
+      "wikidataId": null
+    },
+    {
       "id": "nintendo-64-bio-freaks",
       "title": "Bio Freaks",
       "platform": "Nintendo 64",
@@ -911,6 +936,30 @@
       "boxartRatio": 0.714
     },
     {
+      "id": "nintendo-gamecube-freaky-flyers",
+      "title": "Freaky Flyers",
+      "platform": "Nintendo GameCube",
+      "year": 2003,
+      "cover": "assets/covers/nintendo-gamecube-freaky-flyers.jpg",
+      "description": "Freaky Flyers is an air racing video game developed internally by Midway San Diego for Xbox and PS2 while the GameCube version was developed by Point of View, Inc. and published by Midway Games.",
+      "genres": [
+        "Racing"
+      ],
+      "developer": "Midway Games",
+      "publisher": "Midway Games",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-20",
+      "boxart": "assets/boxart/nintendo-gamecube-freaky-flyers.png",
+      "boxartRatio": 0.702,
+      "igdbId": 3918,
+      "wikidataId": null
+    },
+    {
       "id": "microsoft-xbox-furious-karting",
       "title": "Furious Karting",
       "platform": "Microsoft Xbox",
@@ -1444,6 +1493,30 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 109458
+    },
+    {
+      "id": "nintendo-gamecube-kelly-slater-s-pro-surfer",
+      "title": "Kelly Slater's Pro Surfer",
+      "platform": "Nintendo GameCube",
+      "year": 2002,
+      "cover": "assets/covers/nintendo-gamecube-kelly-slater-s-pro-surfer.jpg",
+      "description": "Each surfer is represented by a high-res 3-D model that brings their signature style and tricks to life. Take an exhilarating thrill ride down huge wave faces and into barreling tubes, using an intuitive control system and multiple modes of play. Plus, surf exotic real-world locales in South Africa, Hawaii, Australia, Tahiti, Spain and North America.",
+      "genres": [
+        "Sport"
+      ],
+      "developer": "Treyarch, Beenox",
+      "publisher": "Activision",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-20",
+      "boxart": "assets/boxart/nintendo-gamecube-kelly-slater-s-pro-surfer.png",
+      "boxartRatio": 0.693,
+      "igdbId": 3963,
+      "wikidataId": null
     },
     {
       "id": "nintendo-switch-killer-queen-black",
