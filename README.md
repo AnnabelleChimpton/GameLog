@@ -502,12 +502,49 @@ Each shelf is someone else's site, so one being down or slow just drops that
 shelf from the river and the rest still show. A visitor to your published site
 sees the tab only once you follow at least one shelf.
 
-**Finding more people.** Above the river, a **Shelves your circle follows** strip
-suggests the GameLogs that *your* follows follow but you don't yet — read from
-their public `friends` lists, ranked by how many of your follows point at each,
-and linking straight to them. So the follow graph is walkable: land on a shelf,
-see who it follows, and see who *its* circle follows, a step at a time. Two
-collectors can find each other without any directory in the middle.
+**Finding more people.** Above the river, a **Shelves to explore** strip suggests
+GameLogs you don't follow yet, from two sources: the shelves *your* follows
+follow (read from their public `friends` lists, ranked by how many of your
+follows point at each), and the shelves listed in any **directory** you
+subscribe to. Each links straight out, and its tooltip says where the
+suggestion came from. So the follow graph is walkable a step at a time — land on
+a shelf, see who it follows, and who *its* circle follows.
+
+### Directories
+
+A directory is the on-ramp for someone who doesn't know anyone yet. It's a
+**shared, published list of shelves** — a webring's member list — and, like
+everything else here, it's just a static file anyone can host. Subscribe to one
+(the manager's Site tab, or `directories` in `data/config.json`) and its shelves
+show up in **Shelves to explore**, so you can find people without knowing a
+single address first.
+
+```json
+"directories": [
+  "https://someone.github.io/gamelog-ring/directory.json"
+]
+```
+
+**Hosting your own** is nothing more than publishing this file somewhere with
+open CORS (GitHub Pages does):
+
+```json
+{
+  "gamelog_directory": 1,
+  "name": "The GameLog Ring",
+  "description": "Physical game collectors.",
+  "shelves": [
+    { "name": "Annabelle", "url": "https://annabellechimpton.github.io/GameLog/" },
+    { "name": "Sam", "url": "https://sam.github.io/GameLog/" }
+  ]
+}
+```
+
+`gamelog_directory` is a schema version, `shelves` is a list of `{ name, url }`.
+There's no central directory and no registration — anyone can start one, fork
+one, or run several, and shelves can be listed in as many as they like. A shelf
+you already follow is never suggested back to you, and any address that isn't a
+plain `http(s)` one is dropped, because a directory is somebody else's file too.
 
 ## Cover art and descriptions
 

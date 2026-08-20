@@ -217,35 +217,42 @@ export function renderRiver(items) {
 }
 
 /**
- * The "who else" strip: shelves your follows follow, that you don't yet. Each
- * links out to that shelf, and says who in your circle led you to it, so the
- * follow graph can be walked a step at a time without leaving the page.
+ * The "who else" strip: shelves to explore that you don't follow yet -- friends
+ * of the shelves you follow, and shelves listed in the directories you
+ * subscribe to. Each links out, and its tooltip says where the suggestion came
+ * from, so the follow graph can be walked a step at a time without leaving the
+ * page.
  */
 export function renderDiscovery(candidates) {
   if (!candidates.length) return null;
 
   return h('section', { class: 'discover' },
-    h('h3', { class: 'discover__label', text: 'Shelves your circle follows' }),
+    h('h3', { class: 'discover__label', text: 'Shelves to explore' }),
     h('div', { class: 'discover__chips' },
-      candidates.map((c) => h('a', {
-        class: 'discover__chip',
-        href: c.url,
-        target: '_blank',
-        rel: 'noopener noreferrer',
-        title: `Followed by ${c.followedBy.join(', ')}`,
-      },
-        h('span', { class: 'discover__name', text: c.name }),
-        c.followedBy.length > 1
-          ? h('span', { class: 'discover__count', text: `×${c.followedBy.length}` })
-          : null))));
+      candidates.map((c) => {
+        const via = [];
+        if (c.followedBy?.length) via.push(`Followed by ${c.followedBy.join(', ')}`);
+        if (c.listedIn?.length) via.push(`Listed in ${c.listedIn.join(', ')}`);
+        const sources = (c.followedBy?.length || 0) + (c.listedIn?.length || 0);
+        return h('a', {
+          class: 'discover__chip',
+          href: c.url,
+          target: '_blank',
+          rel: 'noopener noreferrer',
+          title: via.join(' · '),
+        },
+          h('span', { class: 'discover__name', text: c.name }),
+          sources > 1 ? h('span', { class: 'discover__count', text: `×${sources}` }) : null);
+      })));
 }
 
-/** The prompt shown when no shelves are followed yet. */
+/** The prompt shown when there's nothing to follow or explore yet. */
 export function renderFollowingEmpty() {
   return h('div', { class: 'lists__empty' },
     h('h2', { class: 'cmp__title', text: 'You\'re not following anyone yet' }),
     h('p', { class: 'cmp__lede' },
       'Follow another GameLog and its updates show up here — games they beat, '
-      + 'notes they write — read straight from their site. Add the shelves you '
-      + 'follow on the manager\'s Site tab, or as "friends" in data/config.json.'));
+      + 'notes they write — read straight from their site. Or subscribe to a '
+      + 'directory, a shared list of shelves, to find people to follow. Both '
+      + 'live on the manager\'s Site tab, or in data/config.json.'));
 }

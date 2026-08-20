@@ -114,6 +114,9 @@ function validateConfig(data) {
   if (data.friends != null && !Array.isArray(data.friends)) {
     throw new Error('"friends" should be a list.');
   }
+  if (data.directories != null && !Array.isArray(data.directories)) {
+    throw new Error('"directories" should be a list of addresses.');
+  }
   return data;
 }
 

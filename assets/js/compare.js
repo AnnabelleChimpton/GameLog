@@ -270,33 +270,108 @@ export function shelfBase(input) {
   }
 }
 
+// A directory is someone else's file too, so its list of shelves is capped.
+const MAX_DIR_SHELVES = 2000;
+
 /**
- * The friends-of-your-friends worth suggesting: the shelves your follows point
- * at that you don't already follow yourself, deduped and ranked by how many of
- * your follows point at each. This is the graph walk made one step -- landing
- * on a shelf, you see not just who it follows but who its circle follows.
- *
- * `shelves` carries each followed shelf's own friends list; `exclude` is the
- * addresses to leave out -- your own follows, and you.
+ * Load a seed-list directory: a published, forkable index of GameLog shelves
+ * that anyone can host. Nothing about it is fixed to a path -- you subscribe to
+ * a directory by its full url -- so this validates the address itself rather
+ * than deriving one, and treats the file as hostile: capped, shape-checked, and
+ * with each listed url left for shelfBase to vet at use.
  */
-export function discover(shelves, { exclude = [] } = {}) {
+export async function loadDirectory(input) {
+  const raw = String(input ?? '').trim();
+  let url;
+  try {
+    url = new URL(raw);
+  } catch {
+    throw new Error(`"${raw}" isn't a web address.`);
+  }
+  if (!/^https?:$/.test(url.protocol)) {
+    throw new Error('Only http and https directories can be loaded.');
+  }
+
+  let response;
+  try {
+    response = await fetch(url.href, { mode: 'cors', cache: 'no-cache' });
+  } catch {
+    throw new Error(`Couldn't reach ${url.href}.`);
+  }
+  if (!response.ok) throw new Error(`${url.href} answered with HTTP ${response.status}.`);
+
+  let text;
+  try {
+    text = await readCapped(response);
+  } catch {
+    throw new Error(`Couldn't read ${url.href}.`);
+  }
+
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error(`${url.href} isn't valid JSON.`);
+  }
+
+  if (!data || !Array.isArray(data.shelves)) {
+    throw new Error(`${url.href} has no "shelves" list: probably not a GameLog directory.`);
+  }
+  const shelves = data.shelves
+    .filter((s) => s && typeof s.url === 'string')
+    .slice(0, MAX_DIR_SHELVES);
+  return {
+    url: url.href,
+    name: typeof data.name === 'string' && data.name.trim() ? data.name.trim() : url.hostname,
+    shelves,
+  };
+}
+
+/**
+ * The shelves worth suggesting, from two sources with their provenance kept:
+ * the friends of the shelves you follow, and the shelves listed in directories
+ * you subscribe to. Together they let the follow graph be walked a step at a
+ * time *and* seeded from a shared index, so someone following nobody yet still
+ * has somewhere to start.
+ *
+ * `shelves` carries each followed shelf's own friends; `directories` carries
+ * each subscribed directory's shelves; `exclude` is what to leave out -- your
+ * own follows, and you. Ranked warmest first: friends-of-friends ahead of a
+ * bare directory listing.
+ */
+export function discover({ shelves = [], directories = [], exclude = [] } = {}) {
   const skip = new Set(exclude.map(shelfBase).filter(Boolean));
   const found = new Map();
 
+  const at = (name, rawUrl) => {
+    const base = shelfBase(rawUrl);
+    if (!base || skip.has(base)) return null;
+    if (!found.has(base)) {
+      found.set(base, {
+        name: name?.trim() || base, url: base, followedBy: new Set(), listedIn: new Set(),
+      });
+    }
+    return found.get(base);
+  };
+
   for (const shelf of shelves) {
     for (const candidate of shelf.friends || []) {
-      const base = shelfBase(candidate.url);
-      if (!base || skip.has(base)) continue;
-      if (!found.has(base)) {
-        found.set(base, { name: candidate.name?.trim() || base, url: base, followedBy: new Set() });
-      }
-      found.get(base).followedBy.add(shelf.friend.name);
+      at(candidate.name, candidate.url)?.followedBy.add(shelf.friend.name);
+    }
+  }
+  for (const directory of directories) {
+    for (const listing of directory.shelves || []) {
+      at(listing.name, listing.url)?.listedIn.add(directory.name);
     }
   }
 
   return [...found.values()]
-    .map((c) => ({ name: c.name, url: c.url, followedBy: [...c.followedBy] }))
-    .sort((a, b) => b.followedBy.length - a.followedBy.length
+    .map((c) => ({
+      name: c.name, url: c.url, followedBy: [...c.followedBy], listedIn: [...c.listedIn],
+    }))
+    .sort((a, b) =>
+      b.followedBy.length - a.followedBy.length
+      || b.listedIn.length - a.listedIn.length
       || a.name.localeCompare(b.name, 'en'));
 }
 

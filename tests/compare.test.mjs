@@ -4,7 +4,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  resolveCollectionUrl, resolveFeedUrl, diff, loadCollection, loadFeed, loadConfig, discover,
+  resolveCollectionUrl, resolveFeedUrl, diff, loadCollection, loadFeed, loadConfig,
+  loadDirectory, discover,
 } from '../assets/js/compare.js';
 
 /** Stand in for the network for one call, then put the real fetch back. */
@@ -90,7 +91,7 @@ test('discover surfaces friends-of-friends you do not already follow, most-conne
       { name: 'Me', url: 'me.github.io/GameLog' },                // already mine: excluded
     ] },
   ];
-  const found = discover(shelves, { exclude: ['me.github.io/GameLog'] });
+  const found = discover({ shelves, exclude: ['me.github.io/GameLog'] });
 
   // Chris is followed by both Sam and Jo, so ranks ahead of Mel; Me is excluded.
   assert.deepEqual(found.map((c) => c.name), ['Chris', 'Mel']);
@@ -98,13 +99,53 @@ test('discover surfaces friends-of-friends you do not already follow, most-conne
   assert.equal(found.some((c) => c.name === 'Me'), false);
 });
 
-test('discover drops a hostile url in a foreign friends list', () => {
+test('discover folds in directory listings, keeping provenance and ranking warmth first', () => {
   const shelves = [{ friend: { name: 'Sam' }, friends: [
-    { name: 'evil', url: 'javascript:alert(1)' },
-    { name: 'ok', url: 'ok.github.io/GameLog' },
+    { name: 'Chris', url: 'chris.github.io/GameLog' },
   ] }];
-  const found = discover(shelves, {});
+  const directories = [{ name: 'The Ring', shelves: [
+    { name: 'Chris', url: 'https://chris.github.io/GameLog/' }, // also a friend-of-friend
+    { name: 'Rita', url: 'rita.github.io/GameLog' },            // directory-only
+  ] }];
+  const found = discover({ shelves, directories });
+
+  // Chris (followed by a friend AND listed) leads; Rita (listed only) follows.
+  assert.deepEqual(found.map((c) => c.name), ['Chris', 'Rita']);
+  assert.deepEqual(found[0].followedBy, ['Sam']);
+  assert.deepEqual(found[0].listedIn, ['The Ring']);
+  assert.deepEqual(found[1].followedBy, []);
+  assert.deepEqual(found[1].listedIn, ['The Ring']);
+});
+
+test('discover drops a hostile url from either source', () => {
+  const found = discover({
+    shelves: [{ friend: { name: 'Sam' }, friends: [{ name: 'evil', url: 'javascript:alert(1)' }] }],
+    directories: [{ name: 'D', shelves: [
+      { name: 'bad', url: 'file:///etc/passwd' },
+      { name: 'ok', url: 'ok.github.io/GameLog' },
+    ] }],
+  });
   assert.deepEqual(found.map((c) => c.name), ['ok']);
+});
+
+test('loadDirectory reads the shelves list and refuses a non-directory', async () => {
+  const body = JSON.stringify({
+    gamelog_directory: 1, name: 'The Ring',
+    shelves: [{ name: 'Sam', url: 'sam.github.io/GameLog' }, { nope: 1 }],
+  });
+  const got = await withFetch(() => new Response(body, { status: 200 }),
+    () => loadDirectory('https://x.dev/ring.json'));
+  assert.equal(got.name, 'The Ring');
+  assert.equal(got.shelves.length, 1);
+
+  await assert.rejects(
+    withFetch(() => new Response('{"games":[]}', { status: 200 }),
+      () => loadDirectory('https://x.dev/not-a-directory.json')),
+    /directory/i);
+});
+
+test('loadDirectory rejects a non-http address', async () => {
+  await assert.rejects(loadDirectory('ftp://x.dev/ring.json'), /http/i);
 });
 
 test('diff groups by title, not by platform', () => {

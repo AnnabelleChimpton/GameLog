@@ -1051,6 +1051,8 @@ function renderSite() {
   });
 
   const friends = Array.isArray(config.friends) ? config.friends : (config.friends = []);
+  const directories = Array.isArray(config.directories)
+    ? config.directories : (config.directories = []);
 
   wrap.replaceChildren(
     artCard(),
@@ -1083,7 +1085,8 @@ function renderSite() {
     h('div', { class: 'mg-card' },
       h('h2', { class: 'mg-card__title', text: 'Shelves you follow' }),
       h('p', { class: 'mg-hint',
-        text: 'These appear as one-click buttons on the Compare view.' }),
+        text: 'One-click buttons on Compare, and the source of the Following river '
+          + 'and its friends-of-friends suggestions.' }),
       h('div', { class: 'mg-items' },
         friends.map((friend, i) => h('div', { class: 'mg-row mg-row--tight' },
           field('Name', friend.name, (v) => { friend.name = v; markDirty('config'); }),
@@ -1095,7 +1098,25 @@ function renderSite() {
       h('button', {
         type: 'button', class: 'pillbutton',
         onclick: () => { friends.push({ name: '', url: '' }); markDirty('config'); renderSite(); },
-      }, h('span', { text: '+ Add a shelf' }))));
+      }, h('span', { text: '+ Add a shelf' }))),
+
+    h('div', { class: 'mg-card' },
+      h('h2', { class: 'mg-card__title', text: 'Directories' }),
+      h('p', { class: 'mg-hint',
+        text: 'A directory is a shared, published list of GameLog shelves. Subscribe '
+          + 'to one and its shelves appear as suggestions on Following, so you can '
+          + 'find people without knowing their address first.' }),
+      h('div', { class: 'mg-items' },
+        directories.map((url, i) => h('div', { class: 'mg-row mg-row--tight' },
+          field('Directory address', url, (v) => { directories[i] = v; markDirty('config'); },
+            { placeholder: 'https://someone.github.io/ring/directory.json' }),
+          iconButton('Remove', () => {
+            directories.splice(i, 1); markDirty('config'); renderSite();
+          }, { danger: true })))),
+      h('button', {
+        type: 'button', class: 'pillbutton',
+        onclick: () => { directories.push(''); markDirty('config'); renderSite(); },
+      }, h('span', { text: '+ Subscribe to a directory' }))));
 }
 
 

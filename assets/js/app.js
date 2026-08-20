@@ -703,7 +703,8 @@ function renderFriends() {
 
 /* --- Following ------------------------------------------------------------ */
 
-let riverLoading = false;
+let followingLoading = false;
+let followingLoaded = false;
 
 function folStatus(message, kind = 'info') {
   el.folStatus.hidden = !message;
@@ -715,22 +716,28 @@ const followedShelves = () =>
   (Array.isArray(state.config.friends) ? state.config.friends : [])
     .filter((f) => f && typeof f.url === 'string' && f.url.trim());
 
+const subscribedDirectories = () =>
+  (Array.isArray(state.config.directories) ? state.config.directories : [])
+    .filter((d) => typeof d === 'string' && d.trim());
+
 /**
- * Show the river. With no one followed, the prompt; once fetched, the cached
- * stream; otherwise kick off the fetch, which renders itself when it lands.
+ * Show the view. With nothing to read -- no follows and no directories -- the
+ * prompt; once fetched, the cached result; otherwise kick off the fetch, which
+ * paints itself when it lands.
  */
 function renderFollowing() {
   const friends = followedShelves();
-  if (!friends.length) {
+  const directories = subscribedDirectories();
+  if (!friends.length && !directories.length) {
     folStatus('');
     el.folOutput.replaceChildren(renderFollowingEmpty());
     return;
   }
-  if (state.river) {
+  if (followingLoaded) {
     paintFollowing();
     return;
   }
-  if (!riverLoading) runRiver(friends);
+  if (!followingLoading) runFollowing(friends, directories);
 }
 
 /** Draw the discovery strip (when there's anything to suggest) above the river. */
@@ -743,59 +750,68 @@ function paintFollowing() {
 }
 
 /**
- * Read every followed shelf and merge their logs. Each shelf is someone else's
- * site, so a failure to reach one is expected and isolated: that shelf drops
- * out and the rest still show. A shelf's collection is what carries its beaten
- * milestones, so it is required; its feed.json (written posts) is not.
+ * Read one followed shelf: its collection (for the milestones), its feed (for
+ * written posts), and its config (for who it follows, which seeds discovery).
+ * Only the collection is required; a missing feed or config just contributes
+ * less. A shelf that can't be reached at all drops out.
  */
-async function runRiver(friends) {
-  riverLoading = true;
+async function fetchShelf(f) {
+  let games;
+  let collUrl;
+  try {
+    const c = await compare.loadCollection(f.url);
+    games = c.games;
+    collUrl = c.url;
+  } catch {
+    return null;
+  }
+  let posts = [];
+  try { posts = (await compare.loadFeed(f.url)).posts; } catch { posts = []; }
+  let theirFriends = [];
+  try { theirFriends = (await compare.loadConfig(f.url)).friends; } catch { theirFriends = []; }
+  const base = collUrl.replace(/\/data\/collection\.json.*$/, '');
+  return {
+    friend: { name: (f.name && f.name.trim()) || base, url: base },
+    posts, games, friends: theirFriends,
+  };
+}
+
+/**
+ * Read everything the view draws from -- the shelves you follow (for the river
+ * and for friends-of-friends) and the directories you subscribe to (for
+ * seeded discovery) -- in parallel. Each is someone else's file, so a source
+ * that can't be read is isolated: it drops out and the rest still show.
+ */
+async function runFollowing(friends, directories) {
+  followingLoading = true;
   el.folOutput.replaceChildren();
-  folStatus(`Reading ${plural(friends.length, 'shelf', 'shelves')} you follow…`);
+  const reading = [];
+  if (friends.length) reading.push(plural(friends.length, 'shelf', 'shelves'));
+  if (directories.length) reading.push(plural(directories.length, 'directory', 'directories'));
+  folStatus(`Reading ${reading.join(' and ')}…`);
 
-  const shelves = await Promise.all(friends.map(async (f) => {
-    let games;
-    let collUrl;
-    try {
-      const c = await compare.loadCollection(f.url);
-      games = c.games;
-      collUrl = c.url;
-    } catch {
-      return null; // Can't reach their collection: nothing to show for them.
-    }
-    let posts = [];
-    try {
-      posts = (await compare.loadFeed(f.url)).posts;
-    } catch {
-      posts = []; // No readable feed is fine; their milestones still come through.
-    }
-    let theirFriends = [];
-    try {
-      theirFriends = (await compare.loadConfig(f.url)).friends;
-    } catch {
-      theirFriends = []; // No readable config: they just add nobody to discover.
-    }
-    const base = collUrl.replace(/\/data\/collection\.json.*$/, '');
-    return {
-      friend: { name: (f.name && f.name.trim()) || base, url: base },
-      posts, games, friends: theirFriends,
-    };
-  }));
+  const [shelfResults, dirResults] = await Promise.all([
+    Promise.all(friends.map(fetchShelf)),
+    Promise.all(directories.map((u) => compare.loadDirectory(u).catch(() => null))),
+  ]);
 
-  const ok = shelves.filter(Boolean);
-  const missed = friends.length - ok.length;
-  riverLoading = false;
+  const ok = shelfResults.filter(Boolean);
+  const dirs = dirResults.filter(Boolean);
+  const total = friends.length + directories.length;
+  const missed = total - ok.length - dirs.length;
+
+  followingLoading = false;
+  followingLoaded = true;
   state.river = buildRiver(ok);
 
-  // Friends of your friends you don't already follow, minus you.
+  // Shelves to suggest, minus the ones you already follow and you.
   const exclude = friends.map((f) => f.url);
   if (typeof state.config.siteUrl === 'string' && state.config.siteUrl.trim()) {
     exclude.push(state.config.siteUrl);
   }
-  state.discover = compare.discover(ok, { exclude });
+  state.discover = compare.discover({ shelves: ok, directories: dirs, exclude });
 
-  folStatus(missed ? `${missed} of ${plural(friends.length, 'shelf', 'shelves')} couldn't be read.` : '',
-    missed ? 'warn' : 'info');
+  folStatus(missed ? `${missed} of ${total} couldn't be read.` : '', missed ? 'warn' : 'info');
   paintFollowing();
 }
 
@@ -1119,9 +1135,10 @@ async function boot() {
     if (state.view === 'log') state.view = 'shelf';
   }
 
-  // The Following tab needs someone to follow. Locally it stays, so the owner
-  // can see it exists and go add friends on the Site tab.
-  if (!followedShelves().length && !isLocal()) {
+  // The Following tab needs somewhere to read from -- a shelf you follow or a
+  // directory you subscribe to. Locally it stays, so the owner can see it
+  // exists and go set one up on the Site tab.
+  if (!followedShelves().length && !subscribedDirectories().length && !isLocal()) {
     el.views.querySelector('[data-view="following"]')?.remove();
     if (state.view === 'following') state.view = 'shelf';
   }
