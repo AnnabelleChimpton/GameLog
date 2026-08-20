@@ -75,6 +75,14 @@ Four ways, all writing to the same file: mix and match freely.
 **Use the manager.** `npm run manage` opens an editor in your browser, which is
 the easiest way in. The rest of these work just as well.
 
+Not comfortable in a terminal? **Double-click `Open GameLog Manager.command`**
+(Mac) or **`Open GameLog Manager.bat`** (Windows) in this folder. It starts the
+same editor and opens it in your browser — no commands to type. Keep the little
+window that appears open while you edit, and close it when you're done. (You
+still need [Node.js](https://nodejs.org) installed once; the launcher says so if
+it's missing. On a Mac, the first time, right-click the file and choose **Open**
+so it's allowed to run.)
+
 **Type them in by hand.** Every field except `title` and `platform` is optional:
 
 ```json
@@ -726,6 +734,7 @@ untouched.
 
 ```
 index.html               the page
+Open GameLog Manager.*    double-click launchers for the manager (Mac / Windows)
 assets/css/styles.css    all the styling; colours are CSS variables at the top
 assets/js/app.js         state, routing, the shelf, the detail dialog
 assets/js/lib.js         helpers shared by every view
