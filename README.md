@@ -76,8 +76,9 @@ editor opens in your browser. Search for games to add them, set your name and
 photo on the **Profile** tab, and your title and colour on the **Site** tab.
 Your copy starts with example games so the page is not empty while you find your
 way around; delete the ones you do not want with the **Delete** button on each,
-and add your own. (If you would rather clear them all in one go, that is the one
-job a single command does best: `npm run start-fresh`.)
+and add your own. (If you would rather clear them all in one go, double-click
+**Start Fresh.command** or **Start Fresh.bat** first. It shows what it will
+erase and asks you to confirm by typing a word, so nothing is wiped by accident.)
 
 **6. Publish.** When it looks right, open GitHub Desktop. It lists what you
 changed. Write a short note in the **Summary** box, click **Commit to main**,
@@ -782,7 +783,8 @@ untouched.
 
 ```
 index.html               the page
-Open GameLog Manager.*    double-click launchers for the manager (Mac / Windows)
+Open GameLog Manager.*    double-click to open the editor (Mac / Windows)
+Start Fresh.*             double-click to empty a fresh copy (Mac / Windows)
 assets/css/styles.css    all the styling; colours are CSS variables at the top
 assets/js/app.js         state, routing, the shelf, the detail dialog
 assets/js/lib.js         helpers shared by every view
