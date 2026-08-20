@@ -62,8 +62,11 @@ export const isLocal = () =>
  * shape, so true proportions read as a set; mixing an N64 box at 1.37 with a
  * 3DO longbox at 0.50 just looks broken, and the plain grid is better there.
  *
- * A platform also has to be mostly scanned. A handful of true shapes among
- * mostly fallbacks is worse than no true shapes at all.
+ * With enough scans the shape is their measured median. With none -- a current-
+ * gen console libretro can't scan -- it falls back to the platform's known case
+ * proportion, which is exact there because every case is one standard size. In
+ * between, some scans but not most, stays a plain grid: a handful of true shapes
+ * among mostly fallbacks is worse than no true shapes at all.
  */
 const SHAPE_COVERAGE = 0.6;
 
@@ -73,11 +76,23 @@ export function shelfShape(games) {
   if (platforms.size !== 1) return null;
 
   const scanned = games.filter((g) => g.boxart && g.boxartRatio > 0);
-  if (scanned.length / games.length < SHAPE_COVERAGE) return null;
 
-  const ratios = scanned.map((g) => g.boxartRatio).sort((a, b) => a - b);
-  const median = ratios[Math.floor(ratios.length / 2)];
-  return { median, scanned: scanned.length, total: games.length };
+  if (scanned.length / games.length >= SHAPE_COVERAGE) {
+    const ratios = scanned.map((g) => g.boxartRatio).sort((a, b) => a - b);
+    const median = ratios[Math.floor(ratios.length / 2)];
+    return { median, scanned: scanned.length, total: games.length };
+  }
+
+  // No scans to measure, but a known standard case shape for this console. Only
+  // for portrait cases (box < 1): a game's key art is portrait, and a landscape
+  // fallback would crop it to a thin strip. Landscape-box consoles (N64, SNES)
+  // are the ones libretro *does* scan, so they wait for a real scan instead.
+  if (scanned.length === 0) {
+    const { box } = platformInfo([...platforms][0]);
+    if (box > 0 && box < 1) return { median: box, scanned: 0, total: games.length, known: true };
+  }
+
+  return null;
 }
 
 /**

@@ -649,6 +649,15 @@ downloading the image, and takes `--platform "Nintendo 64"` to do one console
 at a time, or `--force` to redo ones already filled in. Anything it can't find
 falls back to the console's usual shape, so a shelf never ends up ragged.
 
+Current-gen consoles have no scan source at all — libretro doesn't scan
+PlayStation 5 or Switch boxes — but their cases are all one standard size, so
+each platform in `assets/js/platforms.mjs` carries a `box` proportion (a Switch
+cartridge case is narrower than a PlayStation Blu-ray case, which is a touch
+wider than a GameCube DVD case). A single-platform shelf uses that known shape
+when there's nothing to measure, so a Switch shelf stands like a shelf of Switch
+cases rather than dropping to a plain grid. A real scan, when there is one,
+always wins over the known value.
+
 ## Preview before you push
 
 ```bash
@@ -680,7 +689,7 @@ auto-generated abbreviation and colour. To give it a proper one, add a line to
 `assets/js/platforms.mjs`:
 
 ```js
-{ key: 'Sega Dreamcast', short: 'DC', color: '#e06c3b', igdb: 23 },
+{ key: 'Sega Dreamcast', short: 'DC', color: '#e06c3b', igdb: 23, box: 0.71 },
 ```
 
 - `key`: exactly as you spell it in `collection.json`
@@ -688,6 +697,11 @@ auto-generated abbreviation and colour. To give it a proper one, add a line to
 - `color`: the chip dot, badge, and placeholder-cover colour
 - `igdb`: IGDB's platform id, which narrows cover-art searches. Look it up in
   the [IGDB platform list](https://api-docs.igdb.com/#platform), or set `null`.
+- `box`: the case proportion (width ÷ height), used to draw a single-platform
+  shelf at true shape when there's no scan to measure. A disc case is about
+  `0.71`, an N64 cartridge box `1.37`, a 3DO longbox `0.52`. Optional — leave it
+  out and that console's shelf just stays a plain grid until its games are
+  scanned.
 
 That one file is shared by the site and the scripts, so a platform added there
 works everywhere.

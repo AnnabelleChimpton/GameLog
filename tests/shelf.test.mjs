@@ -58,6 +58,39 @@ test('one odd scan does not drag the shelf off shape', () => {
   assert.ok(shape.median < 0.6, `median ${shape.median} should still be a longbox`);
 });
 
+test('a current-gen shelf with no scans uses the console\'s known case shape', () => {
+  // Switch cases are all one size and libretro can't scan them, so the known
+  // ratio is exact -- and reads better than dropping to a plain grid.
+  const games = [unscanned('a', 'Nintendo Switch'), unscanned('b', 'Nintendo Switch')];
+  const shape = shelfShape(games);
+  assert.ok(shape, 'a known-shape console still gets a shelf');
+  assert.equal(shape.median, 0.63);
+  assert.equal(shape.known, true);
+  assert.equal(shape.scanned, 0);
+});
+
+test('an unknown platform with no scans and no known shape stays a grid', () => {
+  const games = [unscanned('a', 'Fairchild Channel F'), unscanned('b', 'Fairchild Channel F')];
+  assert.equal(shelfShape(games), null);
+});
+
+test('a landscape-box console with no scans stays a grid rather than cropping art', () => {
+  // N64's box is landscape (1.37); the fallback would squeeze portrait key art
+  // into a wide strip. It is scannable, so it waits for a real scan instead.
+  const games = [unscanned('a', 'Nintendo 64'), unscanned('b', 'Nintendo 64')];
+  assert.equal(shelfShape(games), null);
+});
+
+test('some scans but not enough stays a grid even when the shape is known', () => {
+  // A mix of a few measured shapes and mostly guessed ones reads worse than a
+  // clean grid, so the known fallback is only for a shelf with no scans at all.
+  const s = (id) => ({ id, platform: 'Nintendo Switch',
+    boxart: `https://x/${id}.png`, boxartRatio: 0.63 });
+  const games = [s('a'), s('b'), unscanned('c', 'Nintendo Switch'),
+    unscanned('d', 'Nintendo Switch'), unscanned('e', 'Nintendo Switch')];
+  assert.equal(shelfShape(games), null, '2 of 5 scanned is below the threshold and not zero');
+});
+
 /* --- How tall the shelf is drawn ------------------------------------------ */
 
 test('landscape shelves are drawn shorter than tall ones', () => {
