@@ -13,8 +13,13 @@
 import { createServer } from 'node:http';
 import { serveStatic } from './lib/static.mjs';
 import { handleApi } from './lib/manage-api.mjs';
+import { loadPlatformOverrides } from './lib/collection.mjs';
 
 const port = Number(process.argv[2]) || 4321;
+
+// Fold any data/platforms.json overrides into the registry the search endpoint
+// maps IGDB ids against, so a custom console is understood here too.
+await loadPlatformOverrides();
 
 const server = createServer(async (req, res) => {
   if (await handleApi(req, res, { port })) return;

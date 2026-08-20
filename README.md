@@ -684,27 +684,41 @@ already valid. This is for catching hand-edits.
 
 ## Adding a console the registry doesn't know
 
-Everything still works with an unrecognised platform. It just gets an
-auto-generated abbreviation and colour. To give it a proper one, add a line to
-`assets/js/platforms.mjs`:
+The registry in `assets/js/platforms.mjs` ships comprehensive — every mainstream
+home console and handheld from the Atari 2600 through the Switch, plus the
+Sega/NEC/SNK/Bandai lines — so most shelves need nothing here. An unrecognised
+platform still works too; it just gets an auto-generated abbreviation and
+colour.
 
-```js
-{ key: 'Sega Dreamcast', short: 'DC', color: '#e06c3b', igdb: 23, box: 0.71 },
+To add a console the registry doesn't know, or amend one, **you don't touch
+code** — put it in `data/platforms.json`, which is merged over the built-ins by
+`key` at load:
+
+```json
+{
+  "platforms": [
+    { "key": "Bandai WonderSwan", "short": "WS", "color": "#3a5a7a",
+      "igdb": 57, "box": 0.90, "libretro": "Bandai - WonderSwan" }
+  ]
+}
 ```
 
 - `key`: exactly as you spell it in `collection.json`
 - `short`: the badge label; keep it to about four characters
 - `color`: the chip dot, badge, and placeholder-cover colour
 - `igdb`: IGDB's platform id, which narrows cover-art searches. Look it up in
-  the [IGDB platform list](https://api-docs.igdb.com/#platform), or set `null`.
-- `box`: the case proportion (width ÷ height), used to draw a single-platform
+  the [IGDB platform list](https://api-docs.igdb.com/#platform), or omit it.
+- `box`: the case proportion (width ÷ height), for drawing a single-platform
   shelf at true shape when there's no scan to measure. A disc case is about
-  `0.71`, an N64 cartridge box `1.37`, a 3DO longbox `0.52`. Optional — leave it
-  out and that console's shelf just stays a plain grid until its games are
-  scanned.
+  `0.71`, an N64 cartridge box `1.37`, a 3DO longbox `0.52`.
+- `libretro`: the system directory in libretro's thumbnail repo (No-Intro
+  naming), which is the keyless box-art source. Omit it for anything libretro
+  doesn't scan.
 
-That one file is shared by the site and the scripts, so a platform added there
-works everywhere.
+Only `key` is required; anything you leave out keeps the built-in value (when
+you're amending an existing console) or a sensible default (when adding a new
+one). The file is optional — no `data/platforms.json` just means the built-ins,
+untouched.
 
 ---
 
@@ -724,13 +738,14 @@ assets/js/profile.js     the About view
 assets/js/manage.js      the local manager UI
 manage.html              the manager page (local use only)
 assets/js/compare.js     fetching another collection: Compare, and the Following river
-assets/js/platforms.mjs  the platform registry: names, colours, IGDB ids
+assets/js/platforms.mjs  the built-in platform registry: names, colours, shapes, art sources
 scripts/lib/libretro.mjs keyless box art
 scripts/lib/wikipedia.mjs keyless descriptions and years
 data/collection.json     your games and hardware
 data/lists.json          your lists (optional)
 data/feed.json           your log posts (optional)
 data/config.json         site title, tagline, accent colour, friends
+data/platforms.json      your console overrides/additions (optional)
 scripts/                 the optional Node helpers (start-fresh, add, enrich, …)
 tests/                   `npm test`, no dependencies
 ```

@@ -14,7 +14,7 @@
 // The ratio is stored too. Without it every tile would resize as its image
 // arrives, and a shelf of a few hundred would reflow the whole way down.
 
-import { loadCollection, saveCollection } from './lib/collection.mjs';
+import { loadCollection, saveCollection, loadPlatformOverrides } from './lib/collection.mjs';
 import { vendorEntry } from './lib/vendor.mjs';
 import { findBoxart, coverage } from './lib/libretro.mjs';
 
@@ -24,6 +24,7 @@ const onlyIndex = args.indexOf('--platform');
 const onlyPlatform = onlyIndex !== -1 ? args[onlyIndex + 1] : null;
 
 async function main() {
+  await loadPlatformOverrides();
   const collection = await loadCollection();
   const platforms = [...new Set(collection.games.map((g) => g.platform))];
   const { covered, missing } = await coverage(platforms);

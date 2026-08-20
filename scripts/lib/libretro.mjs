@@ -16,38 +16,18 @@
 // both slower and far worse at finding things.
 
 import { searchableTitle } from './collection.mjs';
+import { platformInfo } from '../../assets/js/platforms.mjs';
 
 const BASE = 'https://thumbnails.libretro.com';
 
 /**
- * GameLog platform -> libretro's system directory, which follows No-Intro
- * naming. Platforms absent here simply have no keyless art source.
+ * A GameLog platform's libretro system directory (No-Intro naming), or null
+ * when libretro has no scans for it. This is the one `libretro` field on the
+ * platform registry, so a console added there -- built in or via the override
+ * file -- brings its art source with it, rather than needing a second list kept
+ * in step here. Read live so a script's loaded overrides are reflected.
  */
-export const SYSTEMS = {
-  '3DO': 'The 3DO Company - 3DO',
-  'Atari 2600': 'Atari - 2600',
-  'Sega Genesis': 'Sega - Mega Drive - Genesis',
-  'Sega Dreamcast': 'Sega - Dreamcast',
-  'Sega Saturn': 'Sega - Saturn',
-  'NES/Famicom': 'Nintendo - Nintendo Entertainment System',
-  'SNES/Super Famicom': 'Nintendo - Super Nintendo Entertainment System',
-  'Nintendo 64': 'Nintendo - Nintendo 64',
-  'Nintendo GameCube': 'Nintendo - GameCube',
-  'Nintendo Wii': 'Nintendo - Wii',
-  'Nintendo Wii U': 'Nintendo - Wii U',
-  'Nintendo Game Boy': 'Nintendo - Game Boy',
-  'Nintendo Game Boy Advance': 'Nintendo - Game Boy Advance',
-  'Nintendo DS': 'Nintendo - Nintendo DS',
-  'Nintendo 3DS': 'Nintendo - Nintendo 3DS',
-  'Sony PlayStation': 'Sony - PlayStation',
-  'Sony PlayStation 2': 'Sony - PlayStation 2',
-  'Sony PlayStation 3': 'Sony - PlayStation 3',
-  'Sony PlayStation 4': 'Sony - PlayStation 4',
-  'Sony PSP': 'Sony - PlayStation Portable',
-  'Sony PS Vita': 'Sony - PlayStation Vita',
-  'Microsoft Xbox': 'Microsoft - Xbox',
-  'Microsoft Xbox 360': 'Microsoft - Xbox 360',
-};
+export const libretroDir = (platform) => platformInfo(platform).libretro || null;
 
 const UA = 'GameLog/1.0 (personal collection site; +https://github.com/AnnabelleChimpton/GameLog)';
 
@@ -158,7 +138,7 @@ export async function loadIndex(system) {
  * covered or nothing matches.
  */
 export async function findCover(title, platform, { region = 'USA' } = {}) {
-  const system = SYSTEMS[platform];
+  const system = libretroDir(platform);
   if (!system) return null;
 
   const entries = await loadIndex(system);
@@ -233,7 +213,7 @@ export async function coverage(platforms) {
   const covered = [];
   const missing = [];
   for (const platform of platforms) {
-    const system = SYSTEMS[platform];
+    const system = libretroDir(platform);
     if (!system) { missing.push(platform); continue; }
     const entries = await loadIndex(system);
     (entries.length >= MIN_USEFUL_ENTRIES ? covered : missing).push(platform);

@@ -6,7 +6,7 @@
 // invalid JSON, missing required fields, duplicate ids, unknown platforms,
 // and how much is still waiting on `npm run enrich`.
 
-import { loadCollection, loadLists, loadFeed, COLLECTION_PATH } from './lib/collection.mjs';
+import { loadCollection, loadLists, loadFeed, loadPlatformOverrides, COLLECTION_PATH } from './lib/collection.mjs';
 import { artSummary, artInventory } from './lib/vendor.mjs';
 import { sizeOf } from './lib/images.mjs';
 import { PLATFORMS, platformInfo } from '../assets/js/platforms.mjs';
@@ -14,6 +14,7 @@ import { PLATFORMS, platformInfo } from '../assets/js/platforms.mjs';
 const problems = [];
 const warnings = [];
 
+await loadPlatformOverrides();
 const known = new Set(PLATFORMS.map((p) => p.key.toLowerCase()));
 
 let collection;
@@ -43,7 +44,7 @@ for (const [kind, items] of [['game', games], ['hardware', hardware]]) {
       warnings.push(
         `${label}: platform "${item.platform}" is not in the registry: ` +
         `it will still show, with a generated "${platformInfo(item.platform).short}" badge. ` +
-        `Add it to assets/js/platforms.mjs for a proper label and colour.`
+        `Add it to data/platforms.json for a proper label, colour and box shape.`
       );
     }
 

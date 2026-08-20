@@ -18,7 +18,7 @@
 // With no credentials configured it uses the keyless sources and says so,
 // rather than refusing to run.
 
-import { loadCollection, saveCollection } from './lib/collection.mjs';
+import { loadCollection, saveCollection, loadPlatformOverrides } from './lib/collection.mjs';
 import { vendorEntry } from './lib/vendor.mjs';
 import { platformInfo } from '../assets/js/platforms.mjs';
 import {
@@ -188,6 +188,7 @@ async function pickSource() {
 }
 
 async function main() {
+  await loadPlatformOverrides();
   const collection = await loadCollection();
   if (!collection.games.length) {
     console.error('data/collection.json has no games yet. Add one with `npm run add "Some Game"`,');

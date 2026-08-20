@@ -13,7 +13,7 @@
 
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
-import { loadCollection, saveCollection, makeId, uniqueId } from './lib/collection.mjs';
+import { loadCollection, saveCollection, makeId, uniqueId, loadPlatformOverrides } from './lib/collection.mjs';
 import { PLATFORMS, platformInfo } from '../assets/js/platforms.mjs';
 import {
   loadEnv, getToken, createClient, searchGames, coverUrl, tidySummary, releaseYear, companies,
@@ -88,6 +88,7 @@ async function choosePlatform(collection, suggested) {
 }
 
 async function main() {
+  await loadPlatformOverrides();
   const opts = parseArgs(process.argv.slice(2));
   const collection = await loadCollection();
 

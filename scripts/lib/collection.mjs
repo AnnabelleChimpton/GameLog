@@ -8,6 +8,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { registerPlatforms } from '../../assets/js/platforms.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -15,7 +16,22 @@ export const COLLECTION_PATH = join(ROOT, 'data', 'collection.json');
 export const CONFIG_PATH = join(ROOT, 'data', 'config.json');
 export const LISTS_PATH = join(ROOT, 'data', 'lists.json');
 export const FEED_PATH = join(ROOT, 'data', 'feed.json');
+export const PLATFORMS_PATH = join(ROOT, 'data', 'platforms.json');
 export { ROOT };
+
+/**
+ * Merge any data/platforms.json overrides into the registry. Optional -- most
+ * collections use the built-ins untouched -- so a missing or broken file is
+ * silently no override. Scripts that do platform-dependent work (art lookup,
+ * validation) call this once at the start; the site does the same at boot.
+ */
+export async function loadPlatformOverrides() {
+  if (!existsSync(PLATFORMS_PATH)) return;
+  try {
+    const data = JSON.parse(await readFile(PLATFORMS_PATH, 'utf8'));
+    registerPlatforms(Array.isArray(data) ? data : data.platforms);
+  } catch { /* leave the built-ins as they are */ }
+}
 
 /** Field order used when writing entries back out, so diffs stay readable. */
 const GAME_KEYS = [

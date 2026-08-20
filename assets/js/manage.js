@@ -7,7 +7,7 @@
 // Edits are held in memory and written on Save, so a mis-click is undone by
 // reloading rather than by digging through git.
 
-import { PLATFORMS, platformFromIgdbId, platformSortIndex } from './platforms.mjs';
+import { PLATFORMS, platformFromIgdbId, platformSortIndex, registerPlatforms } from './platforms.mjs';
 import { h, coverImage, titleKey, plural, STATUSES, STATUS_LABEL, playStatus,
   HARDWARE_KINDS, KIND_LABEL, KIND_PLURAL, hardwareKind, hardwareQuantity } from './lib.js';
 import { labelFor } from './profile.js';
@@ -1541,6 +1541,16 @@ async function boot() {
     document.querySelector('#mg-tabs').hidden = true;
     return;
   }
+
+  // Optional platform overrides, so the platform pickers and badges here match
+  // the site. The server already merged them for its own IGDB mapping.
+  try {
+    const res = await fetch('data/platforms.json', { cache: 'no-cache' });
+    if (res.ok) {
+      const parsed = await res.json();
+      registerPlatforms(Array.isArray(parsed) ? parsed : parsed?.platforms);
+    }
+  } catch { /* no overrides */ }
 
   state.collection = data.collection?.games ? data.collection : { games: [], hardware: [] };
   state.collection.hardware = state.collection.hardware || [];

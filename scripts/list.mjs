@@ -17,7 +17,7 @@
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 import {
-  loadCollection, loadLists, saveLists, makeId, uniqueId, searchableTitle,
+  loadCollection, loadLists, saveLists, makeId, uniqueId, searchableTitle, loadPlatformOverrides,
 } from './lib/collection.mjs';
 import { platformInfo } from '../assets/js/platforms.mjs';
 import {
@@ -240,6 +240,7 @@ async function interactive(data, collection) {
 }
 
 async function main() {
+  await loadPlatformOverrides();
   const argv = process.argv.slice(2);
   const opts = { wanted: argv.includes('--wanted') };
   if (argv.includes('--owned')) opts.wanted = false;

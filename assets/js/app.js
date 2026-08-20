@@ -7,7 +7,7 @@
 //
 // Five views share one filter state: shelf, timeline, lists, stats, compare.
 
-import { platformInfo, platformSortIndex } from './platforms.mjs';
+import { platformInfo, platformSortIndex, registerPlatforms } from './platforms.mjs';
 import {
   fold, sortKey, conditionGroup, CONDITION_ORDER, coverImage, placeholderCover,
   safeImageUrl, h, plural, playStatus, STATUS_LABEL, episodeNumbers, progressOf, isLocal,
@@ -1053,15 +1053,22 @@ async function boot() {
   let lists = [];
   let feed = [];
   try {
-    const [collectionRes, configRes, listsRes, feedRes] = await Promise.all([
+    const [collectionRes, configRes, listsRes, feedRes, platformsRes] = await Promise.all([
       fetch('data/collection.json', { cache: 'no-cache' }),
       fetch('data/config.json', { cache: 'no-cache' }).catch(() => null),
       fetch('data/lists.json', { cache: 'no-cache' }).catch(() => null),
       fetch('data/feed.json', { cache: 'no-cache' }).catch(() => null),
+      fetch('data/platforms.json', { cache: 'no-cache' }).catch(() => null),
     ]);
     if (!collectionRes.ok) throw new Error(`HTTP ${collectionRes.status}`);
     collection = await collectionRes.json();
     if (configRes?.ok) config = await configRes.json();
+    // Optional platform overrides, merged into the registry before anything is
+    // drawn -- so a custom console gets its badge, colour and box shape too.
+    if (platformsRes?.ok) {
+      const parsed = await platformsRes.json().catch(() => null);
+      registerPlatforms(Array.isArray(parsed) ? parsed : parsed?.platforms);
+    }
     // Lists are optional -- a collection with no lists.json still works.
     if (listsRes?.ok) {
       const parsed = await listsRes.json().catch(() => null);

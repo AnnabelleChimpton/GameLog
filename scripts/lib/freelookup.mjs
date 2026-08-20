@@ -6,7 +6,7 @@
 // is what selects which scanned set to look in.
 
 import { searchTitles, yearFromExtract } from './wikipedia.mjs';
-import { findCover, SYSTEMS } from './libretro.mjs';
+import { findCover, libretroDir } from './libretro.mjs';
 
 /** Trim an extract to something that reads as a blurb rather than an article. */
 function blurb(text) {
@@ -41,7 +41,7 @@ export async function searchFree(term, { platform = null, limit = 8, region = 'U
 }
 
 /** True when this platform has any keyless art behind it at all. */
-export const hasFreeArt = (platform) => Boolean(platform && SYSTEMS[platform]);
+export const hasFreeArt = (platform) => Boolean(platform && libretroDir(platform));
 
 /**
  * Resolve art for a title already decided on -- used after the platform is
