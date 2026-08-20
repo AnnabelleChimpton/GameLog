@@ -213,8 +213,10 @@ Open the address it prints and you get a proper editor:
 Adding a game searches your own collection *and* a game database at once: IGDB
 if you've set it up, Wikipedia and libretro if you haven't. Pick something you
 own and it links to it; pick something you don't and it's saved as a wanted
-entry with its cover art. IGDB results that are ROM hacks or ports are labelled,
-so you don't accidentally add *Chrono Trigger+* instead of *Chrono Trigger*.
+entry, after asking which platform you want — and it pulls that platform's cover
+art. On a list you can leave the platform as "any"; a catalogue entry needs one.
+IGDB results that are ROM hacks or ports are labelled, so you don't accidentally
+add *Chrono Trigger+* instead of *Chrono Trigger*.
 
 Box art from the keyless source is chosen per platform, so a game added before
 you picked one gets its cover the moment you choose the platform.

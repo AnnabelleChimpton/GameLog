@@ -2230,6 +2230,8 @@ a.logentry__thumb { display: block; }
 .mg-platgrid { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 12px; }
 .mg-platpick { padding: 7px 14px; font-size: 0.83rem; }
 .mg-platpick:hover { border-color: var(--accent); color: var(--text); }
+/* "Any platform" is an escape, not a console, so it reads as a quieter option. */
+.mg-platpick--any { border-style: dashed; color: var(--text-faint); }
 
 /* Publish dialog */
 .mg-pub { display: grid; gap: 12px; padding: 22px 24px; }

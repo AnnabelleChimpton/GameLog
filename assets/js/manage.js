@@ -169,8 +169,13 @@ function likelyPlatforms(candidate) {
   return [...new Set(state.collection.games.map((g) => g.platform))].filter(Boolean).sort();
 }
 
-/** Step two of the picker: which platform is your copy for. */
-function renderPlatformStep(candidate, results, done) {
+/**
+ * Step two of the picker: which platform.
+ *
+ * With `allowAny`, the platform is optional -- a wishlist entry can be for any
+ * version of a game, so an "Any platform" choice resolves it with none.
+ */
+function renderPlatformStep(candidate, results, done, { allowAny = false } = {}) {
   const suggested = likelyPlatforms(candidate);
 
   const all = h('select', { class: 'mg-input' },
@@ -183,11 +188,17 @@ function renderPlatformStep(candidate, results, done) {
       h('span', { class: 'mg-picked__label', text: 'Adding' }),
       h('span', { class: 'mg-picked__name',
         text: `${candidate.title}${candidate.year ? ` (${candidate.year})` : ''}` })),
-    h('p', { class: 'mg-hint', text: 'Which platform is your copy for?' }),
+    h('p', { class: 'mg-hint',
+      text: allowAny ? 'Which platform do you want? (optional)' : 'Which platform is your copy for?' }),
     h('div', { class: 'mg-platgrid' },
       suggested.map((key) => h('button', {
         type: 'button', class: 'mg-mini mg-platpick', onclick: () => done(key),
-      }, h('span', { text: key })))),
+      }, h('span', { text: key }))),
+      allowAny
+        ? h('button', {
+            type: 'button', class: 'mg-mini mg-platpick mg-platpick--any', onclick: () => done(null),
+          }, h('span', { text: 'Any platform' }))
+        : null),
     all);
 }
 
@@ -199,10 +210,15 @@ function renderPlatformStep(candidate, results, done) {
  * belongs on and resolves box art for it before returning.
  */
 function openPicker({ title, allowOwned = true, allowSearch = true, platform = null,
-                      needPlatform = false }) {
+                      needPlatform = false, allowAnyPlatform = false }) {
   const dialog = $('#picker');
   const input = $('#picker-input');
   const results = $('#picker-results');
+  // True once a real choice is committed. The dialog's close event resolves the
+  // promise with null (for a dismissal), but the platform step closes the dialog
+  // *before* awaiting box art -- so without this guard that null would settle
+  // the promise first and the real pick would be lost.
+  let resolving = false;
   input.value = '';
   input.placeholder = title || 'Search…';
   results.replaceChildren();
@@ -254,6 +270,7 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
             }
             $('#picker-hint').textContent = '';
             renderPlatformStep(found, results, async (chosenPlatform) => {
+              resolving = true;
               dialog.close();
               // Keyless art is per-platform, so it can only be resolved now.
               // The box scan is asked for even when the search already found a
@@ -269,7 +286,7 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
                 found.boxartRatio = got.boxartRatio || null;
               }
               pickerResolve?.({ kind: 'new', game: found, platform: chosenPlatform });
-            });
+            }, { allowAny: allowAnyPlatform });
           },
         },
           thumb({ cover: found.cover, platform: platform || found.platforms?.[0] }),
@@ -295,7 +312,9 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
 
   return new Promise((resolve) => {
     pickerResolve = resolve;
-    dialog.addEventListener('close', () => resolve(null), { once: true });
+    // Only a dismissal resolves null; a committed choice (resolving) closes the
+    // dialog itself and resolves with the real value a moment later.
+    dialog.addEventListener('close', () => { if (!resolving) resolve(null); }, { once: true });
   });
 }
 
@@ -430,14 +449,19 @@ function renderLists() {
   const addButton = h('button', {
     type: 'button', class: 'pillbutton pillbutton--accent mg-add',
     onclick: async () => {
-      const picked = await openPicker({ title: 'Add a game to this list' });
+      // A game you own is pinned by ref, so its platform is already fixed. One
+      // you don't own is stored by title, and the platform is what says which
+      // version you want -- so the picker asks, with "any" allowed.
+      const picked = await openPicker({
+        title: 'Add a game to this list', needPlatform: true, allowAnyPlatform: true,
+      });
       if (!picked) return;
       if (picked.kind === 'owned') {
         list.items.push({ ref: picked.game.id });
       } else {
         const g = picked.game;
         list.items.push({
-          title: g.title, platform: null, year: g.year, cover: g.cover,
+          title: g.title, platform: picked.platform || null, year: g.year, cover: g.cover,
           description: g.description, genres: g.genres, developer: g.developer,
           publisher: g.publisher, igdbId: g.igdbId,
         });
