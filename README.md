@@ -39,6 +39,54 @@ Add the ones you follow to `data/config.json` and they become one-click buttons:
 
 ## Make it yours
 
+There are two ways to set up your own GameLog. The numbered steps further down
+are the quick path if you use git and a terminal. If you would rather not, the
+click-only walkthrough here does the whole thing with buttons.
+
+### Not a coder? Start here
+
+You can run your own GameLog without typing a single command. You need three
+free things: a GitHub account, GitHub Desktop, and Node.js. Setup takes about ten
+minutes and you only do it once. After that, editing is a double-click.
+
+**1. Make your own copy.** Sign in at github.com, open this project's page, and
+click the green **Use this template** button, then **Create a new repository**.
+Give it a name (GameLog is fine) and create it. You now have your own copy under
+your account.
+
+**2. Turn on hosting.** In your copy, open **Settings**, then **Pages** in the
+left sidebar. Under **Source**, choose **Deploy from a branch**, select the
+`main` branch and the `/ (root)` folder, and save. Your site goes live at
+`https://YOUR-USERNAME.github.io/GameLog/` in a minute or two. This is the only
+setting you touch here.
+
+**3. Copy it to your computer.** Install **GitHub Desktop** from
+desktop.github.com and sign in. Choose **File**, then **Clone repository**, pick
+your GameLog, and clone it. GitHub Desktop is also how you publish later, with a
+button instead of commands.
+
+**4. Install Node.js.** The editor runs on your own machine and needs this, once.
+Get it from nodejs.org and choose the version labelled LTS. There is nothing to
+configure.
+
+**5. Edit.** Open your GameLog folder (in GitHub Desktop, use **Repository**,
+then **Show in Finder** or **Show in Explorer**). Double-click **Open GameLog
+Manager.command** on a Mac, or **Open GameLog Manager.bat** on Windows. The
+editor opens in your browser. Search for games to add them, set your name and
+photo on the **Profile** tab, and your title and colour on the **Site** tab.
+Your copy starts with example games so the page is not empty while you find your
+way around; delete the ones you do not want with the **Delete** button on each,
+and add your own. (If you would rather clear them all in one go, that is the one
+job a single command does best: `npm run start-fresh`.)
+
+**6. Publish.** When it looks right, open GitHub Desktop. It lists what you
+changed. Write a short note in the **Summary** box, click **Commit to main**,
+then **Push origin**. Your live site updates within a minute. The manager's own
+**Publish** button does the same thing once GitHub Desktop has signed you in.
+
+After setup, the whole routine is: double-click the launcher, make your changes,
+and push in GitHub Desktop.
+
 ### 1. Fork it
 
 Click **Fork** at the top of this repo (or use the green **Use this template**
