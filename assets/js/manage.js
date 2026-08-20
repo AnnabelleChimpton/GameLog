@@ -181,9 +181,21 @@ function likelyPlatforms(candidate) {
   }
 
   // Keyless results carry no platform data, so fall back to the shelves this
-  // collection already uses -- far shorter than the full registry.
-  return [...new Set(state.collection.games.map((g) => g.platform))].filter(Boolean).sort();
+  // collection already uses -- far shorter than the full registry. On a
+  // brand-new shelf there are none yet, so offer a spread of common consoles
+  // instead: without this the very first game you add has no shortcut buttons at
+  // all, only the dropdown, which is a bare moment right when you're least sure.
+  const owned = [...new Set(state.collection.games.map((g) => g.platform))].filter(Boolean);
+  return owned.length ? owned.sort() : COMMON_PLATFORMS;
 }
+
+// A cross-section of the most-collected consoles, for suggesting a platform when
+// the shelf is empty and there's no IGDB data to go on. The dropdown still lists
+// them all; this is only the shortcut row.
+const COMMON_PLATFORMS = [
+  'Nintendo Switch', 'Sony PlayStation 5', 'Microsoft Xbox Series X|S', 'Sony PlayStation 4',
+  'Nintendo 64', 'SNES/Super Famicom', 'Sony PlayStation', 'Sega Genesis',
+];
 
 /**
  * Step two of the picker: which platform.

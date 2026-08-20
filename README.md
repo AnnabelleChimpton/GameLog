@@ -49,10 +49,12 @@ You can run your own GameLog without typing a single command. You need three
 free things: a GitHub account, GitHub Desktop, and Node.js. Setup takes about ten
 minutes and you only do it once. After that, editing is a double-click.
 
-**1. Make your own copy.** Sign in at github.com, open this project's page, and
-click the green **Use this template** button, then **Create a new repository**.
-Give it a name (GameLog is fine) and create it. You now have your own copy under
-your account.
+**1. Make your own copy.** Sign in at github.com and open this project's page.
+Near the top right, click **Fork**, then **Create fork**. That makes a copy under
+your own account, which is what you edit and publish from. (Some copies of this
+project also show a green **Use this template** button near the top, which does
+the same thing without carrying the original's history. Either one is fine; Fork
+is always there.)
 
 **2. Turn on hosting.** In your copy, open **Settings**, then **Pages** in the
 left sidebar. Under **Source**, choose **Deploy from a branch**, select the
@@ -90,8 +92,9 @@ and push in GitHub Desktop.
 
 ### 1. Fork it
 
-Click **Fork** at the top of this repo (or use the green **Use this template**
-button if you'd rather not carry the commit history), then clone your copy:
+Click **Fork** at the top of this repo (or, if the repo offers a green **Use
+this template** button, that too, which skips the commit history), then clone
+your copy:
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/GameLog.git && cd GameLog
