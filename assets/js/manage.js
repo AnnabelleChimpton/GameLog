@@ -118,6 +118,22 @@ function platformField(value, onChange) {
     h('span', { class: 'mg-field__label', text: 'Platform' }), select);
 }
 
+/**
+ * A compact, unlabelled platform picker whose empty choice is "Any platform".
+ * For a wishlist entry, no platform is a real answer -- you'll take any version
+ * -- so this is worded for that rather than as a prompt to fill something in.
+ */
+function platformSelect(value, onChange) {
+  const select = h('select', { class: 'mg-input mg-input--slim' });
+  select.append(h('option', { value: '', text: 'Any platform' }));
+  const known = PLATFORMS.map((p) => p.key);
+  const options = known.includes(value) || !value ? known : [value, ...known];
+  for (const key of options) select.append(h('option', { value: key, text: key }));
+  select.value = value || '';
+  select.addEventListener('change', () => onChange(select.value || null));
+  return select;
+}
+
 function iconButton(label, onClick, { danger = false, title = '' } = {}) {
   return h('button', {
     type: 'button',
@@ -416,20 +432,42 @@ function renderLists() {
     const { game, owned, missing } = entry;
     const item = list.items[i];
 
+    const note = h('input', {
+      class: 'mg-input mg-input--slim',
+      placeholder: 'Note (optional)',
+      value: item.note || '',
+      oninput: (e) => { item.note = e.target.value || undefined; markDirty('lists'); },
+    });
+
+    // A game added by `ref` is a pointer at a collection entry, so its title and
+    // platform belong to that game and are edited on the Games tab -- here only
+    // the note is yours to change. A wanted entry stores its own title and
+    // platform, so both are editable in place.
+    const body = item.ref
+      ? h('div', { class: 'mg-item__body' },
+          h('span', { class: 'mg-item__name', text: game.title }),
+          h('span', { class: 'mg-item__meta',
+            text: missing ? 'broken link. No such game id'
+              : `${game.platform} · in your collection` }),
+          note)
+      : h('div', { class: 'mg-item__body' },
+          h('input', {
+            class: 'mg-input mg-input--slim mg-item__title',
+            placeholder: 'Title',
+            value: item.title || '',
+            oninput: (e) => { item.title = e.target.value; markDirty('lists'); },
+          }),
+          h('div', { class: 'mg-item__edit' },
+            platformSelect(item.platform, (v) => {
+              item.platform = v; markDirty('lists'); renderLists();
+            }),
+            h('span', { class: 'mg-item__meta',
+              text: owned ? 'you own a copy' : 'not owned yet' })),
+          note);
+
     return h('div', { class: owned ? 'mg-item' : 'mg-item mg-item--wanted' },
       thumb(game),
-      h('div', { class: 'mg-item__body' },
-        h('span', { class: 'mg-item__name', text: game.title }),
-        h('span', { class: 'mg-item__meta',
-          text: missing ? 'broken link. No such game id'
-            : owned ? `${game.platform} · in your collection`
-            : `${game.platform || 'any platform'} · not owned yet` }),
-        h('input', {
-          class: 'mg-input mg-input--slim',
-          placeholder: 'Note (optional)',
-          value: item.note || '',
-          oninput: (e) => { item.note = e.target.value || undefined; markDirty('lists'); },
-        })),
+      body,
       h('div', { class: 'mg-item__acts' },
         iconButton('↑', () => {
           if (i === 0) return;

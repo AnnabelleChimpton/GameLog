@@ -1944,9 +1944,12 @@ a.logentry__thumb { display: block; }
 }
 .mg-item--wanted { border-style: dashed; }
 .mg-item--wanted .mg-thumb { opacity: 0.5; }
-.mg-item__body { flex: 1 1 auto; min-width: 0; display: grid; }
+.mg-item__body { flex: 1 1 auto; min-width: 0; display: grid; gap: 4px; }
 .mg-item__name { font-size: 0.9rem; font-weight: 600; }
 .mg-item__meta { font-size: 0.76rem; color: var(--text-faint); }
+.mg-item__title { font-weight: 600; margin-top: 0; }
+.mg-item__edit { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.mg-item__edit .mg-input { margin-top: 0; flex: 0 1 200px; }
 .mg-item__acts { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
 
 .mg-gamerow {

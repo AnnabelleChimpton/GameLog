@@ -202,7 +202,9 @@ npm run manage
 
 Open the address it prints and you get a proper editor:
 
-- **Lists**: make them, rename them, drag entries up and down, add notes.
+- **Lists**: make them, rename them, mark one as your wishlist, drag entries up
+  and down. A wanted entry's title and platform are editable in place; an owned
+  one is edited on the Games tab, so here you just add a note.
 - **Games**: edit any field on any game, or add one by searching IGDB.
 - **Hardware**: consoles, controllers, memory cards and accessories.
 - **Updates**: write log posts, attach a game to one, delete them.
