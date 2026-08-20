@@ -3,7 +3,9 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveCollectionUrl, resolveFeedUrl, diff, loadCollection, loadFeed } from '../assets/js/compare.js';
+import {
+  resolveCollectionUrl, resolveFeedUrl, diff, loadCollection, loadFeed, loadConfig, discover,
+} from '../assets/js/compare.js';
 
 /** Stand in for the network for one call, then put the real fetch back. */
 async function withFetch(handler, run) {
@@ -63,6 +65,46 @@ test('loadFeed reads posts, and treats a missing feed as simply empty', async ()
     () => new Response('nope', { status: 404 }),
     () => loadFeed('someone/GameLog'));
   assert.deepEqual(none.posts, []);
+});
+
+test('loadConfig reads the friends list, and a missing config is just no friends', async () => {
+  const body = JSON.stringify({ friends: [{ name: 'Mel', url: 'mel.github.io/GameLog' }, { bad: 1 }] });
+  const got = await withFetch(() => new Response(body, { status: 200 }),
+    () => loadConfig('someone/GameLog'));
+  assert.equal(got.friends.length, 1);
+  assert.equal(got.friends[0].name, 'Mel');
+
+  const none = await withFetch(() => new Response('', { status: 404 }),
+    () => loadConfig('someone/GameLog'));
+  assert.deepEqual(none.friends, []);
+});
+
+test('discover surfaces friends-of-friends you do not already follow, most-connected first', () => {
+  const shelves = [
+    { friend: { name: 'Sam' }, friends: [
+      { name: 'Mel', url: 'mel.github.io/GameLog' },
+      { name: 'Chris', url: 'chris.github.io/GameLog' },
+    ] },
+    { friend: { name: 'Jo' }, friends: [
+      { name: 'Chris', url: 'https://chris.github.io/GameLog/' }, // same shelf, other spelling
+      { name: 'Me', url: 'me.github.io/GameLog' },                // already mine: excluded
+    ] },
+  ];
+  const found = discover(shelves, { exclude: ['me.github.io/GameLog'] });
+
+  // Chris is followed by both Sam and Jo, so ranks ahead of Mel; Me is excluded.
+  assert.deepEqual(found.map((c) => c.name), ['Chris', 'Mel']);
+  assert.deepEqual(found[0].followedBy.sort(), ['Jo', 'Sam']);
+  assert.equal(found.some((c) => c.name === 'Me'), false);
+});
+
+test('discover drops a hostile url in a foreign friends list', () => {
+  const shelves = [{ friend: { name: 'Sam' }, friends: [
+    { name: 'evil', url: 'javascript:alert(1)' },
+    { name: 'ok', url: 'ok.github.io/GameLog' },
+  ] }];
+  const found = discover(shelves, {});
+  assert.deepEqual(found.map((c) => c.name), ['ok']);
 });
 
 test('diff groups by title, not by platform', () => {

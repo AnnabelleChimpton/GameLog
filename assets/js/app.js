@@ -18,7 +18,7 @@ import { renderStats } from './stats.js';
 import { renderTimeline } from './timeline.js';
 import * as compare from './compare.js';
 import { renderLists } from './lists.js';
-import { renderLog, buildRiver, renderRiver, renderFollowingEmpty } from './feed.js';
+import { renderLog, buildRiver, renderRiver, renderDiscovery, renderFollowingEmpty } from './feed.js';
 import { renderHero } from './profile.js';
 
 const $ = (sel) => document.querySelector(sel);
@@ -93,6 +93,7 @@ const state = {
   lists: [],
   feed: [],
   river: null,
+  discover: [],
   config: {},
   view: 'shelf',
   list: null,
@@ -726,10 +727,19 @@ function renderFollowing() {
     return;
   }
   if (state.river) {
-    el.folOutput.replaceChildren(renderRiver(state.river));
+    paintFollowing();
     return;
   }
   if (!riverLoading) runRiver(friends);
+}
+
+/** Draw the discovery strip (when there's anything to suggest) above the river. */
+function paintFollowing() {
+  const parts = [];
+  const discovery = renderDiscovery(state.discover);
+  if (discovery) parts.push(discovery);
+  parts.push(renderRiver(state.river || []));
+  el.folOutput.replaceChildren(...parts);
 }
 
 /**
@@ -759,8 +769,17 @@ async function runRiver(friends) {
     } catch {
       posts = []; // No readable feed is fine; their milestones still come through.
     }
+    let theirFriends = [];
+    try {
+      theirFriends = (await compare.loadConfig(f.url)).friends;
+    } catch {
+      theirFriends = []; // No readable config: they just add nobody to discover.
+    }
     const base = collUrl.replace(/\/data\/collection\.json.*$/, '');
-    return { friend: { name: (f.name && f.name.trim()) || base, url: base }, posts, games };
+    return {
+      friend: { name: (f.name && f.name.trim()) || base, url: base },
+      posts, games, friends: theirFriends,
+    };
   }));
 
   const ok = shelves.filter(Boolean);
@@ -768,9 +787,16 @@ async function runRiver(friends) {
   riverLoading = false;
   state.river = buildRiver(ok);
 
+  // Friends of your friends you don't already follow, minus you.
+  const exclude = friends.map((f) => f.url);
+  if (typeof state.config.siteUrl === 'string' && state.config.siteUrl.trim()) {
+    exclude.push(state.config.siteUrl);
+  }
+  state.discover = compare.discover(ok, { exclude });
+
   folStatus(missed ? `${missed} of ${plural(friends.length, 'shelf', 'shelves')} couldn't be read.` : '',
     missed ? 'warn' : 'info');
-  el.folOutput.replaceChildren(renderRiver(state.river));
+  paintFollowing();
 }
 
 /** Put every filter back to its default. */

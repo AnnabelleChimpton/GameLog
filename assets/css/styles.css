@@ -1633,6 +1633,47 @@ a.river__title { text-decoration: none; color: var(--text); }
 a.river__title:hover { text-decoration: underline; text-decoration-color: var(--accent); }
 a.logentry__thumb { display: block; }
 
+/* Friends of your friends: a strip of shelves to explore, above the river. */
+.discover {
+  display: grid;
+  gap: 9px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  background: var(--surface-sunk);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-ui);
+}
+.discover__label {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.discover__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.discover__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  font-size: 0.85rem;
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 100px;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.discover__chip:hover { color: var(--accent); border-color: var(--accent); }
+.discover__count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.discover__chip:hover .discover__count { color: var(--accent); }
+
 /* ==========================================================================
    The local manager (manage.html)
    ========================================================================== */

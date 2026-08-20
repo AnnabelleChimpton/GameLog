@@ -489,6 +489,13 @@ Each shelf is someone else's site, so one being down or slow just drops that
 shelf from the river and the rest still show. A visitor to your published site
 sees the tab only once you follow at least one shelf.
 
+**Finding more people.** Above the river, a **Shelves your circle follows** strip
+suggests the GameLogs that *your* follows follow but you don't yet — read from
+their public `friends` lists, ranked by how many of your follows point at each,
+and linking straight to them. So the follow graph is walkable: land on a shelf,
+see who it follows, and see who *its* circle follows, a step at a time. Two
+collectors can find each other without any directory in the middle.
+
 ## Cover art and descriptions
 
 ```bash

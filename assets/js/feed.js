@@ -216,6 +216,30 @@ export function renderRiver(items) {
     h('div', { class: 'logfeed' }, items.map(riverEntry)));
 }
 
+/**
+ * The "who else" strip: shelves your follows follow, that you don't yet. Each
+ * links out to that shelf, and says who in your circle led you to it, so the
+ * follow graph can be walked a step at a time without leaving the page.
+ */
+export function renderDiscovery(candidates) {
+  if (!candidates.length) return null;
+
+  return h('section', { class: 'discover' },
+    h('h3', { class: 'discover__label', text: 'Shelves your circle follows' }),
+    h('div', { class: 'discover__chips' },
+      candidates.map((c) => h('a', {
+        class: 'discover__chip',
+        href: c.url,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        title: `Followed by ${c.followedBy.join(', ')}`,
+      },
+        h('span', { class: 'discover__name', text: c.name }),
+        c.followedBy.length > 1
+          ? h('span', { class: 'discover__count', text: `×${c.followedBy.length}` })
+          : null))));
+}
+
 /** The prompt shown when no shelves are followed yet. */
 export function renderFollowingEmpty() {
   return h('div', { class: 'lists__empty' },

@@ -218,6 +218,88 @@ export async function loadFeed(input) {
   return { url, posts };
 }
 
+/**
+ * Fetch a shelf's config, for the one thing that makes the follow graph
+ * walkable: who *they* follow. Everything here is someone else's file, so the
+ * friends list is treated as hostile -- capped, and each entry sanity-checked
+ * where it is used.
+ */
+export async function loadConfig(input) {
+  const url = resolveCollectionUrl(input).replace(/\/collection\.json(\?.*)?$/, '/config.json$1');
+
+  let response;
+  try {
+    response = await fetch(url, { mode: 'cors', cache: 'no-cache' });
+  } catch {
+    throw new Error(`Couldn't reach ${url}.`);
+  }
+  if (response.status === 404) return { url, friends: [] };
+  if (!response.ok) throw new Error(`${url} answered with HTTP ${response.status}.`);
+
+  let text;
+  try {
+    text = await readCapped(response);
+  } catch {
+    throw new Error(`Couldn't read ${url}.`);
+  }
+
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error(`${url} isn't valid JSON.`);
+  }
+
+  const friends = Array.isArray(data?.friends)
+    ? data.friends.filter((f) => f && typeof f.url === 'string').slice(0, 500)
+    : [];
+  return { url, friends };
+}
+
+/**
+ * The canonical site root of any shelf address, or null when it isn't a
+ * loadable http(s) one. Runs the address through the same validation a
+ * comparison does, so a `javascript:` "url" in a foreign friends list resolves
+ * to null and is dropped rather than trusted.
+ */
+export function shelfBase(input) {
+  try {
+    return resolveCollectionUrl(input).replace(/\/data\/collection\.json.*$/, '');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The friends-of-your-friends worth suggesting: the shelves your follows point
+ * at that you don't already follow yourself, deduped and ranked by how many of
+ * your follows point at each. This is the graph walk made one step -- landing
+ * on a shelf, you see not just who it follows but who its circle follows.
+ *
+ * `shelves` carries each followed shelf's own friends list; `exclude` is the
+ * addresses to leave out -- your own follows, and you.
+ */
+export function discover(shelves, { exclude = [] } = {}) {
+  const skip = new Set(exclude.map(shelfBase).filter(Boolean));
+  const found = new Map();
+
+  for (const shelf of shelves) {
+    for (const candidate of shelf.friends || []) {
+      const base = shelfBase(candidate.url);
+      if (!base || skip.has(base)) continue;
+      if (!found.has(base)) {
+        found.set(base, { name: candidate.name?.trim() || base, url: base, followedBy: new Set() });
+      }
+      found.get(base).followedBy.add(shelf.friend.name);
+    }
+  }
+
+  return [...found.values()]
+    .map((c) => ({ name: c.name, url: c.url, followedBy: [...c.followedBy] }))
+    .sort((a, b) => b.followedBy.length - a.followedBy.length
+      || a.name.localeCompare(b.name, 'en'));
+}
+
 /** Group two collections into shared / theirs-only / yours-only. */
 export function diff(mine, theirs) {
   const index = (games) => {
