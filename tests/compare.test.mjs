@@ -3,7 +3,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveCollectionUrl, diff, loadCollection } from '../assets/js/compare.js';
+import { resolveCollectionUrl, resolveFeedUrl, diff, loadCollection, loadFeed } from '../assets/js/compare.js';
 
 /** Stand in for the network for one call, then put the real fetch back. */
 async function withFetch(handler, run) {
@@ -42,6 +42,27 @@ test('resolveCollectionUrl rejects input that is not an address', () => {
 test('resolveCollectionUrl allows localhost, for comparing against a preview', () => {
   assert.equal(resolveCollectionUrl('localhost:4321'),
     'http://localhost:4321/data/collection.json');
+});
+
+test('resolveFeedUrl points at feed.json alongside the collection', () => {
+  assert.equal(resolveFeedUrl('someone/GameLog'),
+    'https://someone.github.io/GameLog/data/feed.json');
+  assert.equal(resolveFeedUrl('https://someone.github.io/GameLog/'),
+    'https://someone.github.io/GameLog/data/feed.json');
+});
+
+test('loadFeed reads posts, and treats a missing feed as simply empty', async () => {
+  const posts = JSON.stringify({ posts: [{ title: 'A note', date: '2026-08-19' }] });
+  const got = await withFetch(
+    () => new Response(posts, { status: 200 }),
+    () => loadFeed('someone/GameLog'));
+  assert.equal(got.posts.length, 1);
+
+  // A 404 is normal -- a shelf can have milestones and no written posts.
+  const none = await withFetch(
+    () => new Response('nope', { status: 404 }),
+    () => loadFeed('someone/GameLog'));
+  assert.deepEqual(none.posts, []);
 });
 
 test('diff groups by title, not by platform', () => {

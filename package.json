@@ -8,6 +8,7 @@
     "add": "node scripts/add.mjs",
     "start-fresh": "node scripts/start-fresh.mjs",
     "list": "node scripts/list.mjs",
+    "post": "node scripts/post.mjs",
     "enrich": "node scripts/enrich.mjs",
     "boxart": "node scripts/boxart.mjs",
     "vendor": "node scripts/vendor.mjs",

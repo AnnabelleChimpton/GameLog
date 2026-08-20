@@ -6,7 +6,7 @@
 // invalid JSON, missing required fields, duplicate ids, unknown platforms,
 // and how much is still waiting on `npm run enrich`.
 
-import { loadCollection, loadLists, COLLECTION_PATH } from './lib/collection.mjs';
+import { loadCollection, loadLists, loadFeed, COLLECTION_PATH } from './lib/collection.mjs';
 import { artSummary, artInventory } from './lib/vendor.mjs';
 import { sizeOf } from './lib/images.mjs';
 import { PLATFORMS, platformInfo } from '../assets/js/platforms.mjs';
@@ -124,6 +124,33 @@ for (const list of lists.lists) {
   }
 }
 
+/* --- Feed ----------------------------------------------------------------- */
+
+let feed = { posts: [] };
+try {
+  feed = await loadFeed();
+} catch (err) {
+  problems.push(`data/feed.json is not valid JSON: ${err.message}`);
+}
+
+const postIds = new Set();
+for (const post of feed.posts) {
+  const label = post.title || post.id || '<untitled post>';
+  if (!post.title) problems.push(`a log post is missing a "title"`);
+  if (!post.date || !/^\d{4}-\d{2}-\d{2}/.test(post.date)) {
+    problems.push(`${label}: a log post needs a "date" like 2026-08-19`);
+  }
+  if (post.id) {
+    if (postIds.has(post.id)) problems.push(`two log posts share the id "${post.id}"`);
+    else postIds.add(post.id);
+  }
+  // A post ref that doesn't resolve just loses its cover thumbnail -- the post
+  // still shows -- so it's a warning, like a list's dangling ref.
+  if (post.ref && !gameIds.has(post.ref)) {
+    warnings.push(`${label}: ref "${post.ref}" matches no game, so the post shows without a cover`);
+  }
+}
+
 // Artwork. A path in the JSON with no file behind it is the one art problem
 // the page cannot recover from, because the original link is gone.
 const art = artSummary(collection);
@@ -148,6 +175,7 @@ if (lists.lists.length) {
   console.log(`  ${lists.lists.length} list(s), ${items} entries` +
     (wantedCount ? `, ${wantedCount} not owned yet` : ''));
 }
+if (feed.posts.length) console.log(`  ${feed.posts.length} log post(s)`);
 console.log('');
 
 if (problems.length) {

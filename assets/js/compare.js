@@ -172,6 +172,52 @@ export async function loadCollection(input) {
   return { url, games };
 }
 
+/** Where a shelf's feed.json lives, derived from the same address a collection is. */
+export function resolveFeedUrl(input) {
+  return resolveCollectionUrl(input).replace(/\/collection\.json(\?.*)?$/, '/feed.json$1');
+}
+
+/**
+ * Fetch a shelf's log posts, treating them as the same hostile input a compared
+ * collection is: capped size, `posts` shape checked, entry count limited.
+ *
+ * A missing feed.json is normal, not an error -- a shelf can have milestones
+ * (beaten games) and no written posts at all -- so a 404 returns an empty list
+ * rather than throwing, and the caller still gets that shelf's milestones from
+ * its collection.
+ */
+export async function loadFeed(input) {
+  const url = resolveFeedUrl(input);
+
+  let response;
+  try {
+    response = await fetch(url, { mode: 'cors', cache: 'no-cache' });
+  } catch {
+    throw new Error(`Couldn't reach ${url}.`);
+  }
+  if (response.status === 404) return { url, posts: [] };
+  if (!response.ok) throw new Error(`${url} answered with HTTP ${response.status}.`);
+
+  let text;
+  try {
+    text = await readCapped(response);
+  } catch (err) {
+    throw new Error(err.message === 'TOO_BIG' ? `${url} is too large to load.` : `Couldn't read ${url}.`);
+  }
+
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error(`${url} isn't valid JSON.`);
+  }
+
+  const posts = Array.isArray(data?.posts)
+    ? data.posts.slice(0, MAX_ENTRIES).filter((p) => p && typeof p.title === 'string')
+    : [];
+  return { url, posts };
+}
+
 /** Group two collections into shared / theirs-only / yours-only. */
 export function diff(mine, theirs) {
   const index = (games) => {

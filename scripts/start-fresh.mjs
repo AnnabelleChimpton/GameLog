@@ -14,7 +14,7 @@ import { stdin, stdout } from 'node:process';
 import { writeFile, rm, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH, SCHEMA_VERSION } from './lib/collection.mjs';
+import { ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH, FEED_PATH, SCHEMA_VERSION } from './lib/collection.mjs';
 
 const FRESH_CONFIG = {
   title: 'GameLog',
@@ -70,6 +70,7 @@ async function main() {
   let games = 0;
   let hardware = 0;
   let lists = 0;
+  let posts = 0;
   let owner = null;
   try {
     const c = JSON.parse(await readFile(COLLECTION_PATH, 'utf8'));
@@ -80,12 +81,16 @@ async function main() {
     lists = JSON.parse(await readFile(LISTS_PATH, 'utf8')).lists?.length || 0;
   } catch { /* nothing to count */ }
   try {
+    posts = JSON.parse(await readFile(FEED_PATH, 'utf8')).posts?.length || 0;
+  } catch { /* nothing to count */ }
+  try {
     owner = JSON.parse(await readFile(CONFIG_PATH, 'utf8')).profile?.name || null;
   } catch { /* nothing to count */ }
 
   console.log('\nThis will empty:');
   console.log(`  data/collection.json   ${games} games, ${hardware} hardware items`);
   console.log(`  data/lists.json        ${lists} list(s)`);
+  console.log(`  data/feed.json         ${posts} log post(s)`);
   console.log(`  data/config.json       title, tagline, links${owner ? `, and ${owner}'s profile` : ''}`);
   console.log('  assets/profile/        any profile photo');
   console.log('  index.html             the link-preview tags');
@@ -108,6 +113,10 @@ async function main() {
   await writeFile(COLLECTION_PATH,
     JSON.stringify({ gamelog: SCHEMA_VERSION, games: [], hardware: [] }, null, 2) + '\n', 'utf8');
   await writeFile(LISTS_PATH, JSON.stringify({ lists: [] }, null, 2) + '\n', 'utf8');
+  await writeFile(FEED_PATH, JSON.stringify({ gamelog: SCHEMA_VERSION, posts: [] }, null, 2) + '\n', 'utf8');
+  // The generated RSS feed belonged to the previous owner; an empty log has no
+  // feed, so it is removed rather than emptied.
+  await rm(join(ROOT, 'feed.xml'), { force: true });
   await writeFile(CONFIG_PATH, JSON.stringify(FRESH_CONFIG, null, 2) + '\n', 'utf8');
   if (existsSync(join(ROOT, 'assets', 'profile'))) {
     await rm(join(ROOT, 'assets', 'profile'), { recursive: true, force: true });

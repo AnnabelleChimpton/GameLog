@@ -205,6 +205,7 @@ Open the address it prints and you get a proper editor:
 - **Lists**: make them, rename them, drag entries up and down, add notes.
 - **Games**: edit any field on any game, or add one by searching IGDB.
 - **Hardware**: consoles, controllers, memory cards and accessories.
+- **Updates**: write log posts, attach a game to one, delete them.
 - **Profile**: your photo, bio and links.
 - **Site**: title, tagline, accent colour (with a colour picker), and the
   shelves you follow.
@@ -397,6 +398,97 @@ One caveat on the scripted form: `npm run list -- add …` run without a termina
 takes the first search result sight unseen. Run it interactively when the title
 is ambiguous. There are a lot of *Chrono Trigger* ROM hacks.
 
+## The log
+
+A running feed of your collection, on its own **Log** tab: short notes you write
+("finally found a boxed copy"), woven together with a milestone for every game
+you mark beaten or dropped, newest first.
+
+```bash
+npm run post "Finally landed a boxed Halo 2"
+```
+
+That's the whole thing. Add `--ref <game-id>` to hang the post off a game you
+own, and it borrows that game's cover as a thumbnail that opens the detail on
+click:
+
+```bash
+npm run post -- "Beat it at last" --ref microsoft-xbox-halo-2
+npm run post -- "Shelf reorg" --body "Everything back in generation order." --date 2026-08-19
+npm run post -- show          # print the log
+npm run post -- rm <id>       # remove a post
+```
+
+**The part worth knowing:** you rarely need to write a post at all. Every game
+you mark beaten or dropped (on the manager's Games tab, or by hand) already
+becomes a dated entry, with its verdict as the text and its episode number
+attached. So the log fills itself in from the play-through fields you were
+setting anyway; written posts are for the things the collection can't know.
+
+The manager's **Updates** tab is the point-and-click way: write a post, attach a
+game, delete one. Like everything else it saves to a `data/*.json` file —
+`data/feed.json` — and nothing else.
+
+### The file
+
+`data/feed.json`, plain enough to write by hand:
+
+```json
+{
+  "gamelog": 1,
+  "posts": [
+    { "id": "2026-08-19-boxed-halo", "date": "2026-08-19",
+      "title": "Finally landed a boxed Halo 2",
+      "body": "Flea-market find, **complete** with the manual.",
+      "ref": "microsoft-xbox-halo-2" }
+  ]
+}
+```
+
+`title` and `date` (`YYYY-MM-DD`) are required; `body` and `ref` are optional.
+`body` takes the same restrained markdown as your bio — blank lines make
+paragraphs, `**bold**` and `[links](https://…)` work, and nothing else is
+interpreted, so a log read from another shelf later is as safe as a collection
+is. `id` doubles as a deep-link anchor and is filled in for you. `npm run check`
+warns about a `ref` that matches no game.
+
+The feed is optional: with no `data/feed.json` at all, the milestones still fill
+the log, and a visitor sees the Log tab only once there's something in it.
+
+### It's a real RSS feed
+
+The log is also published as `feed.xml`, so anyone can follow your shelf in a
+normal feed reader — paste `https://you.github.io/GameLog/feed.xml` (or just the
+site address; the page advertises the feed) into whatever they use.
+
+Readers don't run JavaScript, so `feed.xml` can't be built in the browser the
+way the rest of the page is — it's a static file, generated the same way and for
+the same reason as the link-preview tags. It's rewritten from `data/feed.json`
+and your collection whenever you save in the manager, when you run
+`npm run post`, and again at publish, so it never drifts. The milestones ride
+along in it, so a subscriber sees "Beaten: *Halo 2*" without you writing a post.
+
+For the item links to work, set **Published address** on the manager's Site tab
+(or `siteUrl` in the config) — a reader can't resolve a relative link, the same
+requirement the preview-card image has. Without it, no `feed.xml` is written.
+
+### Following other shelves
+
+The **Following** tab is the other side of the log: the latest from the GameLogs
+*you* follow, all in one newest-first river — games they've beaten, notes
+they've written — each labelled with whose shelf it's from and linking back to
+it.
+
+It's the same trick as Compare. The shelves you follow are the `friends` in
+`data/config.json` (set on the manager's Site tab), and the river reads each
+one's collection and log **straight from their site in your browser** — no
+server, no account, nothing in between. Their milestones come through too, so
+following someone shows "Sam beat *Halo 2*" without Sam writing a word.
+
+Each shelf is someone else's site, so one being down or slow just drops that
+shelf from the river and the rest still show. A visitor to your published site
+sees the tab only once you follow at least one shelf.
+
 ## Cover art and descriptions
 
 ```bash
@@ -551,15 +643,18 @@ assets/js/lib.js         helpers shared by every view
 assets/js/stats.js       the stats view and its charts
 assets/js/timeline.js    the by-year view
 assets/js/lists.js       lists, and resolving entries against the collection
+assets/js/feed.js        the log: posts woven with play-through milestones
+scripts/lib/rss.mjs      generates feed.xml from the log
 assets/js/profile.js     the About view
 assets/js/manage.js      the local manager UI
 manage.html              the manager page (local use only)
-assets/js/compare.js     fetching and diffing another collection
+assets/js/compare.js     fetching another collection: Compare, and the Following river
 assets/js/platforms.mjs  the platform registry: names, colours, IGDB ids
 scripts/lib/libretro.mjs keyless box art
 scripts/lib/wikipedia.mjs keyless descriptions and years
 data/collection.json     your games and hardware
 data/lists.json          your lists (optional)
+data/feed.json           your log posts (optional)
 data/config.json         site title, tagline, accent colour, friends
 scripts/                 the optional Node helpers (start-fresh, add, enrich, …)
 tests/                   `npm test`, no dependencies

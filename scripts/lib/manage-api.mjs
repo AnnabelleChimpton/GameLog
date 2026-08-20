@@ -18,7 +18,7 @@ import { writeFile, rename, readFile } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import { join } from 'node:path';
 import {
-  ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH, SCHEMA_VERSION,
+  ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH, FEED_PATH, SCHEMA_VERSION,
 } from './collection.mjs';
 import { loadEnv, getToken, createClient, searchGames, coverUrl, tidySummary, releaseYear, companies } from './igdb.mjs';
 import { searchFree, coverFor } from './freelookup.mjs';
@@ -27,6 +27,7 @@ import {
   PHOTO_DIR, COVER_DIR, BOXART_DIR, MAX_IMAGE_BYTES, writeImage, fetchImageAsDataUrl,
 } from './images.mjs';
 import { vendorArt, artSummary, usableId } from './vendor.mjs';
+import { writeFeedXml } from './rss.mjs';
 import { loadCollection as loadCollectionForVendor, saveCollection as saveCollectionFromVendor }
   from './collection.mjs';
 
@@ -35,6 +36,7 @@ const WRITABLE = {
   collection: { path: COLLECTION_PATH, validate: validateCollection },
   lists: { path: LISTS_PATH, validate: validateLists },
   config: { path: CONFIG_PATH, validate: validateConfig },
+  feed: { path: FEED_PATH, validate: validateFeed },
 };
 
 const MAX_BODY_BYTES = 12 * 1024 * 1024;
@@ -72,6 +74,32 @@ function validateLists(data) {
   return { lists: data.lists };
 }
 
+function validateFeed(data) {
+  if (!data || !Array.isArray(data.posts)) throw new Error('Expected a "posts" list.');
+  // Rebuild each post in a fixed key order, dropping empty optionals, so the
+  // file stays tidy whichever client wrote it -- no stray "body": "" or
+  // "ref": null left behind in the diff.
+  const posts = data.posts.map((post) => {
+    if (!post || typeof post.title !== 'string' || !post.title.trim()) {
+      throw new Error('Every post needs a title.');
+    }
+    if (typeof post.date !== 'string' || !/^\d{4}-\d{2}-\d{2}/.test(post.date)) {
+      throw new Error(`"${post.title}" needs a date like 2026-08-19.`);
+    }
+    if (post.ref != null && typeof post.ref !== 'string') {
+      throw new Error(`"${post.title}" has a ref that is not a game id.`);
+    }
+    const clean = {};
+    if (typeof post.id === 'string' && post.id.trim()) clean.id = post.id.trim();
+    clean.date = post.date.slice(0, 10);
+    clean.title = post.title;
+    if (typeof post.body === 'string' && post.body.trim()) clean.body = post.body;
+    if (typeof post.ref === 'string' && post.ref.trim()) clean.ref = post.ref.trim();
+    return clean;
+  });
+  return { gamelog: SCHEMA_VERSION, posts };
+}
+
 function validateConfig(data) {
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
     throw new Error('Expected an object.');
@@ -89,7 +117,7 @@ function validateConfig(data) {
  * publish. Anything else you have changed stays yours to handle in git, and is
  * reported rather than silently swept into a commit.
  */
-const PUBLISHABLE = ['data', 'assets/profile', 'index.html'];
+const PUBLISHABLE = ['data', 'assets/profile', 'index.html', 'feed.xml'];
 
 /** Run git without a shell, so nothing here can be interpolated into one. */
 function git(args, { cwd = ROOT } = {}) {
@@ -143,6 +171,10 @@ async function gitStatus() {
 
 /** Stage the manager's files, commit, and push. */
 async function gitPublish(message) {
+  // Rebuild the feed from whatever is on disk first, so a hand-edited feed.json
+  // or collection.json is reflected in feed.xml before it is staged.
+  await writeFeedXml();
+
   const status = await gitStatus();
   if (!status.isRepo) throw new Error('This folder is not a git repository.');
   if (!status.remote) {
@@ -351,13 +383,14 @@ export async function handleApi(req, res, { port }) {
 
   try {
     if (route === 'state' && req.method === 'GET') {
-      const [collection, lists, config] = await Promise.all([
+      const [collection, lists, config, feed] = await Promise.all([
         readJsonFile(COLLECTION_PATH, { games: [], hardware: [] }),
         readJsonFile(LISTS_PATH, { lists: [] }),
         readJsonFile(CONFIG_PATH, {}),
+        readJsonFile(FEED_PATH, { posts: [] }),
       ]);
       send(res, 200, {
-        collection, lists, config,
+        collection, lists, config, feed,
         igdb: Boolean(await getIgdb()),
         root: ROOT,
       });
@@ -487,6 +520,10 @@ export async function handleApi(req, res, { port }) {
       // The link-preview tags live in index.html and are derived from config,
       // so they are refreshed here rather than drifting until someone notices.
       if (route === 'config') await syncMeta(clean);
+      // feed.xml is derived from the feed, the collection (for milestones) and
+      // the config (title, siteUrl), so any of the three going out means it is
+      // regenerated rather than left stale.
+      if (['feed', 'collection', 'config'].includes(route)) await writeFeedXml();
       send(res, 200, { ok: true, file: path.replace(ROOT + '/', '') });
       return true;
     }

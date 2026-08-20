@@ -15,6 +15,18 @@ import { resolveList } from './lists.js';
 
 const $ = (s) => document.querySelector(s);
 
+/**
+ * Today as YYYY-MM-DD in the owner's own timezone.
+ *
+ * A shelf's "today" is the owner's calendar day, not UTC's -- toISOString on a
+ * Western evening already reads as tomorrow, which would date a game you beat
+ * tonight, or a post you just wrote, a day ahead.
+ */
+const todayIso = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 const API = {
   headers: { 'X-GameLog-Manage': '1', 'Content-Type': 'application/json' },
 };
@@ -22,6 +34,7 @@ const API = {
 const state = {
   collection: { games: [], hardware: [] },
   lists: { lists: [] },
+  feed: { posts: [] },
   config: {},
   igdb: false,
   tab: 'lists',
@@ -62,6 +75,7 @@ async function save() {
     for (const what of targets) {
       const body = what === 'collection' ? state.collection
         : what === 'lists' ? state.lists
+        : what === 'feed' ? state.feed
         : state.config;
       const res = await fetch(`/api/${what}`, {
         method: 'PUT', headers: API.headers, body: JSON.stringify(body),
@@ -676,7 +690,7 @@ function gameEditor(game) {
             // Finishing something usually happens today, so fill the date in
             // rather than making it a second chore.
             if (key === 'beaten' && !game.beatenOn) {
-              game.beatenOn = new Date().toISOString().slice(0, 10);
+              game.beatenOn = todayIso();
             }
             if (key === 'unplayed') { game.beatenOn = null; }
             markDirty('collection');
@@ -756,7 +770,7 @@ function renderGames() {
           description: g.description, genres: g.genres || [], developer: g.developer,
           publisher: g.publisher, region: null, release: null, condition: null,
           copies: 1, metacritic: null, notes: null,
-          added: new Date().toISOString().slice(0, 10),
+          added: todayIso(),
           boxart: g.boxart ?? null, boxartRatio: g.boxartRatio ?? null,
           igdbId: g.igdbId ?? null, wikidataId: g.wikidataId ?? null,
         };
@@ -1296,6 +1310,100 @@ async function doPublish() {
   }
 }
 
+/* --- Updates tab ---------------------------------------------------------- */
+
+/** A url-safe, deep-linkable id from a post's date and title. */
+function postId(post, taken) {
+  const base = `${String(post.date || '').slice(0, 10)}-${post.title}`
+    .normalize('NFKD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+    || String(post.date || 'post');
+  if (!taken.has(base)) return base;
+  let n = 2;
+  while (taken.has(`${base}-${n}`)) n += 1;
+  return `${base}-${n}`;
+}
+
+/** Freeze an id once the post has a title, the way a saved list's id is frozen. */
+function ensurePostId(post) {
+  if (post.id || !post.title.trim()) return;
+  const taken = new Set(state.feed.posts.map((p) => p.id).filter(Boolean));
+  post.id = postId(post, taken);
+}
+
+function renderUpdates() {
+  const wrap = $('#tab-updates');
+  const posts = state.feed.posts;
+  const byId = new Map(state.collection.games.map((g) => [g.id, g]));
+
+  const add = h('button', {
+    type: 'button', class: 'mg-mini mg-mini--add',
+    onclick: () => {
+      posts.unshift({ id: null, date: todayIso(), title: '', body: '', ref: null });
+      markDirty('feed');
+      renderUpdates();
+    },
+  }, h('span', { text: '+ Write a post' }));
+
+  const head = h('div', { class: 'mg-listbar' },
+    h('span', { class: 'mg-listbar__label', text: plural(posts.length, 'post') }),
+    add);
+
+  // Newest first, matching how the log reads. Play-through milestones are added
+  // by the site itself, so they are not editable here -- this is the hint.
+  const ordered = [...posts].sort((a, b) =>
+    String(b.date).localeCompare(String(a.date)));
+
+  const cards = ordered.map((post) => {
+    const linked = post.ref ? byId.get(post.ref) : null;
+
+    const attach = post.ref
+      ? h('div', { class: 'mg-postgame' },
+          linked ? thumb(linked) : null,
+          h('span', { class: 'mg-postgame__name',
+            text: linked ? linked.title : `${post.ref} (not in collection)` }),
+          iconButton('Detach', () => { post.ref = null; markDirty('feed'); renderUpdates(); },
+            { title: 'Remove the linked game' }))
+      : h('button', {
+          type: 'button', class: 'mg-mini',
+          onclick: async () => {
+            const picked = await openPicker({
+              title: 'Attach a game you own', allowOwned: true, allowSearch: false });
+            if (picked?.kind === 'owned' && picked.game?.id) {
+              post.ref = picked.game.id;
+              markDirty('feed');
+              renderUpdates();
+            }
+          },
+        }, h('span', { text: 'Attach a game' }));
+
+    return h('div', { class: 'mg-postcard' },
+      h('div', { class: 'mg-postcard__row' },
+        field('Title', post.title, (v) => {
+          post.title = v; ensurePostId(post); markDirty('feed');
+        }, { placeholder: 'Finally found a boxed Halo' }),
+        field('Date', post.date, (v) => { post.date = v; markDirty('feed'); },
+          { type: 'date' })),
+      field('Body', post.body, (v) => { post.body = v; markDirty('feed'); },
+        { rows: 3, placeholder: 'Blank lines make paragraphs. **bold** and [links](https://…) work.' }),
+      h('div', { class: 'mg-postcard__foot' },
+        attach,
+        iconButton('Delete', () => {
+          const i = posts.indexOf(post);
+          if (i !== -1) posts.splice(i, 1);
+          markDirty('feed');
+          renderUpdates();
+        }, { danger: true })));
+  });
+
+  const hint = h('p', { class: 'mg-hint',
+    text: 'Games you mark beaten or dropped on the Games tab appear in the log on '
+      + 'their own, with their date — you don\'t need a post for those.' });
+
+  wrap.replaceChildren(head, hint,
+    ...(cards.length ? cards : [h('p', { class: 'cmp__none', text: 'No posts yet.' })]));
+}
+
 /* --- Tabs and boot -------------------------------------------------------- */
 
 
@@ -1306,12 +1414,14 @@ function renderTab() {
   $('#tab-lists').hidden = state.tab !== 'lists';
   $('#tab-games').hidden = state.tab !== 'games';
   $('#tab-hardware').hidden = state.tab !== 'hardware';
+  $('#tab-updates').hidden = state.tab !== 'updates';
   $('#tab-profile').hidden = state.tab !== 'profile';
   $('#tab-site').hidden = state.tab !== 'site';
 
   if (state.tab === 'lists') renderLists();
   else if (state.tab === 'games') renderGames();
   else if (state.tab === 'hardware') renderHardware();
+  else if (state.tab === 'updates') renderUpdates();
   else if (state.tab === 'profile') renderProfileTab();
   else renderSite();
 }
@@ -1337,6 +1447,7 @@ async function boot() {
   state.collection = data.collection?.games ? data.collection : { games: [], hardware: [] };
   state.collection.hardware = state.collection.hardware || [];
   state.lists = data.lists?.lists ? data.lists : { lists: [] };
+  state.feed = data.feed?.posts ? data.feed : { posts: [] };
   state.config = data.config || {};
   state.igdb = Boolean(data.igdb);
   state.selectedList = state.lists.lists[0]?.id || null;

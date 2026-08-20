@@ -14,6 +14,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const COLLECTION_PATH = join(ROOT, 'data', 'collection.json');
 export const CONFIG_PATH = join(ROOT, 'data', 'config.json');
 export const LISTS_PATH = join(ROOT, 'data', 'lists.json');
+export const FEED_PATH = join(ROOT, 'data', 'feed.json');
 export { ROOT };
 
 /** Field order used when writing entries back out, so diffs stay readable. */
@@ -94,17 +95,50 @@ export async function saveLists(data) {
   await writeFile(LISTS_PATH, JSON.stringify(out, null, 2) + '\n', 'utf8');
 }
 
+/** Lowercase, url-safe slug: "Chrono Trigger" -> "chrono-trigger". */
+export function slug(s) {
+  return String(s)
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 /** A stable, readable, URL-safe id like "nintendo-64-goldeneye-007". */
 export function makeId(platform, title) {
-  const slug = (s) =>
-    String(s)
-      .normalize('NFKD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/&/g, ' and ')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
   return `${slug(platform)}-${slug(title)}`.replace(/-{2,}/g, '-');
+}
+
+/* --- Feed ----------------------------------------------------------------- */
+
+const POST_KEYS = ['id', 'date', 'title', 'body', 'ref'];
+
+export async function loadFeed() {
+  if (!existsSync(FEED_PATH)) return { posts: [] };
+  const data = JSON.parse(await readFile(FEED_PATH, 'utf8'));
+  return { posts: Array.isArray(data.posts) ? data.posts : [] };
+}
+
+export async function saveFeed(data) {
+  const out = {
+    gamelog: SCHEMA_VERSION,
+    posts: (data.posts || []).map((post) => orderKeys(post, POST_KEYS)),
+  };
+  await writeFile(FEED_PATH, JSON.stringify(out, null, 2) + '\n', 'utf8');
+}
+
+/**
+ * A post's id doubles as its deep-link anchor, so it has to be url-safe and
+ * stable. Date-prefixed keeps the file sorting the way it reads -- newest
+ * first -- and keeps two posts written the same day from colliding on title
+ * alone only when their titles differ.
+ */
+export function makePostId(date, title, taken = new Set()) {
+  const base = `${String(date || '').slice(0, 10)}-${slug(title)}`.replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '') || String(date || 'post');
+  return uniqueId(base, taken);
 }
 
 /** Ensure an id is unique within the collection by suffixing -2, -3, ... */

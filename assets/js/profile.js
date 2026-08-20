@@ -7,7 +7,7 @@
 // It scrolls away. The controls below it are what stays pinned, because once
 // you're browsing, the search box matters more than the biography.
 
-import { h, safeImageUrl, plural, hardwareCounts } from './lib.js';
+import { h, safeImageUrl, plural, hardwareCounts, richText } from './lib.js';
 
 /**
  * Brand glyphs for the handful of places collectors actually link to. Anything
@@ -65,28 +65,6 @@ function svgIcon(name) {
   return svg;
 }
 
-/** Paragraphs, plus the same restrained markdown the footer allows. */
-function prose(text) {
-  return String(text).split(/\n{2,}/).map((para) => {
-    const node = h('p', { class: 'hero__para' });
-    const pattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|\*\*([^*]+)\*\*/g;
-    let last = 0;
-    let match;
-    while ((match = pattern.exec(para))) {
-      if (match.index > last) node.append(para.slice(last, match.index));
-      if (match[2]) {
-        node.append(h('a', { href: match[2], target: '_blank',
-          rel: 'noopener noreferrer', text: match[1] }));
-      } else {
-        node.append(h('strong', { text: match[3] }));
-      }
-      last = pattern.lastIndex;
-    }
-    if (last < para.length) node.append(para.slice(last));
-    return node;
-  });
-}
-
 /** "184 games · 10 platforms · 5 consoles · 1983-2024" */
 function factLine(games, hardware) {
   const platforms = new Set(games.map((g) => g.platform)).size;
@@ -133,7 +111,7 @@ export function renderHero(config, { games, hardware }) {
     h('p', { class: 'hero__facts', text: factLine(games, hardware) }));
 
   if (profile.about) {
-    const bio = h('div', { class: 'hero__bio' }, prose(profile.about));
+    const bio = h('div', { class: 'hero__bio' }, richText(profile.about, { paraClass: 'hero__para' }));
     const more = h('button', {
       class: 'hero__more', type: 'button', hidden: true,
       onclick: () => {

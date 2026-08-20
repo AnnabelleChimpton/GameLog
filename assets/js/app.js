@@ -18,6 +18,7 @@ import { renderStats } from './stats.js';
 import { renderTimeline } from './timeline.js';
 import * as compare from './compare.js';
 import { renderLists } from './lists.js';
+import { renderLog, buildRiver, renderRiver, renderFollowingEmpty } from './feed.js';
 import { renderHero } from './profile.js';
 
 const $ = (sel) => document.querySelector(sel);
@@ -55,6 +56,7 @@ const el = {
   viewShelf: $('#view-shelf'),
   viewTimeline: $('#view-timeline'),
   viewLists: $('#view-lists'),
+  viewLog: $('#view-log'),
   viewStats: $('#view-stats'),
   hero: $('#hero'),
   viewCompare: $('#view-compare'),
@@ -63,6 +65,9 @@ const el = {
   cmpStatus: $('#cmp-status'),
   cmpOutput: $('#cmp-output'),
   cmpFriends: $('#cmp-friends'),
+  viewFollowing: $('#view-following'),
+  folStatus: $('#fol-status'),
+  folOutput: $('#fol-output'),
   dialog: $('#detail'),
   dCover: $('#detail-cover'),
   dPlatform: $('#detail-platform'),
@@ -80,12 +85,14 @@ const el = {
   dClose: $('.detail__close'),
 };
 
-const VIEWS = ['shelf', 'timeline', 'lists', 'stats', 'compare'];
+const VIEWS = ['shelf', 'timeline', 'lists', 'log', 'stats', 'compare', 'following'];
 
 const state = {
   games: [],
   hardware: [],
   lists: [],
+  feed: [],
+  river: null,
   config: {},
   view: 'shelf',
   list: null,
@@ -368,8 +375,10 @@ function render() {
   el.viewShelf.hidden = state.view !== 'shelf';
   el.viewTimeline.hidden = state.view !== 'timeline';
   el.viewLists.hidden = state.view !== 'lists';
+  el.viewLog.hidden = state.view !== 'log';
   el.viewStats.hidden = state.view !== 'stats';
   el.viewCompare.hidden = state.view !== 'compare';
+  el.viewFollowing.hidden = state.view !== 'following';
 
   // Stats now describes whatever is filtered, so the chips have to stay
   // visible there: otherwise the filter is doing work you can neither see nor
@@ -399,6 +408,10 @@ function render() {
       onSelect: (id) => { state.list = id; writeUrl(); render(); },
       onOpen: openFromAnywhere,
     }));
+  } else if (state.view === 'log') {
+    el.viewLog.replaceChildren(renderLog(state.feed, state.games, { onOpen: openFromAnywhere }));
+  } else if (state.view === 'following') {
+    renderFollowing();
   } else if (state.view === 'stats') {
     // Stats describes whatever is filtered, not always the whole collection.
     // With a platform selected this is that shelf's portrait, which is what
@@ -687,6 +700,79 @@ function renderFriends() {
       }, h('span', { text: f.name || f.url }))));
 }
 
+/* --- Following ------------------------------------------------------------ */
+
+let riverLoading = false;
+
+function folStatus(message, kind = 'info') {
+  el.folStatus.hidden = !message;
+  el.folStatus.textContent = message || '';
+  el.folStatus.dataset.kind = kind;
+}
+
+const followedShelves = () =>
+  (Array.isArray(state.config.friends) ? state.config.friends : [])
+    .filter((f) => f && typeof f.url === 'string' && f.url.trim());
+
+/**
+ * Show the river. With no one followed, the prompt; once fetched, the cached
+ * stream; otherwise kick off the fetch, which renders itself when it lands.
+ */
+function renderFollowing() {
+  const friends = followedShelves();
+  if (!friends.length) {
+    folStatus('');
+    el.folOutput.replaceChildren(renderFollowingEmpty());
+    return;
+  }
+  if (state.river) {
+    el.folOutput.replaceChildren(renderRiver(state.river));
+    return;
+  }
+  if (!riverLoading) runRiver(friends);
+}
+
+/**
+ * Read every followed shelf and merge their logs. Each shelf is someone else's
+ * site, so a failure to reach one is expected and isolated: that shelf drops
+ * out and the rest still show. A shelf's collection is what carries its beaten
+ * milestones, so it is required; its feed.json (written posts) is not.
+ */
+async function runRiver(friends) {
+  riverLoading = true;
+  el.folOutput.replaceChildren();
+  folStatus(`Reading ${plural(friends.length, 'shelf', 'shelves')} you follow…`);
+
+  const shelves = await Promise.all(friends.map(async (f) => {
+    let games;
+    let collUrl;
+    try {
+      const c = await compare.loadCollection(f.url);
+      games = c.games;
+      collUrl = c.url;
+    } catch {
+      return null; // Can't reach their collection: nothing to show for them.
+    }
+    let posts = [];
+    try {
+      posts = (await compare.loadFeed(f.url)).posts;
+    } catch {
+      posts = []; // No readable feed is fine; their milestones still come through.
+    }
+    const base = collUrl.replace(/\/data\/collection\.json.*$/, '');
+    return { friend: { name: (f.name && f.name.trim()) || base, url: base }, posts, games };
+  }));
+
+  const ok = shelves.filter(Boolean);
+  const missed = friends.length - ok.length;
+  riverLoading = false;
+  state.river = buildRiver(ok);
+
+  folStatus(missed ? `${missed} of ${plural(friends.length, 'shelf', 'shelves')} couldn't be read.` : '',
+    missed ? 'warn' : 'info');
+  el.folOutput.replaceChildren(renderRiver(state.river));
+}
+
 /** Put every filter back to its default. */
 function clearFilters() {
   state.query = '';
@@ -923,11 +1009,13 @@ async function boot() {
   let collection;
   let config = {};
   let lists = [];
+  let feed = [];
   try {
-    const [collectionRes, configRes, listsRes] = await Promise.all([
+    const [collectionRes, configRes, listsRes, feedRes] = await Promise.all([
       fetch('data/collection.json', { cache: 'no-cache' }),
       fetch('data/config.json', { cache: 'no-cache' }).catch(() => null),
       fetch('data/lists.json', { cache: 'no-cache' }).catch(() => null),
+      fetch('data/feed.json', { cache: 'no-cache' }).catch(() => null),
     ]);
     if (!collectionRes.ok) throw new Error(`HTTP ${collectionRes.status}`);
     collection = await collectionRes.json();
@@ -936,6 +1024,12 @@ async function boot() {
     if (listsRes?.ok) {
       const parsed = await listsRes.json().catch(() => null);
       if (Array.isArray(parsed?.lists)) lists = parsed.lists;
+    }
+    // The feed is optional too: play-through milestones fill it even with no
+    // feed.json at all, so an absent file just means "no written posts".
+    if (feedRes?.ok) {
+      const parsed = await feedRes.json().catch(() => null);
+      if (Array.isArray(parsed?.posts)) feed = parsed.posts;
     }
   } catch (err) {
     el.grid.hidden = true;
@@ -959,6 +1053,7 @@ async function boot() {
   }));
   state.hardware = collection.hardware || [];
   state.lists = lists;
+  state.feed = feed;
   state.episodes = episodeNumbers(state.games);
 
   // Config-driven chrome.
@@ -987,6 +1082,22 @@ async function boot() {
   if (!state.lists.length && !isLocal()) {
     el.views.querySelector('[data-view="lists"]')?.remove();
     if (state.view === 'lists') state.view = 'shelf';
+  }
+
+  // Same for the Log: a visitor sees the tab only once there is something in it,
+  // which is any written post or any game marked beaten or dropped with a date.
+  const hasLog = state.feed.length
+    || state.games.some((g) => ['beaten', 'dropped'].includes(playStatus(g)) && g.beatenOn);
+  if (!hasLog && !isLocal()) {
+    el.views.querySelector('[data-view="log"]')?.remove();
+    if (state.view === 'log') state.view = 'shelf';
+  }
+
+  // The Following tab needs someone to follow. Locally it stays, so the owner
+  // can see it exists and go add friends on the Site tab.
+  if (!followedShelves().length && !isLocal()) {
+    el.views.querySelector('[data-view="following"]')?.remove();
+    if (state.view === 'following') state.view = 'shelf';
   }
 
   placeFilters();

@@ -340,6 +340,37 @@ export function h(tag, props = {}, ...children) {
   return node;
 }
 
+/**
+ * The one restrained-markdown renderer, shared by the bio, the footer and the
+ * log. Blank lines make paragraphs; `[text](https://…)` makes a link and
+ * `**text**` makes bold, and nothing else is interpreted.
+ *
+ * Everything is built as DOM nodes -- the source string never touches innerHTML
+ * -- which is what keeps it safe to run on a post fetched from someone else's
+ * shelf over the network. `class` names the paragraph so each caller can style
+ * its own prose.
+ */
+export function richText(text, { paraClass = 'prose__p' } = {}) {
+  return String(text ?? '').split(/\n{2,}/).map((para) => {
+    const node = h('p', { class: paraClass });
+    const pattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|\*\*([^*]+)\*\*/g;
+    let last = 0;
+    let match;
+    while ((match = pattern.exec(para))) {
+      if (match.index > last) node.append(para.slice(last, match.index));
+      if (match[2]) {
+        node.append(h('a', { href: match[2], target: '_blank',
+          rel: 'noopener noreferrer', text: match[1] }));
+      } else {
+        node.append(h('strong', { text: match[3] }));
+      }
+      last = pattern.lastIndex;
+    }
+    if (last < para.length) node.append(para.slice(last));
+    return node;
+  });
+}
+
 /** Count occurrences, returning [value, count] sorted by count descending. */
 export function tally(items, pick) {
   const counts = new Map();
