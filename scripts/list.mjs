@@ -5,6 +5,7 @@
 //   npm run list -- add hunt "Chrono Trigger"
 //   npm run list -- add hunt "Banjo-Kazooie" --owned
 //   npm run list -- rm hunt "Chrono Trigger"
+//   npm run list -- wants hunt              mark a list as your wishlist
 //   npm run list -- show                    print every list
 //
 // Adding a game you already own stores a `ref` to its collection entry.
@@ -165,6 +166,32 @@ async function cmdRemove(data, listKey, title) {
   console.log(`  Removed from "${list.name}" (${list.items.length} left).`);
 }
 
+/** Mark one list as the wishlist (the games you're hunting), or clear it. */
+async function cmdWants(data, key) {
+  if (!key) {
+    const current = data.lists.find((l) => l.wants);
+    console.log(current
+      ? `Your wishlist is "${current.name}" [${current.id}].`
+      : 'No list is marked as your wishlist yet.');
+    console.log('Set one:  npm run list -- wants <list-id>   (or "none" to clear)');
+    return;
+  }
+
+  // One canonical wishlist, so clear any existing mark first.
+  for (const l of data.lists) delete l.wants;
+  if (/^(none|off|clear)$/i.test(key)) {
+    await saveLists(data);
+    console.log('Cleared the wishlist mark.');
+    return;
+  }
+
+  const list = findList(data.lists, key);
+  if (!list) { console.log(`No list matches "${key}".`); process.exitCode = 1; return; }
+  list.wants = true;
+  await saveLists(data);
+  console.log(`"${list.name}" is now your wishlist.`);
+}
+
 function cmdShow(data, collection) {
   if (!data.lists.length) {
     console.log('No lists yet.  npm run list -- new "The hunt"');
@@ -174,7 +201,8 @@ function cmdShow(data, collection) {
     const owned = list.items.filter((i) =>
       i.ref ? collection.games.some((g) => g.id === i.ref)
             : matchOwned(collection.games, i.title, i.platform)).length;
-    console.log(`\n${list.name}  [${list.id}] : ${list.items.length} items, ${owned} owned`);
+    const tag = list.wants ? ' ★ wishlist' : '';
+    console.log(`\n${list.name}${tag}  [${list.id}] : ${list.items.length} items, ${owned} owned`);
     if (list.description) console.log(`  ${list.description}`);
     for (const item of list.items) {
       const isOwned = item.ref
@@ -238,12 +266,14 @@ async function main() {
     case 'add': await cmdAdd(data, collection, rest[0], rest.slice(1).join(' '), opts); break;
     case 'rm':
     case 'remove': await cmdRemove(data, rest[0], rest.slice(1).join(' ')); break;
+    case 'wants':
+    case 'wishlist': await cmdWants(data, rest[0]); break;
     case 'show':
     case 'ls': cmdShow(data, collection); break;
     case undefined: await interactive(data, collection); break;
     default:
       console.log(`Unknown command "${command}".`);
-      console.log('Use: new | add | rm | show, or run `npm run list` with no arguments.');
+      console.log('Use: new | add | rm | wants | show, or run `npm run list` with no arguments.');
   }
 }
 

@@ -91,12 +91,18 @@ try {
 const listIds = new Set();
 const gameIds = new Set(games.map((g) => g.id));
 let wantedCount = 0;
+let wishlists = 0;
 
 for (const list of lists.lists) {
   const label = list.name || list.id || '<unnamed list>';
   if (!list.id) problems.push(`${label}: a list needs an "id"`);
   else if (listIds.has(list.id)) problems.push(`two lists share the id "${list.id}"`);
   else listIds.add(list.id);
+
+  if (list.wants === true) wishlists += 1;
+  else if (list.wants != null && typeof list.wants !== 'boolean') {
+    problems.push(`${label}: "wants" should be true or false`);
+  }
 
   if (!Array.isArray(list.items)) {
     problems.push(`${label}: "items" should be a list`);
@@ -122,6 +128,12 @@ for (const list of lists.lists) {
       wantedCount += 1;
     }
   }
+}
+
+// One canonical wishlist, so anything reading it never has to guess which.
+if (wishlists > 1) {
+  warnings.push(`${wishlists} lists are marked as the wishlist; the site uses the first. `
+    + 'Mark just one with `npm run list -- wants <id>`.');
 }
 
 /* --- Feed ----------------------------------------------------------------- */

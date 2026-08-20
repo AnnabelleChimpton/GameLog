@@ -63,3 +63,10 @@ test('resolveList counts what is owned', () => {
   assert.equal(list.total, 3);
   assert.equal(list.ownedCount, 2);
 });
+
+test('resolveList carries the wishlist flag through so the view can lead with it', () => {
+  const list = resolveList({ id: 'hunt', wants: true, items: [{ title: 'Not Owned' }] }, games);
+  assert.equal(list.wants, true);
+  // A normal list has no flag rather than a false one.
+  assert.equal(resolveList({ id: 'backlog', items: [] }, games).wants, undefined);
+});

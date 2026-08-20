@@ -123,17 +123,23 @@ function listTile(entry, { onOpen }) {
 }
 
 function progress(resolved) {
-  const { ownedCount, total } = resolved;
+  const { ownedCount, total, wants } = resolved;
   if (!total) return null;
   const pct = Math.round((ownedCount / total) * 100);
+
+  // A wishlist reads by what's left to find; any other list by what you own.
+  const text = wants
+    ? (ownedCount === total
+        ? `all ${plural(total, 'game')} found`
+        : `${plural(total - ownedCount, 'game')} still to find`)
+    : (ownedCount === total
+        ? `all ${plural(total, 'game')} owned`
+        : `${ownedCount} of ${total} owned`);
 
   return h('div', { class: 'listprog' },
     h('div', { class: 'listprog__track' },
       h('div', { class: 'listprog__fill', style: `width:${pct}%` })),
-    h('span', { class: 'listprog__text',
-      text: ownedCount === total
-        ? `all ${plural(total, 'game')} owned`
-        : `${ownedCount} of ${total} owned` }));
+    h('span', { class: 'listprog__text', text }));
 }
 
 export function renderLists(lists, games, { selected, onSelect, onOpen }) {
@@ -154,22 +160,27 @@ export function renderLists(lists, games, { selected, onSelect, onOpen }) {
           : null));
   }
 
-  const resolved = lists.map((list) => resolveList(list, games));
+  // The wishlist, when there is one, leads -- it's the list you check most.
+  const resolved = lists.map((list) => resolveList(list, games))
+    .sort((a, b) => (b.wants ? 1 : 0) - (a.wants ? 1 : 0));
   const current = resolved.find((l) => l.id === selected) || resolved[0];
 
   const picker = h('div', { class: 'listpicker', role: 'tablist' },
     resolved.map((list) => h('button', {
       type: 'button',
-      class: 'chip',
+      class: list.wants ? 'chip chip--wish' : 'chip',
       role: 'tab',
       'aria-selected': String(list.id === current.id),
       onclick: () => onSelect(list.id),
     },
+      list.wants ? h('span', { class: 'chip__wish', 'aria-hidden': 'true', text: '★' }) : null,
       h('span', { text: list.name || list.id }),
       h('span', { class: 'chip__count', text: String(list.total) }))));
 
   const header = h('div', { class: 'listhead' },
-    h('h2', { class: 'listhead__name', text: current.name || current.id }),
+    h('h2', { class: 'listhead__name' },
+      h('span', { text: current.name || current.id }),
+      current.wants ? h('span', { class: 'listhead__tag', text: 'Wishlist' }) : null),
     current.description ? h('p', { class: 'listhead__desc', text: current.description }) : null,
     progress(current));
 

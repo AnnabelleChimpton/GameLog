@@ -60,10 +60,15 @@ function validateCollection(data) {
 
 function validateLists(data) {
   if (!data || !Array.isArray(data.lists)) throw new Error('Expected a "lists" list.');
+  let wants = 0;
   for (const list of data.lists) {
     if (!list || typeof list.id !== 'string' || !list.id.trim()) {
       throw new Error('Every list needs an id.');
     }
+    if (list.wants != null && typeof list.wants !== 'boolean') {
+      throw new Error(`List "${list.id}" wants must be true or false.`);
+    }
+    if (list.wants === true) wants += 1;
     if (!Array.isArray(list.items)) throw new Error(`List "${list.id}" needs an items list.`);
     for (const item of list.items) {
       if (!item || (!item.ref && !item.title)) {
@@ -71,6 +76,8 @@ function validateLists(data) {
       }
     }
   }
+  // One canonical wishlist, so anything reading it later never has to guess.
+  if (wants > 1) throw new Error('Only one list can be the wishlist.');
   return { lists: data.lists };
 }
 

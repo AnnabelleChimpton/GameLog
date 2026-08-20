@@ -353,6 +353,7 @@ That walks you through it. The direct forms:
 npm run list -- new "The hunt"
 npm run list -- add the-hunt "Chrono Trigger" --platform "SNES/Super Famicom"
 npm run list -- rm the-hunt "Chrono Trigger"
+npm run list -- wants the-hunt
 npm run list -- show
 ```
 
@@ -369,6 +370,16 @@ list entry turns from wanted into owned by itself. Nothing to edit, and the
 Wanted games render dimmed with a **want** badge; owned ones are full colour and
 open their details on click.
 
+### Your wishlist
+
+One list can be marked as your **wishlist** — the games you're actively hunting.
+It's just a flag (`"wants": true` on the list, or the star toggle on the
+manager's Lists tab, or `npm run list -- wants <id>`), and only one list can
+hold it. The wishlist leads the Lists tab, carries a **Wishlist** tag, and
+counts by what's left — "*2 games still to find*" — rather than by what you own.
+Everything else about it is an ordinary list, so a game flips from wanted to
+owned the moment it lands in your collection.
+
 ### The file
 
 `data/lists.json`, and it's plain enough to write by hand:
@@ -379,6 +390,7 @@ open their details on click.
     {
       "id": "the-hunt",
       "name": "The hunt",
+      "wants": true,
       "description": "Actively looking for these.",
       "items": [
         { "title": "Panzer Dragoon Saga", "platform": "Sega Saturn", "note": "disc only is fine" },
@@ -389,7 +401,8 @@ open their details on click.
 }
 ```
 
-Each entry is either a `ref` (a game `id` from your collection) or a `title`
+`wants` is optional and marks this as your one wishlist. Each entry is either a
+`ref` (a game `id` from your collection) or a `title`
 (plus an optional `platform` to pin which version you want). `note` is yours to
 use however. Order is preserved, so a "play next" list stays in the order you
 put it in. `npm run check` warns about a `ref` that doesn't match anything.

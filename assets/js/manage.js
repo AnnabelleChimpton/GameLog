@@ -316,6 +316,7 @@ function renderLists() {
       'aria-selected': String(list.id === state.selectedList),
       onclick: () => { state.selectedList = list.id; renderLists(); },
     },
+      list.wants ? h('span', { class: 'chip__wish', title: 'Wishlist', text: '★' }) : null,
       h('span', { text: list.name || list.id }),
       h('span', { class: 'chip__count', text: String(list.items?.length || 0) }))),
     h('button', {
@@ -367,6 +368,20 @@ function renderLists() {
       }, { placeholder: 'Optional' })),
     h('div', { class: 'mg-row mg-row--tight' },
       idLabel,
+      h('button', {
+        type: 'button',
+        class: 'mg-mini',
+        'aria-pressed': String(Boolean(list.wants)),
+        title: 'The one list of games you are hunting',
+        onclick: () => {
+          const on = !list.wants;
+          // One canonical wishlist: turning this on turns any other off.
+          for (const l of lists) delete l.wants;
+          if (on) list.wants = true;
+          markDirty('lists');
+          renderLists();
+        },
+      }, h('span', { text: list.wants ? '★ Wishlist' : 'Mark as wishlist' })),
       h('span', { class: 'mg-grow' }),
       h('span', { class: 'mg-hint',
         text: `${resolved.ownedCount} of ${resolved.total} owned` }),

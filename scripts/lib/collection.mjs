@@ -74,7 +74,7 @@ export async function saveCollection(collection) {
 
 /* --- Lists ---------------------------------------------------------------- */
 
-const LIST_KEYS = ['id', 'name', 'description', 'items'];
+const LIST_KEYS = ['id', 'name', 'wants', 'description', 'items'];
 const ITEM_KEYS = ['ref', 'title', 'platform', 'note', 'year', 'cover', 'description',
   'genres', 'developer', 'publisher', 'igdbId'];
 

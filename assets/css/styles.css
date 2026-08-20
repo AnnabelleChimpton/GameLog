@@ -1428,12 +1428,32 @@ div.minitile { cursor: default; }
 
 .listhead { display: grid; gap: 5px; max-width: 68ch; }
 .listhead__name {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
   font-family: var(--font-display);
   font-size: clamp(1.15rem, 1rem + 0.8vw, 1.45rem);
   font-weight: 700;
   letter-spacing: -0.022em;
 }
+.listhead__tag {
+  font-family: var(--font-body, inherit);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 100px;
+  padding: 2px 9px;
+  align-self: center;
+}
 .listhead__desc { font-size: 0.9rem; color: var(--text-soft); line-height: 1.6; }
+
+/* The wishlist star, on its picker chip and in the manager. */
+.chip__wish { color: var(--accent); font-size: 0.85em; line-height: 1; }
+.chip[aria-selected="true"] .chip__wish { color: inherit; }
 
 .listprog {
   display: flex;
@@ -1820,6 +1840,11 @@ a.logentry__thumb { display: block; }
 }
 .mg-mini:hover { color: var(--text); border-color: var(--border-strong); }
 .mg-mini--danger:hover { color: #d1553f; border-color: #d1553f; }
+.mg-mini[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface-sunk));
+}
 
 .mg-listbar {
   display: flex;
