@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>AnnabelleChimpton's GameLog</title>
+    <title>Annabelle Wright's GameLog</title>
     <link>https://annabellechimpton.github.io/GameLog/</link>
     <description>Welcome to my game collection! These are all of the physical copies of games I currently own. I also developed this site, and it's open source if you'd like to copy it and use it yourself :)</description>
     <atom:link href="https://annabellechimpton.github.io/GameLog/feed.xml" rel="self" type="application/rss+xml"/>

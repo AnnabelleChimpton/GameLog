@@ -1519,6 +1519,30 @@
       "wikidataId": null
     },
     {
+      "id": "nintendo-64-ken-griffey-jr-s-slugfest",
+      "title": "Ken Griffey Jr.'s Slugfest",
+      "platform": "Nintendo 64",
+      "year": 1999,
+      "cover": "assets/covers/nintendo-64-ken-griffey-jr-s-slugfest.jpg",
+      "description": "Bursting with stunning realism and high-excitement baseball action, Ken Griffey Jr.'s Slugfest drives home the winning run! Improved player animations and color commentary by Dave Niehaus - \"The Voice of the Mariners\" - make you feel like you're really at the game, while easy-to-use controls, updated rosters and statistics, and an optional fantasy draft make it even more fun than being there!",
+      "genres": [
+        "Sport"
+      ],
+      "developer": "Angel Studios",
+      "publisher": "Nintendo",
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-21",
+      "boxart": "assets/boxart/nintendo-64-ken-griffey-jr-s-slugfest.png",
+      "boxartRatio": 1.369,
+      "igdbId": 3531,
+      "wikidataId": null
+    },
+    {
       "id": "nintendo-switch-killer-queen-black",
       "title": "Killer Queen Black",
       "platform": "Nintendo Switch",
@@ -3028,6 +3052,30 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 134584
+    },
+    {
+      "id": "snes-super-famicom-revolution-x",
+      "title": "Revolution X",
+      "platform": "SNES/Super Famicom",
+      "year": 1994,
+      "cover": "assets/covers/snes-super-famicom-revolution-x.jpg",
+      "description": "Revolution X is about the ol' Rock & Roll. There is an evil nation putting the youth down and banning our beloved rock music. Who you gonna call? Aerosmith! With the help of Aerosmith, the player must shoot his/her way through enemy infested levels, (light) guns blazing, collecting power-ups and releasing hostages. Almost all of the graphics are digitized and Aerosmith themselves are too! There are also lots of fmv videos.",
+      "genres": [
+        "Shooter"
+      ],
+      "developer": "Midway Games",
+      "publisher": "Midway Games, Playtronic",
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-21",
+      "boxart": "assets/boxart/snes-super-famicom-revolution-x.png",
+      "boxartRatio": 1.407,
+      "igdbId": 20298,
+      "wikidataId": null
     },
     {
       "id": "nintendo-switch-ring-fit-adventure",
