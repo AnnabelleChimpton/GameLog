@@ -328,13 +328,25 @@ button, input, select { font: inherit; color: inherit; }
 .chips {
   display: flex;
   gap: 7px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  /* Every console on view, wrapping to a second line when there are many. A
+     strip that scrolled sideways hid the last few with nothing to grab -- on a
+     desktop there is no thumb to swipe with, and a chip you cannot see is a
+     filter you do not know you have. */
+  flex-wrap: wrap;
   padding-bottom: 2px;
-  /* Fade the overflow edge instead of showing a hard cut. */
-  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
 }
-.chips::-webkit-scrollbar { display: none; }
+
+@media (max-width: 700px) {
+  /* A phone has a thumb and a Filter sheet that lists them all, so here the
+     strip scrolls and the edge fades rather than wrapping into a tall block. */
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+  .chips::-webkit-scrollbar { display: none; }
+}
 
 .chip {
   flex: 0 0 auto;
