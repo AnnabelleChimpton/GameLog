@@ -22,7 +22,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3774,
-      "boxart": "assets/boxart/nintendo-gamecube-1080-avalanche.png",
+      "boxart": "assets/boxart/nintendo-gamecube-1080-avalanche.jpg",
       "boxartRatio": 0.705
     },
     {
@@ -41,11 +41,11 @@
       "release": null,
       "condition": "Loose",
       "copies": 1,
-      "metacritic": null,
+      "metacritic": 88,
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3328,
-      "boxart": "assets/boxart/nintendo-64-1080-snowboarding.png",
+      "boxart": "assets/boxart/nintendo-64-1080-snowboarding.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -69,7 +69,7 @@
       "notes": null,
       "added": "2024-10-08",
       "igdbId": 4270,
-      "boxart": "assets/boxart/3do-advanced-dungeons-and-dragons-deathkeep.png",
+      "boxart": "assets/boxart/3do-advanced-dungeons-and-dragons-deathkeep.jpg",
       "boxartRatio": 0.527
     },
     {
@@ -94,7 +94,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2655,
-      "boxart": "assets/boxart/nintendo-gamecube-animal-crossing.png",
+      "boxart": "assets/boxart/nintendo-gamecube-animal-crossing.jpg",
       "boxartRatio": 0.717
     },
     {
@@ -117,7 +117,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3703,
-      "boxart": "assets/boxart/microsoft-xbox-arctic-thunder.png",
+      "boxart": "assets/boxart/microsoft-xbox-arctic-thunder.jpg",
       "boxartRatio": 0.715
     },
     {
@@ -164,7 +164,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2148,
-      "boxart": "assets/boxart/nintendo-64-banjo-kazooie.png",
+      "boxart": "assets/boxart/nintendo-64-banjo-kazooie.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -187,15 +187,15 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 357181,
-      "boxart": "assets/boxart/snes-super-famicom-bass-masters-classic.png",
+      "boxart": "assets/boxart/snes-super-famicom-bass-masters-classic.jpg",
       "boxartRatio": 1.407
     },
     {
-      "id": "game-bassmasters-2000",
+      "id": "nintendo-64-bassmasters-2000",
       "title": "BassMasters 2000",
       "platform": "Nintendo 64",
       "year": 1999,
-      "cover": "assets/covers/game-bassmasters-2000.jpg",
+      "cover": "assets/covers/nintendo-64-bassmasters-2000.jpg",
       "description": "BassMasters 2000 is a fishing simulation game which counts a total of 4 modes and has a variety of customizable options. You can create and save up to 7 anglers through the “Create Angler” option, customising characteristics such as sex, hair, face, clothes, etc. Other customisable options include “Lake Conditions” (lake location, season, weather, time, etc.), “Boat” (boat model, engine, etc.) and “Tackle” (rod/reel, line, lure, etc.).",
       "genres": [
         "Simulator",
@@ -211,7 +211,7 @@
       "notes": null,
       "added": "2026-08-17",
       "igdbId": 3420,
-      "boxart": "assets/boxart/game-bassmasters-2000.png",
+      "boxart": "assets/boxart/nintendo-64-bassmasters-2000.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -231,13 +231,13 @@
       "release": null,
       "condition": "CIB",
       "copies": 1,
-      "metacritic": null,
+      "metacritic": 59,
       "notes": null,
       "added": "2026-08-20",
-      "boxart": "assets/boxart/microsoft-xbox-big-mutha-truckers.png",
-      "boxartRatio": 0.715,
       "igdbId": 3809,
-      "wikidataId": null
+      "wikidataId": null,
+      "boxart": "assets/boxart/microsoft-xbox-big-mutha-truckers.jpg",
+      "boxartRatio": 0.715
     },
     {
       "id": "nintendo-64-bio-freaks",
@@ -259,7 +259,7 @@
       "notes": null,
       "added": "2026-08-14",
       "igdbId": 3366,
-      "boxart": "assets/boxart/nintendo-64-bio-freaks.png",
+      "boxart": "assets/boxart/nintendo-64-bio-freaks.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -283,7 +283,7 @@
       "notes": null,
       "added": "2026-08-14",
       "igdbId": 3424,
-      "boxart": "assets/boxart/nintendo-64-blast-corps.png",
+      "boxart": "assets/boxart/nintendo-64-blast-corps.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -309,7 +309,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 5760,
-      "boxart": "assets/boxart/microsoft-xbox-buffy-the-vampire-slayer.png",
+      "boxart": "assets/boxart/microsoft-xbox-buffy-the-vampire-slayer.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -333,7 +333,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3837,
-      "boxart": "assets/boxart/microsoft-xbox-buffy-the-vampire-slayer-chaos-bleeds.png",
+      "boxart": "assets/boxart/microsoft-xbox-buffy-the-vampire-slayer-chaos-bleeds.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -356,7 +356,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 949,
-      "boxart": "assets/boxart/microsoft-xbox-call-of-duty-3.png",
+      "boxart": "assets/boxart/microsoft-xbox-call-of-duty-3.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -380,7 +380,7 @@
       "added": "2026-08-11",
       "igdbId": 366631,
       "wikidataId": "Q2948513",
-      "boxart": "assets/boxart/nintendo-64-chameleon-twist.png",
+      "boxart": "assets/boxart/nintendo-64-chameleon-twist.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -403,7 +403,7 @@
       "notes": null,
       "added": "2026-08-14",
       "igdbId": 647,
-      "boxart": "assets/boxart/nintendo-64-command-and-conquer.png",
+      "boxart": "assets/boxart/nintendo-64-command-and-conquer.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -429,7 +429,7 @@
       "notes": null,
       "added": "2026-08-11",
       "igdbId": 1286,
-      "boxart": "assets/boxart/nintendo-64-conker-s-bad-fur-day.png",
+      "boxart": "assets/boxart/nintendo-64-conker-s-bad-fur-day.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -452,7 +452,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 266357,
-      "boxart": "assets/boxart/microsoft-xbox-counter-strike.png",
+      "boxart": "assets/boxart/microsoft-xbox-counter-strike.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -475,7 +475,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 37114,
-      "boxart": "assets/boxart/3do-coven.png",
+      "boxart": "assets/boxart/3do-coven.jpg",
       "boxartRatio": 1.169
     },
     {
@@ -498,7 +498,7 @@
       "notes": null,
       "added": "2024-10-08",
       "igdbId": 4237,
-      "boxart": "assets/boxart/3do-daedalus-encounter.png",
+      "boxart": "assets/boxart/3do-daedalus-encounter.jpg",
       "boxartRatio": 0.518
     },
     {
@@ -521,7 +521,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 5800,
-      "boxart": "assets/boxart/microsoft-xbox-dance-dance-revolution-ultramix-2.png",
+      "boxart": "assets/boxart/microsoft-xbox-dance-dance-revolution-ultramix-2.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -544,7 +544,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3869,
-      "boxart": "assets/boxart/microsoft-xbox-dark-summit.png",
+      "boxart": "assets/boxart/microsoft-xbox-dark-summit.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -567,7 +567,7 @@
       "notes": "First game sealed, second game has pld printout of cheats/unlockables from gamefaq",
       "added": "2024-10-09",
       "igdbId": 318500,
-      "boxart": "assets/boxart/microsoft-xbox-dead-or-alive-ultimate.png",
+      "boxart": "assets/boxart/microsoft-xbox-dead-or-alive-ultimate.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -590,7 +590,7 @@
       "notes": "Original purchase receipts",
       "added": "2024-10-09",
       "igdbId": 1390,
-      "boxart": "assets/boxart/microsoft-xbox-dead-or-alive-xtreme-beach-volleyball.png",
+      "boxart": "assets/boxart/microsoft-xbox-dead-or-alive-xtreme-beach-volleyball.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -613,7 +613,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 5812,
-      "boxart": "assets/boxart/microsoft-xbox-delta-force-black-hawk-down.png",
+      "boxart": "assets/boxart/microsoft-xbox-delta-force-black-hawk-down.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -659,7 +659,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2652,
-      "boxart": "assets/boxart/microsoft-xbox-destroy-all-humans-2.png",
+      "boxart": "assets/boxart/microsoft-xbox-destroy-all-humans-2.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -682,7 +682,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2723,
-      "boxart": "assets/boxart/nintendo-64-diddy-kong-racing.png",
+      "boxart": "assets/boxart/nintendo-64-diddy-kong-racing.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -701,11 +701,11 @@
       "release": null,
       "condition": "Loose",
       "copies": 1,
-      "metacritic": null,
+      "metacritic": 80,
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 1092,
-      "boxart": "assets/boxart/snes-super-famicom-donkey-kong-country-2-diddy-s-kong-quest.png",
+      "boxart": "assets/boxart/snes-super-famicom-donkey-kong-country-2-diddy-s-kong-quest.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -772,15 +772,15 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 4248,
-      "boxart": "assets/boxart/3do-dragon-s-lair.png",
+      "boxart": "assets/boxart/3do-dragon-s-lair.jpg",
       "boxartRatio": 0.509
     },
     {
-      "id": "game-dreamworks-shark-tale",
+      "id": "nintendo-gamecube-dreamworks-shark-tale",
       "title": "Dreamworks' Shark Tale",
       "platform": "Nintendo GameCube",
       "year": 2004,
-      "cover": "assets/covers/game-dreamworks-shark-tale.jpg",
+      "cover": "assets/covers/nintendo-gamecube-dreamworks-shark-tale.jpg",
       "description": "Shark Tale is a 2004 video game based on the film of the same name that was released on PlayStation 2, Microsoft Windows, Game Boy Advance, GameCube and Xbox. The player is the role of Oscar, the fast-talking little fish, who becomes an unlikely hero after he decides to take the easy road to fame and fortune by fighting with his shark friend.",
       "genres": [
         "Adventure"
@@ -795,7 +795,7 @@
       "notes": null,
       "added": "2026-08-17",
       "igdbId": 4148,
-      "boxart": "assets/boxart/game-dreamworks-shark-tale.png",
+      "boxart": "assets/boxart/nintendo-gamecube-dreamworks-shark-tale.jpg",
       "boxartRatio": 0.693
     },
     {
@@ -818,7 +818,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 5380,
-      "boxart": "assets/boxart/snes-super-famicom-espn-baseball-tonight.png",
+      "boxart": "assets/boxart/snes-super-famicom-espn-baseball-tonight.jpg",
       "boxartRatio": 1.407
     },
     {
@@ -841,7 +841,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 4335,
-      "boxart": "assets/boxart/3do-fatty-bear-s-birthday-surprise.png",
+      "boxart": "assets/boxart/3do-fatty-bear-s-birthday-surprise.jpg",
       "boxartRatio": 0.518
     },
     {
@@ -864,7 +864,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 240238,
-      "boxart": "assets/boxart/3do-fifa-international-soccer.png",
+      "boxart": "assets/boxart/3do-fifa-international-soccer.jpg",
       "boxartRatio": 0.518
     },
     {
@@ -932,7 +932,7 @@
       "notes": "Old xbox live trial - appears to be unclaimed",
       "added": "2024-10-09",
       "igdbId": 3073,
-      "boxart": "assets/boxart/microsoft-xbox-forza-motorsport-not-for-resale.png",
+      "boxart": "assets/boxart/microsoft-xbox-forza-motorsport-not-for-resale.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -951,13 +951,13 @@
       "release": null,
       "condition": "CIB",
       "copies": 1,
-      "metacritic": null,
+      "metacritic": 69,
       "notes": null,
       "added": "2026-08-20",
-      "boxart": "assets/boxart/nintendo-gamecube-freaky-flyers.png",
-      "boxartRatio": 0.702,
       "igdbId": 3918,
-      "wikidataId": null
+      "wikidataId": null,
+      "boxart": "assets/boxart/nintendo-gamecube-freaky-flyers.jpg",
+      "boxartRatio": 0.702
     },
     {
       "id": "microsoft-xbox-furious-karting",
@@ -979,7 +979,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 47310,
-      "boxart": "assets/boxart/microsoft-xbox-furious-karting.png",
+      "boxart": "assets/boxart/microsoft-xbox-furious-karting.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -1002,7 +1002,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 322267,
-      "boxart": "assets/boxart/nintendo-64-gauntlet-legends.png",
+      "boxart": "assets/boxart/nintendo-64-gauntlet-legends.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -1026,7 +1026,7 @@
       "notes": null,
       "added": "2024-10-08",
       "igdbId": 4309,
-      "boxart": "assets/boxart/3do-gex.png",
+      "boxart": "assets/boxart/3do-gex.jpg",
       "boxartRatio": 0.709
     },
     {
@@ -1049,7 +1049,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3935,
-      "boxart": "assets/boxart/nintendo-gamecube-godzilla-destroy-all-monsters-melee.png",
+      "boxart": "assets/boxart/nintendo-gamecube-godzilla-destroy-all-monsters-melee.jpg",
       "boxartRatio": 0.702
     },
     {
@@ -1074,7 +1074,8 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1638,
-      "boxart": "assets/boxart/nintendo-64-goldeneye-007.png",
+      "wikidataId": "Q369086",
+      "boxart": "assets/boxart/nintendo-64-goldeneye-007.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -1098,7 +1099,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1632,
-      "boxart": "assets/boxart/nintendo-gamecube-goldeneye-rogue-agent.png",
+      "boxart": "assets/boxart/nintendo-gamecube-goldeneye-rogue-agent.jpg",
       "boxartRatio": 0.693
     },
     {
@@ -1129,7 +1130,7 @@
       "platform": "Microsoft Xbox",
       "year": 2001,
       "cover": "assets/covers/microsoft-xbox-grand-theft-auto-iii-the-xbox-collection.jpg",
-      "description": "Featuring a fully 3-D living city, a combination of narrative driven and non-linear gameplay and a completely open environment, Grand Theft Auto III represents a huge leap forward in interactive entertainment. For the first time, players are put at the heart of their very own gangster movie, and let loose in a fully-realised 3 dimensional city, in which anything can happen and probably will.",
+      "description": "Grand Theft Auto III is a 2001 action-adventure game developed by DMA Design and published by Rockstar Games. It is the first 3D game in the Grand Theft Auto series. Set in Liberty City, loosely based on New York City, the game follows Claude, a silent protagonist who becomes entangled in a world of crime, drugs, gang warfare, and corruption while pursuing revenge against his ex-girlfriend.",
       "genres": [
         "Action",
         "Adventure",
@@ -1145,7 +1146,8 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 730,
-      "boxart": "assets/boxart/microsoft-xbox-grand-theft-auto-iii-the-xbox-collection.png",
+      "wikidataId": "Q149106",
+      "boxart": "assets/boxart/microsoft-xbox-grand-theft-auto-iii-the-xbox-collection.jpg",
       "boxartRatio": 0.702
     },
     {
@@ -1168,7 +1170,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4314,
-      "boxart": "assets/boxart/3do-guardian-war.png",
+      "boxart": "assets/boxart/3do-guardian-war.jpg",
       "boxartRatio": 0.528
     },
     {
@@ -1192,7 +1194,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 986,
-      "boxart": "assets/boxart/microsoft-xbox-halo-2.png",
+      "boxart": "assets/boxart/microsoft-xbox-halo-2.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -1216,7 +1218,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 740,
-      "boxart": "assets/boxart/microsoft-xbox-halo-combat-evolved.png",
+      "boxart": "assets/boxart/microsoft-xbox-halo-combat-evolved.jpg",
       "boxartRatio": 0.697
     },
     {
@@ -1239,7 +1241,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4297,
-      "boxart": "assets/boxart/3do-hell-a-cyberpunk-thriller.png",
+      "boxart": "assets/boxart/3do-hell-a-cyberpunk-thriller.jpg",
       "boxartRatio": 0.491
     },
     {
@@ -1262,7 +1264,7 @@
       "notes": null,
       "added": "2026-08-11",
       "igdbId": 2642,
-      "boxart": "assets/boxart/nintendo-64-hey-you-pikachu.png",
+      "boxart": "assets/boxart/nintendo-64-hey-you-pikachu.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -1309,7 +1311,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 4332,
-      "boxart": "assets/boxart/3do-icebreaker.png",
+      "boxart": "assets/boxart/3do-icebreaker.jpg",
       "boxartRatio": 1.008
     },
     {
@@ -1333,7 +1335,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4296,
-      "boxart": "assets/boxart/3do-immercenary.png",
+      "boxart": "assets/boxart/3do-immercenary.jpg",
       "boxartRatio": 0.491
     },
     {
@@ -1356,7 +1358,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 2160,
-      "boxart": "assets/boxart/snes-super-famicom-incredible-crash-dummies.png",
+      "boxart": "assets/boxart/snes-super-famicom-incredible-crash-dummies.jpg",
       "boxartRatio": 1.407
     },
     {
@@ -1379,7 +1381,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 13240,
-      "boxart": "assets/boxart/3do-john-madden-football.png",
+      "boxart": "assets/boxart/3do-john-madden-football.jpg",
       "boxartRatio": 0.518
     },
     {
@@ -1423,7 +1425,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2704,
-      "boxart": "assets/boxart/nintendo-wii-just-dance.png",
+      "boxart": "assets/boxart/nintendo-wii-just-dance.jpg",
       "boxartRatio": 0.706
     },
     {
@@ -1446,7 +1448,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2664,
-      "boxart": "assets/boxart/nintendo-wii-just-dance-2.png",
+      "boxart": "assets/boxart/nintendo-wii-just-dance-2.jpg",
       "boxartRatio": 0.706
     },
     {
@@ -1469,7 +1471,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 288945,
-      "boxart": "assets/boxart/nintendo-wii-just-dance-3.png",
+      "boxart": "assets/boxart/nintendo-wii-just-dance-3.jpg",
       "boxartRatio": 0.706
     },
     {
@@ -1510,13 +1512,13 @@
       "release": null,
       "condition": "CIB",
       "copies": 1,
-      "metacritic": null,
+      "metacritic": 80,
       "notes": null,
       "added": "2026-08-20",
-      "boxart": "assets/boxart/nintendo-gamecube-kelly-slater-s-pro-surfer.png",
-      "boxartRatio": 0.693,
       "igdbId": 3963,
-      "wikidataId": null
+      "wikidataId": null,
+      "boxart": "assets/boxart/nintendo-gamecube-kelly-slater-s-pro-surfer.jpg",
+      "boxartRatio": 0.693
     },
     {
       "id": "nintendo-64-ken-griffey-jr-s-slugfest",
@@ -1537,10 +1539,10 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-21",
-      "boxart": "assets/boxart/nintendo-64-ken-griffey-jr-s-slugfest.png",
-      "boxartRatio": 1.369,
       "igdbId": 3531,
-      "wikidataId": null
+      "wikidataId": "Q3195037",
+      "boxart": "assets/boxart/nintendo-64-ken-griffey-jr-s-slugfest.jpg",
+      "boxartRatio": 1.369
     },
     {
       "id": "nintendo-switch-killer-queen-black",
@@ -1605,7 +1607,7 @@
       "notes": null,
       "added": "2024-10-08",
       "igdbId": 4287,
-      "boxart": "assets/boxart/3do-last-bounty-hunter.png",
+      "boxart": "assets/boxart/3do-last-bounty-hunter.jpg",
       "boxartRatio": 0.491
     },
     {
@@ -1677,7 +1679,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 45139,
-      "boxart": "assets/boxart/nintendo-gamecube-legend-of-zelda-collector-s-edition.png",
+      "boxart": "assets/boxart/nintendo-gamecube-legend-of-zelda-collector-s-edition.jpg",
       "boxartRatio": 0.721
     },
     {
@@ -1747,7 +1749,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1030,
-      "boxart": "assets/boxart/nintendo-64-legend-of-zelda-majora-s-mask-collector-s-edition.png",
+      "boxart": "assets/boxart/nintendo-64-legend-of-zelda-majora-s-mask-collector-s-edition.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -1774,7 +1776,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1029,
-      "boxart": "assets/boxart/nintendo-64-legend-of-zelda-ocarina-of-time.png",
+      "boxart": "assets/boxart/nintendo-64-legend-of-zelda-ocarina-of-time.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -1801,7 +1803,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1033,
-      "boxart": "assets/boxart/nintendo-gamecube-legend-of-zelda-the-wind-waker.png",
+      "boxart": "assets/boxart/nintendo-gamecube-legend-of-zelda-the-wind-waker.jpg",
       "boxartRatio": 0.701
     },
     {
@@ -1825,7 +1827,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2681,
-      "boxart": "assets/boxart/microsoft-xbox-lego-star-wars-the-video-game.png",
+      "boxart": "assets/boxart/microsoft-xbox-lego-star-wars-the-video-game.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -1849,7 +1851,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2972,
-      "boxart": "assets/boxart/microsoft-xbox-lord-of-the-rings-the-fellowship-of-the-ring.png",
+      "boxart": "assets/boxart/microsoft-xbox-lord-of-the-rings-the-fellowship-of-the-ring.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -1872,7 +1874,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2973,
-      "boxart": "assets/boxart/microsoft-xbox-lord-of-the-rings-the-return-of-the-king.png",
+      "boxart": "assets/boxart/microsoft-xbox-lord-of-the-rings-the-return-of-the-king.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -1896,7 +1898,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2973,
-      "boxart": "assets/boxart/nintendo-gamecube-lord-of-the-rings-the-return-of-the-king-player-s-choice.png",
+      "boxart": "assets/boxart/nintendo-gamecube-lord-of-the-rings-the-return-of-the-king-player-s-choice.jpg",
       "boxartRatio": 0.693
     },
     {
@@ -1920,7 +1922,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2965,
-      "boxart": "assets/boxart/nintendo-gamecube-lord-of-the-rings-the-two-towers.png",
+      "boxart": "assets/boxart/nintendo-gamecube-lord-of-the-rings-the-two-towers.jpg",
       "boxartRatio": 0.702
     },
     {
@@ -1943,7 +1945,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 254451,
-      "boxart": "assets/boxart/3do-love-bites.png",
+      "boxart": "assets/boxart/3do-love-bites.jpg",
       "boxartRatio": 1.145
     },
     {
@@ -1966,7 +1968,7 @@
       "notes": "Reproduction",
       "added": "2026-08-09",
       "igdbId": 4300,
-      "boxart": "assets/boxart/3do-lucienne-s-quest.png",
+      "boxart": "assets/boxart/3do-lucienne-s-quest.jpg",
       "boxartRatio": 0.531
     },
     {
@@ -1990,7 +1992,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2485,
-      "boxart": "assets/boxart/nintendo-gamecube-luigi-s-mansion-player-s-choice.png",
+      "boxart": "assets/boxart/nintendo-gamecube-luigi-s-mansion-player-s-choice.jpg",
       "boxartRatio": 0.711
     },
     {
@@ -2034,7 +2036,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3403,
-      "boxart": "assets/boxart/nintendo-gamecube-mario-golf-toadstool-tour.png",
+      "boxart": "assets/boxart/nintendo-gamecube-mario-golf-toadstool-tour.jpg",
       "boxartRatio": 0.717
     },
     {
@@ -2057,7 +2059,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2342,
-      "boxart": "assets/boxart/nintendo-64-mario-kart-64.png",
+      "boxart": "assets/boxart/nintendo-64-mario-kart-64.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -2101,7 +2103,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2344,
-      "boxart": "assets/boxart/nintendo-gamecube-mario-kart-double-dash-not-for-resale.png",
+      "boxart": "assets/boxart/nintendo-gamecube-mario-kart-double-dash-not-for-resale.jpg",
       "boxartRatio": 0.715
     },
     {
@@ -2124,7 +2126,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3986,
-      "boxart": "assets/boxart/nintendo-gamecube-mario-superstar-baseball.png",
+      "boxart": "assets/boxart/nintendo-gamecube-mario-superstar-baseball.jpg",
       "boxartRatio": 0.702
     },
     {
@@ -2147,7 +2149,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3406,
-      "boxart": "assets/boxart/nintendo-64-mario-tennis.png",
+      "boxart": "assets/boxart/nintendo-64-mario-tennis.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -2191,7 +2193,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 5911,
-      "boxart": "assets/boxart/microsoft-xbox-mechassault-2-lone-wolf-limited-edition.png",
+      "boxart": "assets/boxart/microsoft-xbox-mechassault-2-lone-wolf-limited-edition.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -2216,7 +2218,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1728,
-      "boxart": "assets/boxart/microsoft-xbox-mega-man-anniversary-collection.png",
+      "boxart": "assets/boxart/microsoft-xbox-mega-man-anniversary-collection.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -2265,7 +2267,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1105,
-      "boxart": "assets/boxart/nintendo-gamecube-metroid-prime.png",
+      "boxart": "assets/boxart/nintendo-gamecube-metroid-prime.jpg",
       "boxartRatio": 0.715
     },
     {
@@ -2291,11 +2293,11 @@
       "added": "2024-10-09"
     },
     {
-      "id": "game-milo-s-astro-lanes",
+      "id": "nintendo-64-milo-s-astro-lanes",
       "title": "Milo's Astro Lanes",
       "platform": "Nintendo 64",
       "year": 1998,
-      "cover": "assets/covers/game-milo-s-astro-lanes.jpg",
+      "cover": "assets/covers/nintendo-64-milo-s-astro-lanes.jpg",
       "description": "Have you ever bowled against your buddies with a Nuclear Ball on a lane constructed out of an alien's tongue? Probably not. But now you can, as you bowl for the perfect game in Milo's Astro Lanes, the wackiest, most spaced-out bowling blast ever! Use awesome power-ups like the devastating Pea Ball, toxic Cosmic Slime and mighty White Dwarf to thwart your opponents or keep them from stopping you. This insane game is what the future of bowling is all about!",
       "genres": [
         "Simulator",
@@ -2311,7 +2313,7 @@
       "notes": null,
       "added": "2026-08-17",
       "igdbId": 3411,
-      "boxart": "assets/boxart/game-milo-s-astro-lanes.png",
+      "boxart": "assets/boxart/nintendo-64-milo-s-astro-lanes.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -2334,7 +2336,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4306,
-      "boxart": "assets/boxart/3do-mind-teazzer.png",
+      "boxart": "assets/boxart/3do-mind-teazzer.jpg",
       "boxartRatio": 0.634
     },
     {
@@ -2358,7 +2360,7 @@
       "notes": null,
       "added": "2026-08-14",
       "igdbId": 3123,
-      "boxart": "assets/boxart/nintendo-64-mission-impossible.png",
+      "boxart": "assets/boxart/nintendo-64-mission-impossible.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -2381,7 +2383,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 5931,
-      "boxart": "assets/boxart/microsoft-xbox-mojo.png",
+      "boxart": "assets/boxart/microsoft-xbox-mojo.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -2406,7 +2408,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 122241,
-      "boxart": "assets/boxart/snes-super-famicom-monopoly.png",
+      "boxart": "assets/boxart/snes-super-famicom-monopoly.jpg",
       "boxartRatio": 1.407
     },
     {
@@ -2475,7 +2477,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 242151,
-      "boxart": "assets/boxart/snes-super-famicom-mortal-kombat.png",
+      "boxart": "assets/boxart/snes-super-famicom-mortal-kombat.jpg",
       "boxartRatio": 1.407
     },
     {
@@ -2519,7 +2521,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4121,
-      "boxart": "assets/boxart/nintendo-64-mortal-kombat-trilogy.png",
+      "boxart": "assets/boxart/nintendo-64-mortal-kombat-trilogy.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -2563,7 +2565,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 5932,
-      "boxart": "assets/boxart/microsoft-xbox-motocross-mania-3.png",
+      "boxart": "assets/boxart/microsoft-xbox-motocross-mania-3.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -2586,7 +2588,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 8995,
-      "boxart": "assets/boxart/snes-super-famicom-nba-jam.png",
+      "boxart": "assets/boxart/snes-super-famicom-nba-jam.jpg",
       "boxartRatio": 1.407
     },
     {
@@ -2609,7 +2611,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 248770,
-      "boxart": "assets/boxart/microsoft-xbox-nba-live-07.png",
+      "boxart": "assets/boxart/microsoft-xbox-nba-live-07.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -2632,7 +2634,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 248118,
-      "boxart": "assets/boxart/microsoft-xbox-need-for-speed-carbon.png",
+      "boxart": "assets/boxart/microsoft-xbox-need-for-speed-carbon.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -2655,7 +2657,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 4509,
-      "boxart": "assets/boxart/snes-super-famicom-nhl-95.png",
+      "boxart": "assets/boxart/snes-super-famicom-nhl-95.jpg",
       "boxartRatio": 1.407
     },
     {
@@ -2678,7 +2680,7 @@
       "notes": null,
       "added": "2024-10-08",
       "igdbId": 4273,
-      "boxart": "assets/boxart/3do-pebble-beach-golf-links.png",
+      "boxart": "assets/boxart/3do-pebble-beach-golf-links.jpg",
       "boxartRatio": 0.518
     },
     {
@@ -2703,7 +2705,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1463,
-      "boxart": "assets/boxart/nintendo-64-perfect-dark.png",
+      "boxart": "assets/boxart/nintendo-64-perfect-dark.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -2726,7 +2728,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4328,
-      "boxart": "assets/boxart/3do-perfect-general.png",
+      "boxart": "assets/boxart/3do-perfect-general.jpg",
       "boxartRatio": 0.491
     },
     {
@@ -2749,7 +2751,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4251,
-      "boxart": "assets/boxart/3do-plumbers-don-t-wear-ties.png",
+      "boxart": "assets/boxart/3do-plumbers-don-t-wear-ties.jpg",
       "boxartRatio": 0.491
     },
     {
@@ -2772,7 +2774,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4327,
-      "boxart": "assets/boxart/3do-po-ed.png",
+      "boxart": "assets/boxart/3do-po-ed.jpg",
       "boxartRatio": 0.518
     },
     {
@@ -2780,7 +2782,7 @@
       "title": "Pocketbike Racer",
       "platform": "Microsoft Xbox",
       "year": 2006,
-      "cover": "assets/covers/microsoft-xbox-360-pocketbike-racer.png",
+      "cover": "assets/covers/microsoft-xbox-360-pocketbike-racer.jpg",
       "description": "PocketBike Racer is a racing game developed by Blitz Games and published by King Games for the Xbox and Xbox 360 video game consoles, released in 2006. Burger King sold the game with the purchase of value meals. It is one of three titles released by Burger King.",
       "genres": [
         "Racing"
@@ -2795,7 +2797,7 @@
       "notes": null,
       "added": "2026-08-17",
       "wikidataId": "Q7206363",
-      "boxart": "assets/boxart/microsoft-xbox-360-pocketbike-racer.png",
+      "boxart": "assets/boxart/microsoft-xbox-360-pocketbike-racer.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -2887,7 +2889,7 @@
       "notes": null,
       "added": "2024-10-08",
       "igdbId": 4258,
-      "boxart": "assets/boxart/3do-psychic-detective.png",
+      "boxart": "assets/boxart/3do-psychic-detective.jpg",
       "boxartRatio": 0.506
     },
     {
@@ -2979,7 +2981,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 21533,
-      "boxart": "assets/boxart/nintendo-wii-resident-evil-4-wii-edition.png",
+      "boxart": "assets/boxart/nintendo-wii-resident-evil-4-wii-edition.jpg",
       "boxartRatio": 0.715
     },
     {
@@ -3002,7 +3004,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 4339,
-      "boxart": "assets/boxart/3do-return-fire.png",
+      "boxart": "assets/boxart/3do-return-fire.jpg",
       "boxartRatio": 0.526
     },
     {
@@ -3026,7 +3028,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 77220,
-      "boxart": "assets/boxart/microsoft-xbox-return-to-castle-wolfenstein-tides-of-war.png",
+      "boxart": "assets/boxart/microsoft-xbox-return-to-castle-wolfenstein-tides-of-war.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -3072,10 +3074,10 @@
       "metacritic": null,
       "notes": null,
       "added": "2026-08-21",
-      "boxart": "assets/boxart/snes-super-famicom-revolution-x.png",
-      "boxartRatio": 1.407,
       "igdbId": 20298,
-      "wikidataId": null
+      "wikidataId": "Q3428563",
+      "boxart": "assets/boxart/snes-super-famicom-revolution-x.jpg",
+      "boxartRatio": 1.407
     },
     {
       "id": "nintendo-switch-ring-fit-adventure",
@@ -3120,7 +3122,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 141271,
-      "boxart": "assets/boxart/3do-road-rash.png",
+      "boxart": "assets/boxart/3do-road-rash.jpg",
       "boxartRatio": 0.523
     },
     {
@@ -3141,7 +3143,7 @@
       "release": null,
       "condition": null,
       "copies": 1,
-      "metacritic": null,
+      "metacritic": 53,
       "notes": null,
       "added": "2026-08-19",
       "igdbId": 4092,
@@ -3168,7 +3170,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 4260,
-      "boxart": "assets/boxart/3do-samurai-shodown.png",
+      "boxart": "assets/boxart/3do-samurai-shodown.jpg",
       "boxartRatio": 0.491
     },
     {
@@ -3191,7 +3193,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3600,
-      "boxart": "assets/boxart/nintendo-64-shadowgate-64-trials-of-the-four-towers.png",
+      "boxart": "assets/boxart/nintendo-64-shadowgate-64-trials-of-the-four-towers.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -3210,7 +3212,7 @@
       "release": null,
       "condition": "CIB",
       "copies": 1,
-      "metacritic": null,
+      "metacritic": 55,
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 50565
@@ -3235,7 +3237,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4310,
-      "boxart": "assets/boxart/3do-shock-wave-operation-jumpgate.png",
+      "boxart": "assets/boxart/3do-shock-wave-operation-jumpgate.jpg",
       "boxartRatio": 0.491
     },
     {
@@ -3259,7 +3261,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3675,
-      "boxart": "assets/boxart/nintendo-gamecube-shrek-extra-large.png",
+      "boxart": "assets/boxart/nintendo-gamecube-shrek-extra-large.jpg",
       "boxartRatio": 0.69
     },
     {
@@ -3304,7 +3306,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 227989,
-      "boxart": "assets/boxart/microsoft-xbox-soulcalibur-ii.png",
+      "boxart": "assets/boxart/microsoft-xbox-soulcalibur-ii.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -3350,7 +3352,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4176,
-      "boxart": "assets/boxart/nintendo-gamecube-ssx-tricky.png",
+      "boxart": "assets/boxart/nintendo-gamecube-ssx-tricky.jpg",
       "boxartRatio": 0.702
     },
     {
@@ -3373,7 +3375,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 26745,
-      "boxart": "assets/boxart/3do-star-fighter.png",
+      "boxart": "assets/boxart/3do-star-fighter.jpg",
       "boxartRatio": 0.491
     },
     {
@@ -3397,7 +3399,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 8581,
-      "boxart": "assets/boxart/snes-super-famicom-star-fox.png",
+      "boxart": "assets/boxart/snes-super-famicom-star-fox.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -3420,7 +3422,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 154,
-      "boxart": "assets/boxart/nintendo-64-star-wars-episode-i-racer.png",
+      "boxart": "assets/boxart/nintendo-64-star-wars-episode-i-racer.jpg",
       "boxartRatio": 1.373
     },
     {
@@ -3444,7 +3446,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 6159,
-      "boxart": "assets/boxart/microsoft-xbox-star-wars-episode-iii-revenge-of-the-sith.png",
+      "boxart": "assets/boxart/microsoft-xbox-star-wars-episode-iii-revenge-of-the-sith.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -3491,7 +3493,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 142,
-      "boxart": "assets/boxart/microsoft-xbox-star-wars-battlefront-ii.png",
+      "boxart": "assets/boxart/microsoft-xbox-star-wars-battlefront-ii.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -3515,7 +3517,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 116,
-      "boxart": "assets/boxart/microsoft-xbox-star-wars-knights-of-the-old-republic.png",
+      "boxart": "assets/boxart/microsoft-xbox-star-wars-knights-of-the-old-republic.jpg",
       "boxartRatio": 0.705
     },
     {
@@ -3562,7 +3564,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 118,
-      "boxart": "assets/boxart/microsoft-xbox-star-wars-knights-of-the-old-republic-ii-the-sith-lords.png",
+      "boxart": "assets/boxart/microsoft-xbox-star-wars-knights-of-the-old-republic-ii-the-sith-lords.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -3585,7 +3587,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 164,
-      "boxart": "assets/boxart/nintendo-64-star-wars-shadows-of-the-empire.png",
+      "boxart": "assets/boxart/nintendo-64-star-wars-shadows-of-the-empire.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -3609,15 +3611,15 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3760,
-      "boxart": "assets/boxart/microsoft-xbox-star-wars-the-clone-wars.png",
+      "boxart": "assets/boxart/microsoft-xbox-star-wars-the-clone-wars.jpg",
       "boxartRatio": 0.714
     },
     {
-      "id": "game-starcraft-64",
+      "id": "nintendo-64-starcraft-64",
       "title": "StarCraft 64",
       "platform": "Nintendo 64",
       "year": 2000,
-      "cover": "assets/covers/game-starcraft-64.jpg",
+      "cover": "assets/covers/nintendo-64-starcraft-64.jpg",
       "description": "The game itself is split into three episodes, one for the player to command each race. In the first segment of the game, the player and Jim Raynor are attempting to control the colony of Mar Sara in the wake of the Zerg attacks on other Terran worlds. The second campaign reveals that Kerrigan was not killed by the Zerg, but rather is captured and infested in an effort to incorporate her psionic traits into the Zerg gene pool. The final episode of the game sees Aldaris and the Protoss government branding Tassadar a traitor and a heretic for conspiring with the dark templar.",
       "genres": [
         "Real Time Strategy (RTS)",
@@ -3629,11 +3631,11 @@
       "release": null,
       "condition": null,
       "copies": 1,
-      "metacritic": null,
+      "metacritic": 80,
       "notes": null,
       "added": "2026-08-17",
       "igdbId": 9067,
-      "boxart": "assets/boxart/game-starcraft-64.png",
+      "boxart": "assets/boxart/nintendo-64-starcraft-64.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -3725,7 +3727,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1074,
-      "boxart": "assets/boxart/nintendo-64-super-mario-64.png",
+      "boxart": "assets/boxart/nintendo-64-super-mario-64.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -3748,7 +3750,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 5199,
-      "boxart": "assets/boxart/snes-super-famicom-super-mario-all-stars.png",
+      "boxart": "assets/boxart/snes-super-famicom-super-mario-all-stars.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -3773,7 +3775,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1077,
-      "boxart": "assets/boxart/nintendo-wii-super-mario-galaxy.png",
+      "boxart": "assets/boxart/nintendo-wii-super-mario-galaxy.jpg",
       "boxartRatio": 0.711
     },
     {
@@ -3843,7 +3845,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2256,
-      "boxart": "assets/boxart/nintendo-gamecube-super-mario-strikers.png",
+      "boxart": "assets/boxart/nintendo-gamecube-super-mario-strikers.jpg",
       "boxartRatio": 0.708
     },
     {
@@ -3866,7 +3868,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 1070,
-      "boxart": "assets/boxart/snes-super-famicom-super-mario-world.png",
+      "boxart": "assets/boxart/snes-super-famicom-super-mario-world.jpg",
       "boxartRatio": 1.434
     },
     {
@@ -3889,7 +3891,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2927,
-      "boxart": "assets/boxart/nintendo-gamecube-super-monkey-ball.png",
+      "boxart": "assets/boxart/nintendo-gamecube-super-monkey-ball.jpg",
       "boxartRatio": 0.705
     },
     {
@@ -3913,7 +3915,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2928,
-      "boxart": "assets/boxart/nintendo-gamecube-super-monkey-ball-2-players-choice.png",
+      "boxart": "assets/boxart/nintendo-gamecube-super-monkey-ball-2-players-choice.jpg",
       "boxartRatio": 0.709
     },
     {
@@ -3936,7 +3938,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1626,
-      "boxart": "assets/boxart/nintendo-64-super-smash-bros.png",
+      "boxart": "assets/boxart/nintendo-64-super-smash-bros.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -3959,7 +3961,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1628,
-      "boxart": "assets/boxart/nintendo-wii-super-smash-bros-brawl.png",
+      "boxart": "assets/boxart/nintendo-wii-super-smash-bros-brawl.jpg",
       "boxartRatio": 0.712
     },
     {
@@ -3984,7 +3986,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1627,
-      "boxart": "assets/boxart/nintendo-gamecube-super-smash-bros-melee-best-seller.png",
+      "boxart": "assets/boxart/nintendo-gamecube-super-smash-bros-melee-best-seller.jpg",
       "boxartRatio": 0.718
     },
     {
@@ -4030,7 +4032,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 4238,
-      "boxart": "assets/boxart/3do-super-street-fighter-ii-turbo.png",
+      "boxart": "assets/boxart/3do-super-street-fighter-ii-turbo.jpg",
       "boxartRatio": 0.502
     },
     {
@@ -4077,7 +4079,7 @@
       "added": "2026-08-19",
       "igdbId": 19421,
       "wikidataId": null,
-      "boxart": "assets/boxart/nintendo-64-the-powerpuff-girls-chemical-x-traction.png",
+      "boxart": "assets/boxart/nintendo-64-the-powerpuff-girls-chemical-x-traction.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -4100,7 +4102,7 @@
       "notes": null,
       "added": "2024-10-08",
       "igdbId": 283,
-      "boxart": "assets/boxart/3do-theme-park.png",
+      "boxart": "assets/boxart/3do-theme-park.jpg",
       "boxartRatio": 0.491
     },
     {
@@ -4119,7 +4121,7 @@
       "release": null,
       "condition": "CIB",
       "copies": 1,
-      "metacritic": null,
+      "metacritic": 90,
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 6201
@@ -4144,7 +4146,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1294,
-      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-ghost-recon.png",
+      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-ghost-recon.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -4169,7 +4171,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 290167,
-      "boxart": "assets/boxart/nintendo-gamecube-tom-clancy-s-splinter-cell.png",
+      "boxart": "assets/boxart/nintendo-gamecube-tom-clancy-s-splinter-cell.jpg",
       "boxartRatio": 0.702
     },
     {
@@ -4194,7 +4196,7 @@
       "notes": "Old blockbuster game",
       "added": "2024-10-09",
       "igdbId": 910,
-      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-splinter-cell.png",
+      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-splinter-cell.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -4218,7 +4220,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 911,
-      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-splinter-cell-chaos-theory.png",
+      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-splinter-cell-chaos-theory.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -4244,7 +4246,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 874,
-      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-splinter-cell-pandora-tomorrow.png",
+      "boxart": "assets/boxart/microsoft-xbox-tom-clancy-s-splinter-cell-pandora-tomorrow.jpg",
       "boxartRatio": 0.714
     },
     {
@@ -4267,7 +4269,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 210451,
-      "boxart": "assets/boxart/nintendo-64-tony-hawk-s-pro-skater.png",
+      "boxart": "assets/boxart/nintendo-64-tony-hawk-s-pro-skater.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -4311,7 +4313,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2698,
-      "boxart": "assets/boxart/nintendo-gamecube-tony-hawk-s-underground.png",
+      "boxart": "assets/boxart/nintendo-gamecube-tony-hawk-s-underground.jpg",
       "boxartRatio": 0.693
     },
     {
@@ -4334,7 +4336,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2699,
-      "boxart": "assets/boxart/nintendo-gamecube-tony-hawk-s-underground-2.png",
+      "boxart": "assets/boxart/nintendo-gamecube-tony-hawk-s-underground-2.jpg",
       "boxartRatio": 0.705
     },
     {
@@ -4357,7 +4359,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 1327,
-      "boxart": "assets/boxart/nintendo-64-turok-rage-wars.png",
+      "boxart": "assets/boxart/nintendo-64-turok-rage-wars.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -4380,7 +4382,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3622,
-      "boxart": "assets/boxart/nintendo-64-twisted-edge-extreme-snowboarding.png",
+      "boxart": "assets/boxart/nintendo-64-twisted-edge-extreme-snowboarding.jpg",
       "boxartRatio": 1.369
     },
     {
@@ -4403,7 +4405,7 @@
       "notes": null,
       "added": "2024-10-08",
       "igdbId": 4321,
-      "boxart": "assets/boxart/3do-twisted-the-game-show.png",
+      "boxart": "assets/boxart/3do-twisted-the-game-show.jpg",
       "boxartRatio": 0.491
     },
     {
@@ -4426,7 +4428,7 @@
       "notes": null,
       "added": "2026-08-09",
       "igdbId": 190013,
-      "boxart": "assets/boxart/snes-super-famicom-wario-s-woods.png",
+      "boxart": "assets/boxart/snes-super-famicom-wario-s-woods.jpg",
       "boxartRatio": 1.407
     },
     {
@@ -4449,7 +4451,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 2185,
-      "boxart": "assets/boxart/nintendo-wii-wii-play.png",
+      "boxart": "assets/boxart/nintendo-wii-wii-play.jpg",
       "boxartRatio": 0.713
     },
     {
@@ -4472,7 +4474,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4577,
-      "boxart": "assets/boxart/nintendo-gamecube-x-men-next-dimension.png",
+      "boxart": "assets/boxart/nintendo-gamecube-x-men-next-dimension.jpg",
       "boxartRatio": 0.693
     },
     {
@@ -4495,15 +4497,15 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 3647,
-      "boxart": "assets/boxart/nintendo-64-xena-warrior-princess-the-talisman-of-fate.png",
+      "boxart": "assets/boxart/nintendo-64-xena-warrior-princess-the-talisman-of-fate.jpg",
       "boxartRatio": 1.369
     },
     {
-      "id": "game-yu-gi-oh-the-falsebound-kingdom",
+      "id": "nintendo-gamecube-yu-gi-oh-the-falsebound-kingdom",
       "title": "Yu-Gi-Oh! The Falsebound Kingdom",
       "platform": "Nintendo GameCube",
       "year": 2002,
-      "cover": "assets/covers/game-yu-gi-oh-the-falsebound-kingdom.jpg",
+      "cover": "assets/covers/nintendo-gamecube-yu-gi-oh-the-falsebound-kingdom.jpg",
       "description": "Yugi and his friends are trapped in a virtual reality world gone crazy. As Yugi or Kaiba, you must form a team of three monsters to occupy towns across two different scenarios and take part in strategic team battles. Delegate commands to your team to conquer each mission. During battle, your team can perform devastating group attacks and combos. Over 175 monsters from the Yu-Gi-Oh! animated TV series appear in the game--and all of them will fight to the finish for control of each map.",
       "genres": [
         "Real Time Strategy (RTS)",
@@ -4517,11 +4519,11 @@
       "release": null,
       "condition": null,
       "copies": 1,
-      "metacritic": null,
+      "metacritic": 44,
       "notes": null,
       "added": "2026-08-17",
       "igdbId": 4582,
-      "boxart": "assets/boxart/game-yu-gi-oh-the-falsebound-kingdom.png",
+      "boxart": "assets/boxart/nintendo-gamecube-yu-gi-oh-the-falsebound-kingdom.jpg",
       "boxartRatio": 0.703
     },
     {
@@ -4541,7 +4543,7 @@
       "release": null,
       "condition": "CIB",
       "copies": 1,
-      "metacritic": null,
+      "metacritic": 55,
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4583
@@ -4566,7 +4568,7 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4298,
-      "boxart": "assets/boxart/3do-zhadnost-the-people-s-party.png",
+      "boxart": "assets/boxart/3do-zhadnost-the-people-s-party.jpg",
       "boxartRatio": 0.491
     }
   ],
@@ -4632,7 +4634,7 @@
       "name": "Nintendo SNES Classic Edition",
       "platform": "SNES/Super Famicom",
       "year": null,
-      "image": "assets/covers/snes-super-famicom-nintendo-snes-classic-edition.png",
+      "image": "assets/covers/snes-super-famicom-nintendo-snes-classic-edition.jpg",
       "description": null,
       "manufacturer": "Nintendo",
       "region": "USA",
