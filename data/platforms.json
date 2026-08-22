@@ -1,0 +1,4 @@
+{
+  "_comment": "Your own consoles, or changes to the built-in ones, go in the list below. Match a built-in by its key to change just some of its fields; a new key adds a platform. Fields: key, short, color, igdb, box, libretro, wiki, wikidata. See docs/platforms.md. An empty list means the built-ins, untouched.",
+  "platforms": []
+}

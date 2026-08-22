@@ -9,6 +9,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { registerPlatforms } from '../../assets/js/platforms.mjs';
+import { slug, uniqueId } from '../../assets/js/ids.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -111,21 +112,8 @@ export async function saveLists(data) {
   await writeFile(LISTS_PATH, JSON.stringify(out, null, 2) + '\n', 'utf8');
 }
 
-/** Lowercase, url-safe slug: "Chrono Trigger" -> "chrono-trigger". */
-export function slug(s) {
-  return String(s)
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/&/g, ' and ')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-/** A stable, readable, URL-safe id like "nintendo-64-goldeneye-007". */
-export function makeId(platform, title) {
-  return `${slug(platform)}-${slug(title)}`.replace(/-{2,}/g, '-');
-}
+// Ids are made in one place for the scripts and the browser manager alike.
+export { slug, makeId, uniqueId } from '../../assets/js/ids.mjs';
 
 /* --- Feed ----------------------------------------------------------------- */
 
@@ -155,14 +143,6 @@ export function makePostId(date, title, taken = new Set()) {
   const base = `${String(date || '').slice(0, 10)}-${slug(title)}`.replace(/-{2,}/g, '-')
     .replace(/^-+|-+$/g, '') || String(date || 'post');
   return uniqueId(base, taken);
-}
-
-/** Ensure an id is unique within the collection by suffixing -2, -3, ... */
-export function uniqueId(base, taken) {
-  if (!taken.has(base)) return base;
-  let n = 2;
-  while (taken.has(`${base}-${n}`)) n += 1;
-  return `${base}-${n}`;
 }
 
 /**

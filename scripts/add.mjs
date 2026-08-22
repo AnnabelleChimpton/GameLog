@@ -21,6 +21,7 @@ import {
 import { searchFree, coverFor, hasFreeArt } from './lib/freelookup.mjs';
 import { findBoxart } from './lib/libretro.mjs';
 import { vendorEntry } from './lib/vendor.mjs';
+import { scoreFor } from './lib/scores.mjs';
 
 function parseArgs(argv) {
   const opts = { positional: [] };
@@ -159,6 +160,11 @@ async function main() {
   // looking wrong until someone remembers to run `npm run boxart`.
   const box = await findBoxart(finalTitle, platform, { region: opts.region || 'USA' });
 
+  // The score is keyless too, and a shelf that shows scores looks odd with a
+  // blank on the newest game.
+  const metacritic = opts.noLookup ? null
+    : await scoreFor(finalTitle, platform, chosen?.year ?? null).catch(() => null);
+
   const entry = {
     id,
     title: finalTitle,
@@ -173,7 +179,7 @@ async function main() {
     release: null,
     condition: condition || null,
     copies: 1,
-    metacritic: null,
+    metacritic,
     notes: notes || null,
     added: new Date().toISOString().slice(0, 10),
     boxart: box?.url ?? null,
@@ -213,6 +219,7 @@ async function main() {
   console.log(`\n  Added "${entry.title}" [${p.short}]${entry.year ? ` (${entry.year})` : ''}`);
   if (!entry.cover) console.log('  No cover art yet: run `npm run enrich` later, or paste a url into "cover".');
   if (entry.boxart) console.log(`  Box scan too, at ${entry.boxartRatio} for the ${p.short} shelf.`);
+  if (entry.metacritic != null) console.log(`  Metascore ${entry.metacritic}, from its Wikipedia reception box.`);
   if (art.stored) console.log(`  ${art.stored} image(s) stored in your repo.`);
   if (art.failed) {
     console.log(`  ${art.failed} image(s) could not be downloaded and stayed linked. `

@@ -1,4 +1,4 @@
-// Fill in cover art, descriptions and release years.
+// Fill in cover art, descriptions, release years and Metacritic scores.
 //
 //   npm run enrich                  # only what's missing
 //   npm run enrich -- --force       # redo everything, overwriting
@@ -7,13 +7,17 @@
 //   npm run enrich -- --source free # keyless sources even if you have keys
 //   npm run enrich -- --source igdb # require IGDB
 //
-// Two sources, and it picks for you:
+// Two sources for the catalogue fields, and it picks for you:
 //
 //   free  libretro for box art, Wikipedia for descriptions and years. No
 //         signup of any kind. Excellent on emulated consoles, nothing at all
 //         on current-gen.
 //   igdb  one database for everything, including current-gen, plus genres and
 //         companies -- but it needs a free Twitch developer application.
+//
+// Scores come from Wikipedia's reception boxes (and Wikidata behind them)
+// whichever source is in use: no database hands out Metacritic numbers
+// without a key, and this one needs none.
 //
 // With no credentials configured it uses the keyless sources and says so,
 // rather than refusing to run.
@@ -27,6 +31,7 @@ import {
 } from './lib/igdb.mjs';
 import { findCover, coverage } from './lib/libretro.mjs';
 import { lookupAll, yearFromExtract } from './lib/wikipedia.mjs';
+import { lookupScores } from './lib/scores.mjs';
 
 const args = process.argv.slice(2);
 const force = args.includes('--force');
@@ -34,7 +39,8 @@ const dryRun = args.includes('--dry-run');
 const only = args.includes('--only') ? args[args.indexOf('--only') + 1] : null;
 const wantSource = args.includes('--source') ? args[args.indexOf('--source') + 1] : 'auto';
 
-const needsWork = (g) => force || !g.cover || !g.description || !g.year;
+const needsCatalogue = (g) => force || !g.cover || !g.description || !g.year;
+const needsScore = (g) => force || g.metacritic == null;
 
 /* --- IGDB path ------------------------------------------------------------ */
 
@@ -116,7 +122,7 @@ async function enrichFree(collection, targets) {
   if (missing.length) {
     console.log(`  no art source for:     ${missing.join(', ')}`);
     console.log('    (current-gen consoles aren\'t emulated, so nobody has scanned them here.');
-    console.log('     Add those covers in `npm run manage`, or set up IGDB: see the README.)');
+    console.log('     Add those covers in `npm run manage`, or set up IGDB: see docs/art.md.)');
   }
   console.log('');
 
@@ -171,6 +177,27 @@ async function enrichFree(collection, targets) {
   return { updated, unmatched, lowConfidence: [] };
 }
 
+/* --- Scores --------------------------------------------------------------- */
+
+async function enrichScores(targets) {
+  process.stdout.write(`  looking up scores for ${targets.length} game(s)…`);
+  const found = await lookupScores(targets, {
+    onProgress: (n, total) => process.stdout.write(`\r  looking up scores for ${targets.length} game(s)… ${n}/${total}`),
+  });
+  process.stdout.write(`\r  looking up scores for ${targets.length} game(s)… done\n`);
+  for (const [game, score] of found) {
+    game.metacritic = score;
+    console.log(`  ✓  ${game.title} (${platformInfo(game.platform).short})  ${score}`
+      + `   ← ${found.origin?.get(game) || 'Wikipedia'}`);
+  }
+  const missing = targets.length - found.size;
+  if (missing) {
+    console.log(`  ·  ${missing} with no score on record. Metacritic did not cover every release,`);
+    console.log('     and the manager has a Metascore field for the ones you know.');
+  }
+  return found.size;
+}
+
 /* --- Entry ---------------------------------------------------------------- */
 
 async function pickSource() {
@@ -196,25 +223,37 @@ async function main() {
     process.exit(1);
   }
 
-  const targets = collection.games.filter((g) =>
-    only ? g.id === only || g.title.toLowerCase() === only.toLowerCase() : needsWork(g)
+  const chosen = collection.games.filter((g) =>
+    only ? g.id === only || g.title.toLowerCase() === only.toLowerCase() : true
   );
+  const targets = chosen.filter((g) => only || needsCatalogue(g));
+  const unscored = chosen.filter((g) => only || needsScore(g));
 
-  if (!targets.length) {
+  if (!targets.length && !unscored.length) {
     console.log('Everything is already filled in. Use --force to refetch.');
     return;
   }
 
-  const source = await pickSource();
-  const result = source === 'igdb'
-    ? await enrichWithIgdb(collection, targets)
-    : await enrichFree(collection, targets);
+  let result = { updated: 0, unmatched: [], lowConfidence: [] };
+  let source = 'free';
+  if (targets.length) {
+    source = await pickSource();
+    result = source === 'igdb'
+      ? await enrichWithIgdb(collection, targets)
+      : await enrichFree(collection, targets);
+  }
+
+  let scored = 0;
+  if (unscored.length) {
+    console.log('');
+    scored = await enrichScores(unscored);
+  }
 
   if (dryRun) {
     console.log('\n--dry-run: nothing written.');
   } else {
     await saveCollection(collection);
-    console.log(`\nUpdated ${result.updated} game(s) in data/collection.json`);
+    console.log(`\nUpdated ${result.updated} game(s)${scored ? ` and ${scored} score(s)` : ''} in data/collection.json`);
   }
 
   if (result.lowConfidence.length) {

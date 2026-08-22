@@ -12,6 +12,7 @@
     "enrich": "node scripts/enrich.mjs",
     "boxart": "node scripts/boxart.mjs",
     "vendor": "node scripts/vendor.mjs",
+    "shrink": "node scripts/shrink.mjs",
     "import:gameye": "node scripts/import-gameye.mjs",
     "check": "node scripts/check.mjs",
     "test": "node --test tests/*.test.mjs",

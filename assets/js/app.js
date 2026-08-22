@@ -20,6 +20,7 @@ import * as compare from './compare.js';
 import { renderLists } from './lists.js';
 import { renderLog, buildRiver, renderRiver, renderDiscovery, renderFollowingEmpty } from './feed.js';
 import { renderHero } from './profile.js';
+import { createDetail } from './detail.js';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -68,21 +69,6 @@ const el = {
   viewFollowing: $('#view-following'),
   folStatus: $('#fol-status'),
   folOutput: $('#fol-output'),
-  dialog: $('#detail'),
-  dCover: $('#detail-cover'),
-  dPlatform: $('#detail-platform'),
-  dYear: $('#detail-year'),
-  dTitle: $('#detail-title'),
-  dGenres: $('#detail-genres'),
-  dDescription: $('#detail-description'),
-  dMeta: $('#detail-meta'),
-  dNotes: $('#detail-notes'),
-  dEpisode: $('#detail-episode'),
-  dVerdict: $('#detail-verdict'),
-  dVideo: $('#detail-video'),
-  dPrev: $('#detail-prev'),
-  dNext: $('#detail-next'),
-  dClose: $('.detail__close'),
 };
 
 const VIEWS = ['shelf', 'timeline', 'lists', 'log', 'stats', 'compare', 'following'];
@@ -104,9 +90,16 @@ const state = {
   notesOnly: false,
   sort: 'title',
   visible: [],
-  openIndex: -1,
   episodes: new Map(),
 };
+
+// The detail dialog steps through `state.visible`; it reads the list live so
+// the arrows follow the filters. When it closes, focus goes back to the tile.
+const detail = createDetail({
+  visible: () => state.visible,
+  episodes: () => state.episodes,
+  onClose: (index) => el.grid.querySelector(`.tile[data-index="${index}"]`)?.focus(),
+});
 
 /* --- Filtering and sorting ------------------------------------------------ */
 
@@ -402,7 +395,7 @@ function render() {
   } else if (state.view === 'timeline') {
     renderCount();
     el.viewTimeline.replaceChildren(
-      renderTimeline(state.visible, { onOpen: openByGame }));
+      renderTimeline(state.visible, { onOpen: detail.openGame }));
   } else if (state.view === 'lists') {
     el.viewLists.replaceChildren(renderLists(state.lists, state.games, {
       selected: state.list,
@@ -512,85 +505,6 @@ function pruneDeadSorts() {
 
 /* --- Detail dialog -------------------------------------------------------- */
 
-function metaRow(term, value) {
-  if (!value) return [];
-  return [h('dt', { text: term }), h('dd', { text: value })];
-}
-
-function openDetail(index) {
-  const game = state.visible[index];
-  if (!game) return;
-  state.openIndex = index;
-
-  const src = safeImageUrl(game.cover);
-  el.dCover.src = src || placeholderCover(game.platform);
-  el.dCover.alt = `${game.title} cover art`;
-  el.dCover.onerror = () => {
-    el.dCover.onerror = null;
-    el.dCover.src = placeholderCover(game.platform);
-  };
-
-  el.dPlatform.textContent = game.platform;
-  el.dYear.textContent = game.year || '';
-  el.dTitle.textContent = game.title;
-
-  el.dGenres.replaceChildren(
-    ...(game.genres || []).map((g) => h('li', { text: g })));
-
-  el.dDescription.textContent = game.description || '';
-
-  el.dMeta.replaceChildren(
-    ...metaRow('Developer', game.developer),
-    ...metaRow('Publisher', game.publisher),
-    ...metaRow('Condition', game.condition),
-    ...metaRow('Copies', game.copies > 1 ? String(game.copies) : null),
-    ...metaRow('Edition', game.release),
-    ...metaRow('Region', game.region),
-    ...metaRow('Metascore', game.metacritic ? `${game.metacritic}/100` : null),
-    ...metaRow('Added', game.added),
-    ...metaRow('Status', playStatus(game) === 'unplayed' ? null : STATUS_LABEL[playStatus(game)]),
-    ...metaRow('Beaten', game.beatenOn),
-  );
-
-  // The episode number and the write-up are the reason someone clicks through
-  // from a video description, so they sit above the catalogue metadata.
-  const episode = state.episodes.get(game);
-  el.dEpisode.hidden = !episode;
-  if (episode) el.dEpisode.textContent = `Episode ${episode}`;
-
-  el.dVerdict.hidden = !game.verdict;
-  el.dVerdict.textContent = game.verdict || '';
-
-  const video = typeof game.video === 'string' && /^https?:\/\//i.test(game.video)
-    ? game.video : null;
-  el.dVideo.hidden = !video;
-  if (video) el.dVideo.href = video;
-
-  el.dNotes.hidden = !game.notes;
-  el.dNotes.textContent = game.notes || '';
-
-  el.dPrev.disabled = index === 0;
-  el.dNext.disabled = index === state.visible.length - 1;
-
-  if (!el.dialog.open) el.dialog.showModal();
-
-  // Deep links: the url always points at whatever is open.
-  history.replaceState(null, '', `#${game.id}`);
-  el.dialog.querySelector('.detail__inner').scrollTop = 0;
-}
-
-/** Open a game by identity rather than by position in the current list. */
-function openByGame(game) {
-  const index = state.visible.indexOf(game);
-  if (index !== -1) return openDetail(index);
-  const byId = state.visible.findIndex((g) => g.id === game.id);
-  if (byId !== -1) openDetail(byId);
-}
-
-function closeDetail() {
-  if (el.dialog.open) el.dialog.close();
-}
-
 /**
  * Open a game picked from a view that isn't the shelf. The dialog steps through
  * `visible`, so the game has to be in it -- if the current filters exclude it,
@@ -600,29 +514,7 @@ function openFromAnywhere(game) {
   const inView = state.visible.some((g) => g.id === game.id);
   if (!inView) clearFilters();
   setView('shelf');
-  openByGame(game);
-}
-
-function step(delta) {
-  const next = state.openIndex + delta;
-  if (next >= 0 && next < state.visible.length) openDetail(next);
-}
-
-/**
- * Pick something at random from whatever is currently showing.
- *
- * Randomised order is what the N64 project used, and it removes the nightly
- * argument about what to play next. Filter to "Not started" first and this
- * becomes the roll that picks the episode.
- */
-function surpriseMe() {
-  if (!state.visible.length) return;
-  // Never hand back the game already open -- that reads as a broken button.
-  let index = Math.floor(Math.random() * state.visible.length);
-  if (state.visible.length > 1 && index === state.openIndex) {
-    index = (index + 1) % state.visible.length;
-  }
-  openDetail(index);
+  detail.openGame(game);
 }
 
 /* --- Compare -------------------------------------------------------------- */
@@ -965,7 +857,7 @@ function attachEvents() {
     render();
   });
 
-  el.dice.addEventListener('click', surpriseMe);
+  el.dice.addEventListener('click', detail.random);
 
   el.views.addEventListener('click', (event) => {
     const tab = event.target.closest('.viewtab');
@@ -983,7 +875,7 @@ function attachEvents() {
 
   el.grid.addEventListener('click', (event) => {
     const tile = event.target.closest('.tile');
-    if (tile) openDetail(Number(tile.dataset.index));
+    if (tile) detail.open(Number(tile.dataset.index));
   });
 
   el.clear.addEventListener('click', () => {
@@ -998,32 +890,12 @@ function attachEvents() {
     runComparison(el.cmpUrl.value);
   });
 
-  el.dClose.addEventListener('click', closeDetail);
-  el.dPrev.addEventListener('click', () => step(-1));
-  el.dNext.addEventListener('click', () => step(1));
-
-  // Clicking the backdrop (i.e. the dialog element itself) closes it.
-  el.dialog.addEventListener('click', (event) => {
-    if (event.target === el.dialog) closeDetail();
-  });
-
-  el.dialog.addEventListener('close', () => {
-    const tile = el.grid.querySelector(`.tile[data-index="${state.openIndex}"]`);
-    state.openIndex = -1;
-    history.replaceState(null, '', location.pathname + location.search);
-    tile?.focus();
-  });
-
   el.themeToggle.addEventListener('click', () => {
     applyTheme(currentlyDark() ? 'light' : 'dark');
   });
 
   document.addEventListener('keydown', (event) => {
-    if (el.dialog.open) {
-      if (event.key === 'ArrowLeft') { event.preventDefault(); step(-1); }
-      if (event.key === 'ArrowRight') { event.preventDefault(); step(1); }
-      return;
-    }
+    if (detail.isOpen) return; // the dialog handles its own keys
     const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(event.target.tagName);
     if (event.key === '/' && !typing) {
       event.preventDefault();
@@ -1031,7 +903,7 @@ function attachEvents() {
       el.search.select();
     }
     if (event.key.toLowerCase() === 'r' && !typing && !event.metaKey && !event.ctrlKey) {
-      surpriseMe();
+      detail.random();
     }
     if (event.key === 'Escape' && typing && event.target === el.search) {
       el.search.value = '';
@@ -1162,7 +1034,7 @@ async function boot() {
   const wanted = decodeURIComponent(location.hash.slice(1));
   if (wanted) {
     const index = state.visible.findIndex((g) => g.id === wanted);
-    if (index !== -1) openDetail(index);
+    if (index !== -1) detail.open(index);
   }
 
   const withParam = new URLSearchParams(location.search).get('with');

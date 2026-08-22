@@ -9,7 +9,11 @@
 // in place, so the worst case is a game that stays linked rather than one that
 // loses its art.
 
-import { COVER_DIR, BOXART_DIR, fetchImage, storeImage, sizeOf } from './images.mjs';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { COVER_DIR, BOXART_DIR, fetchImage, storeImage, sizeOf, IMAGE_TYPES } from './images.mjs';
+import { shrinkImage } from './shrink.mjs';
+import { ROOT } from './collection.mjs';
 
 /**
  * Where each kind of picture lives.
@@ -131,6 +135,57 @@ export async function vendorEntry(entry, list = 'games') {
   const one = { games: [], hardware: [], [list]: [entry] };
   const { done, failed } = await vendorArt(one);
   return { stored: done.length, failed: failed.length };
+}
+
+/**
+ * Re-encode the pictures already stored in the repo so they weigh less.
+ *
+ * New art is shrunk as it is stored; this is for a collection built before
+ * that was true, or one whose pictures were dropped in by hand. Like
+ * vendorArt it mutates entries in memory and leaves saving to the caller.
+ * A picture that is already as small as this can make it is left alone.
+ */
+export async function shrinkArt(collection, { dryRun = false, fields = ART_FIELDS, onItem = () => {} } = {}) {
+  const done = [];
+  let before = 0;
+  let after = 0;
+  for (const item of artInventory(collection, fields)) {
+    if (item.remote) continue;
+    const result = await shrinkStored(item.url, { dryRun });
+    if (!result) continue;
+    item.entry[item.spec.field] = result.path;
+    before += result.before;
+    after += result.after;
+    done.push({ ...item, ...result });
+    onItem({ ...item, ...result });
+  }
+  return { done, before, after };
+}
+
+const TYPE_OF_EXT = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' };
+
+/**
+ * One stored picture, by repo-relative path: replaced by its smaller self
+ * when there is one. Returns the new path and both sizes, or null.
+ */
+export async function shrinkStored(relative, { dryRun = false } = {}) {
+  const match = /\.(png|jpe?g|webp|gif)$/i.exec(relative);
+  if (!match) return null;
+  let bytes;
+  try {
+    bytes = await readFile(join(ROOT, relative));
+  } catch {
+    return null; // A path with no file behind it is `npm run check`'s problem.
+  }
+  const result = shrinkImage({ type: TYPE_OF_EXT[match[1].toLowerCase()], bytes });
+  if (!result.shrunk) return null;
+
+  const slash = relative.lastIndexOf('/');
+  const dir = join(ROOT, relative.slice(0, slash));
+  const basename = relative.slice(slash + 1).replace(/\.[^.]+$/, '');
+  const path = `${relative.slice(0, slash)}/${basename}.${IMAGE_TYPES[result.type]}`;
+  if (!dryRun) await storeImage({ type: result.type, bytes: result.bytes }, dir, basename);
+  return { path, before: bytes.length, after: result.bytes.length };
 }
 
 /** What the stored art weighs, for the report at the end of a run. */

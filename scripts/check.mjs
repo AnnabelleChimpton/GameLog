@@ -6,7 +6,9 @@
 // invalid JSON, missing required fields, duplicate ids, unknown platforms,
 // and how much is still waiting on `npm run enrich`.
 
-import { loadCollection, loadLists, loadFeed, loadPlatformOverrides, COLLECTION_PATH } from './lib/collection.mjs';
+import {
+  loadCollection, loadLists, loadFeed, loadPlatformOverrides, COLLECTION_PATH, makeId,
+} from './lib/collection.mjs';
 import { artSummary, artInventory } from './lib/vendor.mjs';
 import { sizeOf } from './lib/images.mjs';
 import { PLATFORMS, platformInfo } from '../assets/js/platforms.mjs';
@@ -38,6 +40,13 @@ for (const [kind, items] of [['game', games], ['hardware', hardware]]) {
     } else seenIds.set(item.id, label);
 
     if (kind === 'game' && !item.title) problems.push(`${kind} #${i + 1}: missing "title"`);
+    // An older manager made ids before the platform was picked, so a few
+    // collections carry "game-…" ids that say nothing about the shelf.
+    if (kind === 'game' && /^game-/.test(String(item.id)) && item.platform) {
+      warnings.push(`${label}: id "${item.id}" was made before its platform was known; `
+        + `the manager now names it like "${makeId(item.platform, item.title)}". `
+        + 'Harmless, but renaming it (and its art files) keeps ids consistent.');
+    }
     if (kind === 'hardware' && !item.name) problems.push(`${kind} #${i + 1}: missing "name"`);
     if (!item.platform) problems.push(`${label}: missing "platform"`);
     else if (!known.has(String(item.platform).toLowerCase())) {
@@ -180,6 +189,7 @@ const beaten = games.filter((g) => g.status === 'beaten');
 const noCover = games.filter((g) => !g.cover);
 const noDescription = games.filter((g) => !g.description);
 const noYear = games.filter((g) => !g.year);
+const noScore = games.filter((g) => g.metacritic == null);
 
 console.log(`${COLLECTION_PATH.replace(process.cwd() + '/', '')}`);
 console.log(`  ${games.length} games, ${hardware.length} hardware items`);
@@ -203,11 +213,12 @@ if (warnings.length) {
   console.log('');
 }
 
-if (noCover.length || noDescription.length || noYear.length) {
+if (noCover.length || noDescription.length || noYear.length || noScore.length) {
   console.log('Waiting on `npm run enrich`:');
   if (noCover.length) console.log(`  ${noCover.length} without cover art`);
   if (noDescription.length) console.log(`  ${noDescription.length} without a description`);
   if (noYear.length) console.log(`  ${noYear.length} without a release year`);
+  if (noScore.length) console.log(`  ${noScore.length} without a Metascore (not every release has one)`);
   console.log('');
 }
 

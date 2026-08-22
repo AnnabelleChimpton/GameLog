@@ -23,10 +23,11 @@ import {
 import { loadEnv, getToken, createClient, searchGames, coverUrl, tidySummary, releaseYear, companies } from './igdb.mjs';
 import { searchFree, coverFor } from './freelookup.mjs';
 import { findBoxart } from './libretro.mjs';
+import { scoreFor } from './scores.mjs';
 import {
   PHOTO_DIR, COVER_DIR, BOXART_DIR, MAX_IMAGE_BYTES, writeImage, fetchImageAsDataUrl,
 } from './images.mjs';
-import { vendorArt, artSummary, usableId } from './vendor.mjs';
+import { vendorArt, artSummary, usableId, shrinkArt } from './vendor.mjs';
 import { writeFeedXml } from './rss.mjs';
 import { loadCollection as loadCollectionForVendor, saveCollection as saveCollectionFromVendor }
   from './collection.mjs';
@@ -127,7 +128,17 @@ function validateConfig(data) {
  * publish. Anything else you have changed stays yours to handle in git, and is
  * reported rather than silently swept into a commit.
  */
-const PUBLISHABLE = ['data', 'assets/profile', 'index.html', 'feed.xml'];
+// Everything the manager itself writes. The stored pictures are on the list
+// because every game added here lands with its cover and box scan in the
+// repo, and a Publish that left those behind would put a shelf of broken
+// images on the live site.
+const PUBLISHABLE = ['data', 'assets/profile', 'assets/covers', 'assets/boxart', 'index.html', 'feed.xml'];
+
+/** The GitHub username in an origin url, for a no-reply commit identity. */
+function githubUser(remote) {
+  const m = /github\.com[/:]([^/]+)\//i.exec(String(remote || ''));
+  return m ? m[1].replace(/^.*@/, '') : null;
+}
 
 /** Run git without a shell, so nothing here can be interpolated into one. */
 function git(args, { cwd = ROOT } = {}) {
@@ -135,6 +146,7 @@ function git(args, { cwd = ROOT } = {}) {
     execFile('git', args, { cwd, maxBuffer: 4 * 1024 * 1024 }, (error, stdout, stderr) => {
       resolve({
         ok: !error,
+        missing: error?.code === 'ENOENT',
         code: error?.code ?? 0,
         stdout: String(stdout || '').trim(),
         stderr: String(stderr || '').trim(),
@@ -146,6 +158,7 @@ function git(args, { cwd = ROOT } = {}) {
 /** What would be published, and whether publishing is even possible. */
 async function gitStatus() {
   const inside = await git(['rev-parse', '--is-inside-work-tree']);
+  if (inside.missing) return { isRepo: false, noGit: true };
   if (!inside.ok) return { isRepo: false };
 
   const [branch, remote, porcelain] = await Promise.all([
@@ -186,6 +199,11 @@ async function gitPublish(message) {
   await writeFeedXml();
 
   const status = await gitStatus();
+  if (status.noGit) {
+    throw new Error('Git is not installed on this computer (or GitHub Desktop\'s copy is not on '
+      + 'the PATH), so the manager cannot publish by itself. Your edits are saved: open GitHub '
+      + 'Desktop, write a summary, press "Commit to main", then "Push origin".');
+  }
   if (!status.isRepo) throw new Error('This folder is not a git repository.');
   if (!status.remote) {
     throw new Error('No "origin" remote is set, so there is nowhere to publish to. '
@@ -199,7 +217,23 @@ async function gitPublish(message) {
     if (!add.ok) throw new Error(`git add failed: ${add.stderr}`);
 
     const subject = String(message || '').trim() || 'Update collection';
-    const commit = await git(['commit', '-m', subject]);
+    // A fresh machine often has no git identity yet, and "Please tell me who
+    // you are" is not a message a first-time user should meet. Supply one for
+    // this commit: the name on the profile, and GitHub's no-reply address for
+    // the account the repo belongs to.
+    const identity = [];
+    const hasName = (await git(['config', 'user.name'])).ok;
+    const hasEmail = (await git(['config', 'user.email'])).ok;
+    if (!hasName || !hasEmail) {
+      const user = githubUser(status.remote);
+      let name = user || 'GameLog';
+      try {
+        const config = JSON.parse(await readFile(CONFIG_PATH, 'utf8'));
+        if (config.profile?.name) name = config.profile.name;
+      } catch { /* no profile yet: the username will do */ }
+      identity.push('-c', `user.name=${name}`, '-c', `user.email=${user || 'gamelog'}@users.noreply.github.com`);
+    }
+    const commit = await git([...identity, 'commit', '-m', subject]);
     // "nothing to commit" is a normal outcome, not a failure.
     if (!commit.ok && !/nothing to commit/i.test(commit.stdout + commit.stderr)) {
       throw new Error(`git commit failed: ${commit.stderr || commit.stdout}`);
@@ -458,6 +492,17 @@ export async function handleApi(req, res, { port }) {
       return true;
     }
 
+    if (route === 'score' && req.method === 'GET') {
+      // The keyless Metacritic lookup, for a game just added or one whose
+      // score box is empty. Null is an honest answer: not every release has one.
+      const title = (url.searchParams.get('title') || '').trim();
+      const platform = (url.searchParams.get('platform') || '').trim();
+      const year = Number(url.searchParams.get('year')) || null;
+      if (!title || !platform) { send(res, 200, { metacritic: null }); return true; }
+      send(res, 200, { metacritic: await scoreFor(title, platform, year).catch(() => null) });
+      return true;
+    }
+
     if (route === 'cover' && req.method === 'GET') {
       // Keyless art is per-platform, and the platform is often chosen after
       // the search. This lets the UI fill the gap once it knows both.
@@ -502,6 +547,18 @@ export async function handleApi(req, res, { port }) {
 
     if (route === 'vendor' && req.method === 'GET') {
       send(res, 200, artSummary(await loadCollectionForVendor()));
+      return true;
+    }
+
+    if (route === 'shrink' && req.method === 'POST') {
+      // Re-encode what is already stored. Same shape as vendor: the server
+      // owns the file during the run and answers once with the totals.
+      const collection = await loadCollectionForVendor();
+      const result = await shrinkArt(collection);
+      if (result.done.length) await saveCollectionFromVendor(collection);
+      send(res, 200, {
+        ok: true, shrunk: result.done.length, before: result.before, after: result.after,
+      });
       return true;
     }
 

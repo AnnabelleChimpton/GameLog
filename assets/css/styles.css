@@ -1796,6 +1796,22 @@ a.logentry__thumb { display: block; }
   color: var(--text-faint);
 }
 
+.mg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.mg-field__row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.mg-field__row .mg-input { flex: 1; min-width: 0; }
+
+
 .mg-input {
   width: 100%;
   padding: 8px 12px;

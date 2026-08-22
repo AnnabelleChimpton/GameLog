@@ -26,6 +26,18 @@ const server = createServer(async (req, res) => {
   await serveStatic(req, res);
 });
 
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log('');
+    console.log(`  Something is already listening on port ${port} -- most likely the manager is`);
+    console.log(`  already running. Open  http://localhost:${port}/manage.html  in your browser,`);
+    console.log('  or close the other window first.');
+    console.log('');
+    process.exit(1);
+  }
+  throw err;
+});
+
 server.listen(port, '127.0.0.1', () => {
   console.log('');
   console.log(`  GameLog manager   http://localhost:${port}/manage.html`);
