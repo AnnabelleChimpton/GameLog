@@ -12,6 +12,7 @@ import { h, coverImage, titleKey, plural, STATUSES, STATUS_LABEL, playStatus,
   HARDWARE_KINDS, KIND_LABEL, KIND_PLURAL, hardwareKind, hardwareQuantity } from './lib.js';
 import { labelFor } from './profile.js';
 import { resolveList } from './lists.js';
+import { makeId, uniqueId } from './ids.mjs';
 
 const $ = (s) => document.querySelector(s);
 
@@ -814,9 +815,7 @@ function gameEditor(game) {
     h('div', { class: 'mg-row' },
       field('Region', game.region, set('region'), { placeholder: 'USA, JP, PAL…' }),
       field('Edition', game.release, set('release'), { placeholder: 'Demo, Not For Resale…' }),
-      field('Metascore', game.metacritic ?? '', (v) => {
-        game.metacritic = v ? Number(v) : null; markDirty('collection');
-      }, { type: 'number' })),
+      scoreField(game)),
 
     field('Genres (comma separated)', (game.genres || []).join(', '), (v) => {
       game.genres = v.split(',').map((s) => s.trim()).filter(Boolean);
@@ -865,6 +864,14 @@ function renderGames() {
         };
         game.id = uniqueGameId(game);
         await storeArtFor(game);
+        // The score is looked up in the background: it is a nicety, and a new
+        // game should appear on the list the moment it is picked.
+        fetchScore(game).then((found) => {
+          if (found == null || game.metacritic != null) return;
+          game.metacritic = found;
+          markDirty('collection');
+          if (state.editing === game.id) renderGames();
+        });
         state.collection.games.push(game);
         state.collection.games.sort((a, b) =>
           a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }));
@@ -910,13 +917,47 @@ function renderGames() {
 }
 
 function uniqueGameId(game) {
-  const base = `${game.platform || 'game'}-${game.title}`
-    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  const taken = new Set(state.collection.games.map((g) => g.id));
-  if (!taken.has(base)) return base;
-  let n = 2;
-  while (taken.has(`${base}-${n}`)) n += 1;
-  return `${base}-${n}`;
+  const taken = new Set([...state.collection.games, ...state.collection.hardware].map((g) => g.id));
+  return uniqueId(makeId(game.platform, game.title), taken);
+}
+
+/**
+ * The Metascore box, with a button that asks the keyless lookup for it.
+ * Typing still works: the lookup fills what it finds, and a number you know
+ * better is yours to keep.
+ */
+function scoreField(game) {
+  const input = h('input', { class: 'mg-input', type: 'number', min: '0', max: '100' });
+  input.value = game.metacritic ?? '';
+  input.addEventListener('input', () => {
+    game.metacritic = input.value ? Number(input.value) : null;
+    markDirty('collection');
+  });
+  const lookup = h('button', { type: 'button', class: 'mg-mini', title: 'Look the score up on Wikipedia' },
+    h('span', { text: 'Look up' }));
+  lookup.addEventListener('click', async () => {
+    lookup.disabled = true;
+    const found = await fetchScore(game);
+    lookup.disabled = false;
+    if (found == null) { status(`No Metascore on record for ${game.title}.`, 'warn'); return; }
+    input.value = String(found);
+    game.metacritic = found;
+    markDirty('collection');
+    status(`Metascore ${found} for ${game.title}.`);
+  });
+  return h('label', { class: 'mg-field' },
+    h('span', { class: 'mg-field__label', text: 'Metascore' }),
+    h('div', { class: 'mg-field__row' }, input, lookup));
+}
+
+/** The keyless Metacritic lookup, or null when there is none to find. */
+async function fetchScore(game) {
+  if (!game.title || !game.platform) return null;
+  const params = new URLSearchParams({ title: game.title, platform: game.platform });
+  if (game.year) params.set('year', String(game.year));
+  const found = await fetch(`/api/score?${params}`, { headers: API.headers })
+    .then((r) => r.json()).catch(() => ({}));
+  return typeof found.metacritic === 'number' ? found.metacritic : null;
 }
 
 /* --- Hardware tab --------------------------------------------------------- */
@@ -1087,8 +1128,49 @@ async function backupArt(button) {
   }
 }
 
+/**
+ * Re-encode the stored pictures so the repo weighs less. Saves first for the
+ * same reason backupArt does: the server rewrites data/collection.json.
+ */
+async function shrinkArt(button) {
+  if (state.dirty.size) await save();
+  if (state.dirty.size) return;
+
+  button.disabled = true;
+  const previous = button.textContent;
+  button.textContent = 'Shrinking…';
+  status('Re-encoding the stored pictures. A few hundred take about a minute.');
+
+  try {
+    const res = await fetch('/api/shrink', { method: 'POST', headers: API.headers });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.error || 'Could not shrink the artwork.');
+
+    const fresh = await fetch('/api/state', { headers: API.headers }).then((r) => r.json());
+    state.collection = fresh.collection?.games ? fresh.collection : state.collection;
+    state.collection.hardware = state.collection.hardware || [];
+
+    const mb = (n) => `${(n / 1024 / 1024).toFixed(1)} MB`;
+    status(json.shrunk
+      ? `Shrunk ${plural(json.shrunk, 'picture')}: ${mb(json.before)} → ${mb(json.after)}. `
+        + 'Publish to push the smaller files.'
+      : 'Every stored picture is already as small as this can make it.');
+    renderTab();
+  } catch (err) {
+    status(err.message, 'error');
+  } finally {
+    button.disabled = false;
+    button.textContent = previous;
+  }
+}
+
 function artCard() {
   const { total, linked } = artCounts();
+  const shrinkLabel = h('span', { text: 'Shrink stored pictures' });
+  const shrink = h('button', {
+    type: 'button', class: 'pillbutton', onclick: () => shrinkArt(shrinkLabel),
+  }, shrinkLabel);
+  shrink.disabled = !total;
   const button = h('span', {
     text: linked ? `Download ${plural(linked, 'image')}` : 'Nothing to download',
   });
@@ -1108,7 +1190,11 @@ function artCard() {
           + 'your repo, where it is yours and it is published with the rest of the site.'
         : `All ${total} of your images are stored in your repo. Nothing here `
           + 'depends on anybody else staying online.' }),
-    go);
+    h('div', { class: 'mg-actions' }, go, shrink),
+    h('p', { class: 'mg-hint',
+      text: 'New pictures are shrunk as they arrive. If your collection predates that, or you '
+        + 'dropped in big scans by hand, this re-encodes what is already stored: box scans '
+        + 'typically come out a tenth of the size with no visible change.' }));
 }
 
 function renderSite() {

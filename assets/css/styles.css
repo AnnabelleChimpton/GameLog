@@ -328,13 +328,25 @@ button, input, select { font: inherit; color: inherit; }
 .chips {
   display: flex;
   gap: 7px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  /* Every console on view, wrapping to a second line when there are many. A
+     strip that scrolled sideways hid the last few with nothing to grab -- on a
+     desktop there is no thumb to swipe with, and a chip you cannot see is a
+     filter you do not know you have. */
+  flex-wrap: wrap;
   padding-bottom: 2px;
-  /* Fade the overflow edge instead of showing a hard cut. */
-  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
 }
-.chips::-webkit-scrollbar { display: none; }
+
+@media (max-width: 700px) {
+  /* A phone has a thumb and a Filter sheet that lists them all, so here the
+     strip scrolls and the edge fades rather than wrapping into a tall block. */
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+  .chips::-webkit-scrollbar { display: none; }
+}
 
 .chip {
   flex: 0 0 auto;
@@ -1796,6 +1808,22 @@ a.logentry__thumb { display: block; }
   color: var(--text-faint);
 }
 
+.mg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.mg-field__row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.mg-field__row .mg-input { flex: 1; min-width: 0; }
+
+
 .mg-input {
   width: 100%;
   padding: 8px 12px;
@@ -2498,6 +2526,10 @@ a.logentry__thumb { display: block; }
     gap: 10px;
     padding-bottom: 4px;
   }
+  /* A column flex item's automatic minimum width is its content's, and seven
+     tabs side by side are wider than a phone: without this the bar, and with
+     it the whole page, scrolled sideways by the width of the last two tabs. */
+  .masthead__bar > * { min-width: 0; max-width: 100%; }
 
   /* Five tabs do not fit; scrolling them is fine, scrolling the page is not. */
   .views {
@@ -2709,6 +2741,11 @@ a.logentry__thumb { display: block; }
   /* Boxes stand on a common line, the way objects on a shelf do. */
   align-items: flex-end;
   gap: clamp(12px, 1.6vw, 20px);
+  /* The script measures the shelf and sets --shelf-h inline; the height
+     actually drawn is derived here, so a phone can scale it down. (An inline
+     --box-h would beat any stylesheet override, which is how phones once got
+     one N64 box per row.) */
+  --box-h: var(--shelf-h, 250px);
 }
 
 .shelf--boxes .tile {
@@ -2735,8 +2772,8 @@ a.logentry__thumb { display: block; }
 .shelf--boxes .tile__name { -webkit-line-clamp: 2; line-clamp: 2; }
 
 @media (max-width: 700px) {
-  /* Two landscape boxes will not fit side by side on a phone, so give the
-     shelf its own smaller height rather than letting one box fill the screen. */
-  .shelf--boxes { --box-h: 108px; }
-  .shelf--boxes[style*="250px"] { --box-h: 170px; }
+  /* Two landscape boxes will not fit side by side on a phone, so the shelf
+     is drawn at two thirds height: 250 -> 170 for cases, 150 -> 100 for
+     cartridge boxes, rather than letting one box fill the screen. */
+  .shelf--boxes { --box-h: calc(var(--shelf-h, 250px) * 0.68); }
 }

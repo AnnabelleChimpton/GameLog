@@ -1,1 +1,1 @@
-{"version":"0.0.1","configurations":[{"name":"gamelog","runtimeExecutable":"node","runtimeArgs":["scripts/serve.mjs","4321"],"port":4321}]}
+{"version":"0.0.1","configurations":[{"name":"gamelog","runtimeExecutable":"node","runtimeArgs":["scripts/serve.mjs","4321"],"port":4321},{"name":"manage","runtimeExecutable":"node","runtimeArgs":["scripts/manage.mjs","4322"],"port":4322}]}

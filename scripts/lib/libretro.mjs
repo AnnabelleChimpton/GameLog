@@ -6,7 +6,7 @@
 // someone to register a Twitch developer application before their shelf looks
 // like anything is a real barrier.
 //
-// Two honest caveats, both documented in the README:
+// Two honest caveats, both documented in docs/art.md:
 //   * it is scanned publisher artwork, exactly like IGDB's. Keyless is a setup
 //     improvement, not a licensing one.
 //   * it covers emulated systems, so anything current-gen is simply absent.

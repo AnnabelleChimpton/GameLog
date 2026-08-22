@@ -11,7 +11,7 @@
 
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
-import { writeFile, rm, readFile } from 'node:fs/promises';
+import { writeFile, rm, readFile, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH, FEED_PATH, SCHEMA_VERSION } from './lib/collection.mjs';
@@ -29,6 +29,8 @@ const FRESH_CONFIG = {
     + 'Cover art and descriptions from [IGDB](https://www.igdb.com), '
     + '[libretro](https://thumbnails.libretro.com) and [Wikipedia](https://en.wikipedia.org).',
 };
+
+const ART_DIRS = [join(ROOT, 'assets', 'covers'), join(ROOT, 'assets', 'boxart')];
 
 const META_START = '<!-- gamelog:meta';
 const META_END = '<!-- /gamelog:meta -->';
@@ -72,6 +74,10 @@ async function main() {
   let lists = 0;
   let posts = 0;
   let owner = null;
+  let pictures = 0;
+  for (const dir of ART_DIRS) {
+    try { pictures += (await readdir(dir)).length; } catch { /* no such folder */ }
+  }
   try {
     const c = JSON.parse(await readFile(COLLECTION_PATH, 'utf8'));
     games = c.games?.length || 0;
@@ -93,6 +99,7 @@ async function main() {
   console.log(`  data/feed.json         ${posts} log post(s)`);
   console.log(`  data/config.json       title, tagline, links${owner ? `, and ${owner}'s profile` : ''}`);
   console.log('  assets/profile/        any profile photo');
+  console.log(`  assets/covers/, assets/boxart/   ${pictures} stored picture(s) of those games`);
   console.log('  index.html             the link-preview tags');
   console.log('\nIt leaves .env, your git history, and everything else alone.');
 
@@ -121,13 +128,15 @@ async function main() {
   if (existsSync(join(ROOT, 'assets', 'profile'))) {
     await rm(join(ROOT, 'assets', 'profile'), { recursive: true, force: true });
   }
+  // The previous owner's pictures belong to the games just emptied out; left
+  // behind, a fork would carry a stranger's shelf of art in every clone.
+  for (const dir of ART_DIRS) await rm(dir, { recursive: true, force: true });
   await resetMeta();
 
   console.log('\n  Done. The collection is yours now.\n');
-  console.log('  Next:');
-  console.log('    npm run manage      add games, write your profile, set the title');
-  console.log('    npm run enrich      fill in cover art and descriptions');
-  console.log('    git add -A && git commit -m "Start my collection" && git push\n');
+  console.log('  Next: double-click "Open GameLog Manager" (or run `npm run manage`) to add');
+  console.log('  games and write your profile, then publish from GitHub Desktop or the');
+  console.log('  manager\'s Publish button.\n');
 }
 
 main().catch((err) => {

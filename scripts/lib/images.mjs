@@ -13,6 +13,7 @@ import { join } from 'node:path';
 import { isIP } from 'node:net';
 import { lookup } from 'node:dns/promises';
 import { ROOT } from './collection.mjs';
+import { shrinkImage } from './shrink.mjs';
 
 /**
  * Formats accepted, and the extension each one is stored under.
@@ -187,9 +188,14 @@ export async function fetchImageAsDataUrl(url) {
  * previously had. Written to a temp file and renamed, so an interrupted save
  * cannot leave a half-written picture behind.
  */
-export async function storeImage({ type, bytes }, dir, basename) {
+export async function storeImage(image, dir, basename) {
+  if (!IMAGE_TYPES[image.type]) {
+    throw new Error(`${image.type} isn't an image type this accepts (jpg, png, webp, gif).`);
+  }
+  // A PNG of a photographed box is the one thing that arrives huge, so it is
+  // re-encoded on the way in. Nothing else is touched.
+  const { type, bytes, shrunk, from } = shrinkImage(image);
   const ext = IMAGE_TYPES[type];
-  if (!ext) throw new Error(`${type} isn't an image type this accepts (jpg, png, webp, gif).`);
 
   await mkdir(dir, { recursive: true });
   await Promise.all(Object.values(IMAGE_TYPES)
@@ -199,7 +205,7 @@ export async function storeImage({ type, bytes }, dir, basename) {
   const tmp = join(dir, `${basename}.${ext}.tmp`);
   await writeFile(tmp, bytes);
   await rename(tmp, join(dir, `${basename}.${ext}`));
-  return { ext, bytes: bytes.length };
+  return { ext, bytes: bytes.length, shrunk: Boolean(shrunk), from: from ?? bytes.length };
 }
 
 /** Decode a base64 image data url and store it. */

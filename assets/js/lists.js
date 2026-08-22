@@ -156,7 +156,7 @@ export function renderLists(lists, games, { selected, onSelect, onOpen }) {
         isLocal() ? h('pre', { class: 'lists__code' }, h('code', { text: 'npm run list' })) : null,
         isLocal()
           ? h('p', { class: 'cmp__blurb',
-              text: 'Or write data/lists.json by hand. The README has the shape.' })
+              text: 'Or write data/lists.json by hand. docs/lists.md has the shape.' })
           : null));
   }
 
