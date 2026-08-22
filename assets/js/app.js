@@ -159,8 +159,8 @@ function renderGrid() {
   // which only works because every box on that shelf is the same shape.
   const shape = shelfShape(state.visible);
   el.grid.classList.toggle('shelf--boxes', Boolean(shape));
-  el.grid.style.removeProperty('--box-h');
-  if (shape) el.grid.style.setProperty('--box-h', `${boxHeight(shape)}px`);
+  el.grid.style.removeProperty('--shelf-h');
+  if (shape) el.grid.style.setProperty('--shelf-h', `${boxHeight(shape)}px`);
 
   state.visible.forEach((game, i) => {
     const info = platformInfo(game.platform);

@@ -2514,6 +2514,10 @@ a.logentry__thumb { display: block; }
     gap: 10px;
     padding-bottom: 4px;
   }
+  /* A column flex item's automatic minimum width is its content's, and seven
+     tabs side by side are wider than a phone: without this the bar, and with
+     it the whole page, scrolled sideways by the width of the last two tabs. */
+  .masthead__bar > * { min-width: 0; max-width: 100%; }
 
   /* Five tabs do not fit; scrolling them is fine, scrolling the page is not. */
   .views {
@@ -2725,6 +2729,11 @@ a.logentry__thumb { display: block; }
   /* Boxes stand on a common line, the way objects on a shelf do. */
   align-items: flex-end;
   gap: clamp(12px, 1.6vw, 20px);
+  /* The script measures the shelf and sets --shelf-h inline; the height
+     actually drawn is derived here, so a phone can scale it down. (An inline
+     --box-h would beat any stylesheet override, which is how phones once got
+     one N64 box per row.) */
+  --box-h: var(--shelf-h, 250px);
 }
 
 .shelf--boxes .tile {
@@ -2751,8 +2760,8 @@ a.logentry__thumb { display: block; }
 .shelf--boxes .tile__name { -webkit-line-clamp: 2; line-clamp: 2; }
 
 @media (max-width: 700px) {
-  /* Two landscape boxes will not fit side by side on a phone, so give the
-     shelf its own smaller height rather than letting one box fill the screen. */
-  .shelf--boxes { --box-h: 108px; }
-  .shelf--boxes[style*="250px"] { --box-h: 170px; }
+  /* Two landscape boxes will not fit side by side on a phone, so the shelf
+     is drawn at two thirds height: 250 -> 170 for cases, 150 -> 100 for
+     cartridge boxes, rather than letting one box fill the screen. */
+  .shelf--boxes { --box-h: calc(var(--shelf-h, 250px) * 0.68); }
 }
