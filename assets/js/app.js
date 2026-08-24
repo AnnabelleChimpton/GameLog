@@ -7,7 +7,7 @@
 //
 // Five views share one filter state: shelf, timeline, lists, stats, compare.
 
-import { platformInfo, platformSortIndex, registerPlatforms } from './platforms.mjs';
+import { platformChipLabel, platformInfo, platformSortIndex, registerPlatforms } from './platforms.mjs';
 import {
   fold, sortKey, conditionGroup, CONDITION_ORDER, coverImage, placeholderCover,
   safeImageUrl, h, plural, playStatus, STATUS_LABEL, episodeNumbers, progressOf, isLocal,
@@ -445,6 +445,9 @@ function renderChips() {
     type: 'button', class: 'chip', role: 'tab',
     dataset: { platform: key },
     'aria-selected': String(state.platform === key),
+    // The chip wears the compact name, so the full one lives in the tooltip
+    // and in the label a screen reader hears.
+    ...(key !== 'all' && label !== key && { title: key, 'aria-label': `${key}, ${count}` }),
   },
     color ? h('span', { class: 'chip__dot', style: `--chip-color:${color}` }) : null,
     h('span', { text: label }),
@@ -452,8 +455,7 @@ function renderChips() {
 
   el.chips.replaceChildren(
     chip('all', 'All', state.games.length, null),
-    ...platforms.map((p) => chip(p, p.length > 20 ? platformInfo(p).short : p,
-      counts.get(p), platformInfo(p).color))
+    ...platforms.map((p) => chip(p, platformChipLabel(p), counts.get(p), platformInfo(p).color))
   );
 }
 

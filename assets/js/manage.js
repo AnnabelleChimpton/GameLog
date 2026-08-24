@@ -13,6 +13,7 @@ import { h, coverImage, titleKey, plural, STATUSES, STATUS_LABEL, playStatus,
 import { labelFor } from './profile.js';
 import { resolveList } from './lists.js';
 import { makeId, uniqueId } from './ids.mjs';
+import { collectionCsv } from './csv.mjs';
 
 const $ = (s) => document.querySelector(s);
 
@@ -1197,6 +1198,43 @@ function artCard() {
         + 'typically come out a tenth of the size with no visible change.' }));
 }
 
+/**
+ * Hand the collection over as a CSV download.
+ *
+ * Built from what is on screen, unsaved edits included -- an export should be
+ * the collection as you last touched it, not as the disk last heard about it.
+ * No server involved: the browser makes the file from memory, so this works
+ * even when the write API is being grumpy.
+ */
+function exportCsv() {
+  const games = state.collection.games;
+  const blob = new Blob([collectionCsv(games)], { type: 'text/csv;charset=utf-8' });
+  const link = h('a', {
+    href: URL.createObjectURL(blob),
+    download: `gamelog-collection-${todayIso()}.csv`,
+  });
+  link.click();
+  URL.revokeObjectURL(link.href);
+  status(`Exported ${plural(games.length, 'game')} to CSV.`);
+}
+
+function exportCard() {
+  const count = state.collection.games.length;
+  const go = h('button', {
+    type: 'button', class: 'pillbutton', onclick: exportCsv,
+  }, h('span', { text: 'Export collection CSV' }));
+  go.disabled = !count;
+
+  return h('div', { class: 'mg-card' },
+    h('h2', { class: 'mg-card__title', text: 'Export' }),
+    h('p', { class: 'mg-hint',
+      text: 'Your games as a spreadsheet: one row each, with platform, condition, status, '
+        + 'notes and the rest. For insurance lists, imports into other collection apps, or '
+        + 'plain spreadsheet fiddling. data/collection.json stays the full backup; this is '
+        + 'the portable copy.' }),
+    h('div', { class: 'mg-actions' }, go));
+}
+
 function renderSite() {
   const wrap = $('#tab-site');
   const config = state.config;
@@ -1216,6 +1254,7 @@ function renderSite() {
 
   wrap.replaceChildren(
     artCard(),
+    exportCard(),
 
     h('div', { class: 'mg-card' },
       h('h2', { class: 'mg-card__title', text: 'Identity' }),

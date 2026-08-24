@@ -196,6 +196,26 @@ export function platformFromIgdbId(id) {
   return hit ? hit.key : null;
 }
 
+/**
+ * The name a filter chip wears: friendlier than `short`, smaller than the key.
+ *
+ * Full names made the chip row wrap -- "Sony PlayStation 4" spends most of its
+ * width saying the manufacturer, which nobody filters by. So: keep the half of
+ * a dual-region name the site's audience knows ("SNES/Super Famicom" -> "SNES"),
+ * drop the maker when what's left still names the console ("Nintendo GameCube"
+ * -> "GameCube", but "Nintendo 64" keeps its brand because "64" alone doesn't),
+ * and if the result is still long, fall back to the badge code ("PlayStation 4"
+ * -> "PS4"). The full key stays available for the chip's tooltip.
+ */
+export function platformChipLabel(key) {
+  const info = platformInfo(key);
+  let label = String(info.key).split('/')[0].trim();
+  const stripped = label.replace(
+    /^(Nintendo|Sony|Microsoft|Sega|Atari|NEC|SNK|Bandai|Philips|Magnavox|Mattel|Coleco)\s+/i, '');
+  if (stripped && !/^\d/.test(stripped)) label = stripped;
+  return label.length > 10 ? info.short : label;
+}
+
 /** Sort order for platform filter chips: known platforms first, in registry order. */
 export function platformSortIndex(key) {
   const i = PLATFORMS.findIndex((p) => p.key.toLowerCase() === String(key).toLowerCase());

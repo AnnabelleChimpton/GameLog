@@ -327,8 +327,9 @@ button, input, select { font: inherit; color: inherit; }
 
 .chips {
   display: flex;
-  gap: 7px;
-  /* Every console on view, wrapping to a second line when there are many. A
+  gap: 6px;
+  /* Every console on view. Labels are kept compact (see platformChipLabel) so
+     a typical collection fits on one line, but a truly large one still wraps. A
      strip that scrolled sideways hid the last few with nothing to grab -- on a
      desktop there is no thumb to swipe with, and a chip you cannot see is a
      filter you do not know you have. */
@@ -352,8 +353,8 @@ button, input, select { font: inherit; color: inherit; }
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 13px;
+  gap: 6px;
+  padding: 6px 11px;
   background: var(--surface-sunk);
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
