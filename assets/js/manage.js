@@ -311,7 +311,12 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
                 const params = new URLSearchParams({ title: found.title, platform: chosenPlatform });
                 const got = await fetch(`/api/cover?${params}`, { headers: API.headers })
                   .then((r) => r.json()).catch(() => ({}));
-                if (!found.cover) found.cover = got.cover || null;
+                // A search-time cover may have been borrowed from another
+                // console just to show a thumbnail (artPlatform says which).
+                // The platform is decided now, so that stand-in is replaced --
+                // an Xbox box must not become the GameCube copy's cover.
+                const borrowed = found.artPlatform && found.artPlatform !== chosenPlatform;
+                if (!found.cover || borrowed) found.cover = got.cover || (borrowed ? null : found.cover);
                 found.boxart = got.boxart || null;
                 found.boxartRatio = got.boxartRatio || null;
               }

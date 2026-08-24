@@ -155,9 +155,15 @@ async function main() {
   const id = uniqueId(makeId(platform, finalTitle), taken);
 
   // Keyless search can only resolve art once a platform is known, and the
-  // platform is chosen after the search. Fill it in now that we have both.
-  if (chosen && !chosen.cover && hasFreeArt(platform)) {
-    chosen.cover = await coverFor(finalTitle, platform, { region: opts.region || 'USA' });
+  // platform is chosen after the search. Fill it in now that we have both --
+  // and replace a cover the search borrowed from another console for its
+  // thumbnail, rather than filing this platform's copy under that box.
+  const borrowed = chosen?.artPlatform && chosen.artPlatform !== platform;
+  if (chosen && (!chosen.cover || borrowed) && hasFreeArt(platform)) {
+    chosen.cover = await coverFor(finalTitle, platform, { region: opts.region || 'USA' })
+      || (borrowed ? null : chosen.cover);
+  } else if (borrowed) {
+    chosen.cover = null;
   }
 
   // The box scan is a second, differently shaped picture used on single-platform
