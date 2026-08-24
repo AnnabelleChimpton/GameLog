@@ -3310,6 +3310,28 @@
       "boxartRatio": 0.714
     },
     {
+      "id": "nintendo-64-south-park",
+      "title": "South Park",
+      "platform": "Nintendo 64",
+      "year": 1998,
+      "cover": "assets/covers/nintendo-64-south-park.jpg",
+      "description": "South Park is a first-person shooter video game based on the American animated sitcom of the same name. The game was developed by Iguana Entertainment with a modified version of the engine used in the Acclaim Entertainment-published Turok 2: Seeds of Evil. Both games shared the same publisher and were released for the Nintendo 64 in December 1998 in North America, and for Microsoft Windows in 1999.",
+      "genres": [],
+      "developer": null,
+      "publisher": null,
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-24",
+      "igdbId": null,
+      "wikidataId": "Q2636173",
+      "boxart": "assets/boxart/nintendo-64-south-park.jpg",
+      "boxartRatio": 1.369
+    },
+    {
       "id": "nintendo-switch-spongebob-squarepants-battle-for-bikini-bottom-rehydrated",
       "title": "SpongeBob SquarePants: Battle for Bikini Bottom Rehydrated",
       "platform": "Nintendo Switch",
