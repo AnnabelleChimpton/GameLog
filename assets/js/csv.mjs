@@ -1,12 +1,16 @@
-// The collection as a CSV file.
+// The collection as CSV files.
 //
-// data/collection.json is already the full backup, but JSON is not what a
-// spreadsheet, an insurance list, or another collection app asks for. This is
-// the same games in the shape those tools speak: one row per game, RFC 4180
-// quoting, and only the fields a person would want in a table -- the asset
-// paths and layout ratios stay home in the JSON.
+// data/collection.json and data/lists.json are already the full backup, but
+// JSON is not what a spreadsheet, an insurance list, or another collection app
+// asks for. These are the same records in the shape those tools speak: one row
+// per thing, RFC 4180 quoting, and only the fields a person would want in a
+// table -- the asset paths and layout ratios stay home in the JSON.
+//
+// Games, hardware and lists are three different shapes, so they are three
+// files rather than one sheet with half its columns blank on every row.
 
-import { playStatus } from './lib.js';
+import { playStatus, hardwareKind, hardwareQuantity } from './lib.js';
+import { resolveList } from './lists.js';
 
 /** One CSV field: quoted (with "" escapes) only when it has to be. */
 export function csvCell(value) {
@@ -14,7 +18,22 @@ export function csvCell(value) {
   return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
-const COLUMNS = [
+/**
+ * Rows under a header, as one CSV string.
+ *
+ * Starts with a UTF-8 byte-order mark: without it Excel assumes a legacy
+ * encoding and the very first shelf with a "1080°" or a "Pokémon" comes out
+ * mangled. Everything else that reads CSV ignores the mark.
+ */
+function toCsv(columns, records) {
+  const rows = [columns.map(([name]) => name).join(',')];
+  for (const record of records) {
+    rows.push(columns.map(([, get]) => csvCell(get(record))).join(','));
+  }
+  return '\uFEFF' + rows.join('\r\n') + '\r\n';
+}
+
+const GAME_COLUMNS = [
   ['id', (g) => g.id],
   ['title', (g) => g.title],
   ['platform', (g) => g.platform],
@@ -35,17 +54,58 @@ const COLUMNS = [
   ['igdbId', (g) => g.igdbId],
 ];
 
-/**
- * The whole collection as one CSV string.
- *
- * Starts with a UTF-8 byte-order mark: without it Excel assumes a legacy
- * encoding and the very first shelf with a "1080°" or a "Pokémon" comes out
- * mangled. Everything else that reads CSV ignores the mark.
- */
+const HARDWARE_COLUMNS = [
+  ['id', (i) => i.id],
+  ['name', (i) => i.name],
+  ['platform', (i) => i.platform],
+  // Resolved like the manager resolves them: an entry from before kinds
+  // existed is a console, and a kind nobody recognises is an accessory.
+  ['kind', (i) => hardwareKind(i)],
+  ['quantity', (i) => hardwareQuantity(i)],
+  ['year', (i) => i.year],
+  ['manufacturer', (i) => i.manufacturer],
+  ['region', (i) => i.region],
+  ['condition', (i) => i.condition],
+  ['notes', (i) => i.notes],
+  ['added', (i) => i.added],
+];
+
+const LIST_COLUMNS = [
+  ['list', (r) => r.listName],
+  ['wishlist', (r) => (r.wants ? 'yes' : 'no')],
+  ['title', (r) => r.game.title],
+  ['platform', (r) => r.game.platform],
+  ['year', (r) => r.game.year],
+  ['owned', (r) => (r.owned ? 'yes' : 'no')],
+  ['note', (r) => r.note],
+  ['igdbId', (r) => r.item?.igdbId ?? r.game.igdbId],
+];
+
+/** The whole games collection as one CSV string. */
 export function collectionCsv(games) {
-  const rows = [COLUMNS.map(([name]) => name).join(',')];
-  for (const game of games) {
-    rows.push(COLUMNS.map(([, get]) => csvCell(get(game))).join(','));
+  return toCsv(GAME_COLUMNS, games);
+}
+
+/** The hardware shelf as one CSV string. */
+export function hardwareCsv(hardware) {
+  return toCsv(HARDWARE_COLUMNS, hardware);
+}
+
+/**
+ * Every list, flattened to one row per entry.
+ *
+ * Entries are resolved against the collection the same way the lists page
+ * resolves them, so the `owned` column says what the site says today -- a
+ * wishlist entry you have since bought exports as owned without the list
+ * ever having been edited.
+ */
+export function listsCsv(lists, games) {
+  const rows = [];
+  for (const list of lists) {
+    const resolved = resolveList(list, games);
+    for (const entry of resolved.entries) {
+      rows.push({ listName: list.name, wants: Boolean(list.wants), ...entry });
+    }
   }
-  return '\uFEFF' + rows.join('\r\n') + '\r\n';
+  return toCsv(LIST_COLUMNS, rows);
 }

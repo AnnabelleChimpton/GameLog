@@ -13,7 +13,7 @@ import { h, coverImage, titleKey, plural, STATUSES, STATUS_LABEL, playStatus,
 import { labelFor } from './profile.js';
 import { resolveList } from './lists.js';
 import { makeId, uniqueId } from './ids.mjs';
-import { collectionCsv } from './csv.mjs';
+import { collectionCsv, hardwareCsv, listsCsv } from './csv.mjs';
 
 const $ = (s) => document.querySelector(s);
 
@@ -1199,40 +1199,53 @@ function artCard() {
 }
 
 /**
- * Hand the collection over as a CSV download.
+ * Hand a CSV file over as a download.
  *
  * Built from what is on screen, unsaved edits included -- an export should be
  * the collection as you last touched it, not as the disk last heard about it.
  * No server involved: the browser makes the file from memory, so this works
  * even when the write API is being grumpy.
  */
-function exportCsv() {
-  const games = state.collection.games;
-  const blob = new Blob([collectionCsv(games)], { type: 'text/csv;charset=utf-8' });
-  const link = h('a', {
-    href: URL.createObjectURL(blob),
-    download: `gamelog-collection-${todayIso()}.csv`,
-  });
+function downloadCsv(text, name) {
+  const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
+  const link = h('a', { href: URL.createObjectURL(blob), download: name });
   link.click();
   URL.revokeObjectURL(link.href);
-  status(`Exported ${plural(games.length, 'game')} to CSV.`);
 }
 
 function exportCard() {
-  const count = state.collection.games.length;
-  const go = h('button', {
-    type: 'button', class: 'pillbutton', onclick: exportCsv,
-  }, h('span', { text: 'Export collection CSV' }));
-  go.disabled = !count;
+  const { games, hardware } = state.collection;
+  const lists = state.lists.lists;
+  const listItems = lists.reduce((n, l) => n + (l.items?.length || 0), 0);
+
+  // Three shapes, three files, three buttons -- a single sheet would spend
+  // half its columns blank on every row.
+  const exporter = (label, count, noun, many, file, make) => {
+    const go = h('button', {
+      type: 'button', class: 'pillbutton',
+      onclick: () => {
+        downloadCsv(make(), `gamelog-${file}-${todayIso()}.csv`);
+        status(`Exported ${plural(count, noun, many)} to ${file}.csv.`);
+      },
+    }, h('span', { text: label }));
+    go.disabled = !count;
+    return go;
+  };
 
   return h('div', { class: 'mg-card' },
     h('h2', { class: 'mg-card__title', text: 'Export' }),
     h('p', { class: 'mg-hint',
-      text: 'Your games as a spreadsheet: one row each, with platform, condition, status, '
-        + 'notes and the rest. For insurance lists, imports into other collection apps, or '
-        + 'plain spreadsheet fiddling. data/collection.json stays the full backup; this is '
-        + 'the portable copy.' }),
-    h('div', { class: 'mg-actions' }, go));
+      text: 'Your shelf as spreadsheets: one row per game, per piece of hardware, or per '
+        + 'list entry, with platform, condition, status, notes and the rest. For insurance '
+        + 'lists, imports into other collection apps, or plain spreadsheet fiddling. The '
+        + 'files in data/ stay the full backup; these are the portable copies.' }),
+    h('div', { class: 'mg-actions' },
+      exporter('Export games CSV', games.length, 'game', undefined, 'games',
+        () => collectionCsv(games)),
+      exporter('Export hardware CSV', hardware.length, 'item', undefined, 'hardware',
+        () => hardwareCsv(hardware)),
+      exporter('Export lists CSV', listItems, 'list entry', 'list entries', 'lists',
+        () => listsCsv(lists, games))));
 }
 
 function renderSite() {

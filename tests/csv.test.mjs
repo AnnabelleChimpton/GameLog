@@ -5,7 +5,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { csvCell, collectionCsv } from '../assets/js/csv.mjs';
+import { csvCell, collectionCsv, hardwareCsv, listsCsv } from '../assets/js/csv.mjs';
 
 test('cells only quote when they must, and escape what they quote', () => {
   assert.equal(csvCell('Chrono Trigger'), 'Chrono Trigger');
@@ -44,4 +44,40 @@ test('missing fields export as the shelf shows them, not as gaps', () => {
   assert.equal(cells[6], 'unplayed');
   assert.equal(cells[7], '1');
   assert.equal(cells[8], '', 'no genres is an empty cell, not a crash');
+});
+
+test('hardware rows resolve kind and quantity the way the manager does', () => {
+  const csv = hardwareCsv([
+    { id: '3do-console', name: '3DO Console', platform: '3DO', manufacturer: '3DO',
+      region: 'USA', condition: 'Loose', added: '2024-10-08' },
+    { id: 'n64-pads', name: 'Controller', platform: 'Nintendo 64', kind: 'controller',
+      quantity: 4 },
+  ]);
+  const lines = csv.split('\r\n');
+  assert.equal(lines[0].slice(1),
+    'id,name,platform,kind,quantity,year,manufacturer,region,condition,notes,added');
+  // An entry from before kinds existed is a console with one of it.
+  assert.equal(lines[1],
+    '3do-console,3DO Console,3DO,console,1,,3DO,USA,Loose,,2024-10-08');
+  assert.equal(lines[2], 'n64-pads,Controller,Nintendo 64,controller,4,,,,,,');
+});
+
+test('list entries flatten to rows and say owned the way the lists page does', () => {
+  const games = [{ id: 'gcn-melee', title: 'Super Smash Bros. Melee',
+    platform: 'Nintendo GameCube' }];
+  const csv = listsCsv([{
+    id: 'looking-for', name: 'Looking for', wants: true,
+    items: [
+      { title: 'Shrek SuperSlam', platform: 'Nintendo GameCube', year: 2005,
+        igdbId: 10628, note: 'I want this awesome fighting game' },
+      // On the list, but also on the shelf: exports as owned.
+      { title: 'Super Smash Bros. Melee', platform: 'Nintendo GameCube' },
+    ],
+  }], games);
+  const lines = csv.split('\r\n');
+  assert.equal(lines[0].slice(1), 'list,wishlist,title,platform,year,owned,note,igdbId');
+  assert.equal(lines[1], 'Looking for,yes,Shrek SuperSlam,Nintendo GameCube,2005,no,'
+    + 'I want this awesome fighting game,10628');
+  assert.equal(lines[2],
+    'Looking for,yes,Super Smash Bros. Melee,Nintendo GameCube,,yes,,');
 });
