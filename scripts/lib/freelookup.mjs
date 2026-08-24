@@ -22,22 +22,39 @@ function blurb(text) {
  *
  * Returns the same fields the IGDB path produces, minus the ones no keyless
  * source has: genres and companies come back empty rather than guessed at.
+ *
+ * Art is chosen per platform, which at search time is usually not decided
+ * yet. `artPlatforms` bridges that: a list of consoles worth trying -- the
+ * ones already on the shelf, most common first -- so results can show a
+ * cover the way the keyed search does. Each console's art index is fetched
+ * once and cached, so this costs a handful of requests per session, not per
+ * keystroke. The platform that matched is reported as `artPlatform`.
  */
-export async function searchFree(term, { platform = null, limit = 8, region = 'USA' } = {}) {
+export async function searchFree(term, { platform = null, limit = 8, region = 'USA', artPlatforms = [] } = {}) {
   const pages = await searchTitles(term, { limit });
+  const tryPlatforms = platform ? [platform] : artPlatforms.filter(hasFreeArt).slice(0, 10);
 
-  return Promise.all(pages.map(async (page) => ({
-    title: page.title,
-    year: yearFromExtract(page.extract),
-    description: blurb(page.extract),
-    cover: platform ? await findCover(page.title, platform, { region }) : null,
-    genres: [],
-    developer: null,
-    publisher: null,
-    wikidataId: page.wikidata,
-    platforms: [],
-    derivative: false,
-  })));
+  return Promise.all(pages.map(async (page) => {
+    let cover = null;
+    let artPlatform = null;
+    for (const candidate of tryPlatforms) {
+      cover = await findCover(page.title, candidate, { region });
+      if (cover) { artPlatform = candidate; break; }
+    }
+    return {
+      title: page.title,
+      year: yearFromExtract(page.extract),
+      description: blurb(page.extract),
+      cover,
+      artPlatform,
+      genres: [],
+      developer: null,
+      publisher: null,
+      wikidataId: page.wikidata,
+      platforms: [],
+      derivative: false,
+    };
+  }));
 }
 
 /** True when this platform has any keyless art behind it at all. */

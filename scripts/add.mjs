@@ -121,7 +121,12 @@ async function main() {
       const raw = await searchGames(query, title, { platform: opts.platform || null });
       results = raw.map(fromIgdb);
     } else {
-      results = await searchFree(title, { platform: opts.platform || null });
+      // Try the consoles already on the shelf for art, most common first, so
+      // the candidate list shows covers before a platform is chosen.
+      const counts = new Map();
+      for (const g of collection.games) counts.set(g.platform, (counts.get(g.platform) || 0) + 1);
+      const artPlatforms = [...counts.keys()].sort((a, b) => counts.get(b) - counts.get(a));
+      results = await searchFree(title, { platform: opts.platform || null, artPlatforms });
     }
 
     if (!results.length) {

@@ -450,7 +450,14 @@ export async function handleApi(req, res, { port }) {
       // same question, just without genres and companies.
       const query = await getIgdb();
       if (!query) {
-        const free = await searchFree(term, { platform, limit: 8 });
+        // The keyless art source is per-console; before one is chosen, the
+        // consoles already on the shelf are the ones worth trying, most
+        // common first, so search results still show covers.
+        const { games } = await loadCollectionForVendor();
+        const counts = new Map();
+        for (const g of games) counts.set(g.platform, (counts.get(g.platform) || 0) + 1);
+        const artPlatforms = [...counts.keys()].sort((a, b) => counts.get(b) - counts.get(a));
+        const free = await searchFree(term, { platform, limit: 8, artPlatforms });
         send(res, 200, { results: free, source: 'free' });
         return true;
       }
