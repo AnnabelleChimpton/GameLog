@@ -3425,6 +3425,28 @@
       "boxartRatio": 1.434
     },
     {
+      "id": "nintendo-gamecube-star-fox-adventures",
+      "title": "Star Fox Adventures",
+      "platform": "Nintendo GameCube",
+      "year": 2002,
+      "cover": "assets/covers/nintendo-gamecube-star-fox-adventures.jpg",
+      "description": "Star Fox Adventures is a 2002 action-adventure game developed by Rare and published by Nintendo for the GameCube. The game's story is set eight years after the events of Star Fox 64, with players taking control of Fox McCloud, who is sent on a mission to visit the Dinosaur Planet in the Lylat System and prevent its destruction. Gameplay is divided between Adventure Mode, in which players explore environments while defeating enemies, solving puzzles, and collecting items, and Arwing Mode, which features rail shooter segments.",
+      "genres": [],
+      "developer": null,
+      "publisher": null,
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": 82,
+      "notes": null,
+      "added": "2026-08-24",
+      "boxart": "assets/boxart/nintendo-gamecube-star-fox-adventures.jpg",
+      "boxartRatio": 0.71,
+      "igdbId": null,
+      "wikidataId": "Q2578717"
+    },
+    {
       "id": "nintendo-64-star-wars-episode-i-racer",
       "title": "Star Wars Episode I: Racer",
       "platform": "Nintendo 64",
