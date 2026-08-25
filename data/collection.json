@@ -287,6 +287,28 @@
       "boxartRatio": 1.434
     },
     {
+      "id": "nintendo-gamecube-bratz-rock-angelz",
+      "title": "Bratz: Rock Angelz",
+      "platform": "Nintendo GameCube",
+      "year": 2005,
+      "cover": "assets/covers/nintendo-gamecube-bratz-rock-angelz.jpg",
+      "description": "Bratz: Rock Angelz is a 2005 adventure video game based on the Bratz fashion doll line and published by THQ. It is based on the direct-to-video film Bratz: Rock Angelz and the line of dolls affiliated with the same name. The game was released for the PlayStation 2, GameCube, Game Boy Advance, and Windows. Blitz Games developed the PlayStation 2 and GameCube versions, while Altron and AWE Games developed the Game Boy Advance and Windows versions respectively.",
+      "genres": [],
+      "developer": null,
+      "publisher": null,
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-24",
+      "boxart": "assets/boxart/nintendo-gamecube-bratz-rock-angelz.jpg",
+      "boxartRatio": 0.693,
+      "igdbId": null,
+      "wikidataId": "Q4958181"
+    },
+    {
       "id": "microsoft-xbox-buffy-the-vampire-slayer",
       "title": "Buffy the Vampire Slayer",
       "platform": "Microsoft Xbox",
