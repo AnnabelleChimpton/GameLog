@@ -199,6 +199,59 @@ export async function findBoxart(title, platform, { region = 'USA' } = {}) {
   return ratio ? { url, ratio } : null;
 }
 
+/** "Legend of Zelda, The - Ocarina of Time" -> "The Legend of Zelda: Ocarina of Time". */
+function displayTitle(stem) {
+  return stem
+    .replace(/^([^-]+?), (The|A|An)( - |$)/, (_, name, article, sep) => `${article} ${name}${sep}`)
+    .replace(/ - /g, ': ')
+    .trim();
+}
+
+/**
+ * Search the art indexes themselves for a title.
+ *
+ * Wikipedia is the usual way a keyless search finds games, but plenty of
+ * licensed and shovelware titles never got an article -- and every one of
+ * them that was scanned is a line in these listings. So the listings double
+ * as a catalogue: whatever matches becomes a candidate, art included.
+ *
+ * A query word matches a name that contains it, and a near miss on the last
+ * character is forgiven ("Diamonds" finds "Diamondz") -- box titles are
+ * misremembered more often than they are mistyped.
+ */
+export async function searchIndexes(term, platforms, { limit = 6, region = 'USA' } = {}) {
+  const tokens = String(term).normalize('NFKD').toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+  if (!tokens.length) return [];
+
+  const matches = (name) => tokens.every((t) =>
+    name.includes(t) || (t.length >= 4 && name.includes(t.slice(0, -1))));
+
+  const found = new Map(); // normalised title -> { title, platforms, entryByPlatform }
+  for (const platform of platforms) {
+    const system = libretroDir(platform);
+    if (!system) continue;
+    const entries = await loadIndex(system);
+    for (const entry of entries) {
+      const name = normalize(entry.title);
+      if (!name || !matches(name)) continue;
+      if (!found.has(name)) found.set(name, { title: displayTitle(entry.title), platforms: [] });
+      const hit = found.get(name);
+      if (!hit.platforms.includes(platform)) hit.platforms.push(platform);
+    }
+  }
+
+  const results = [];
+  for (const hit of found.values()) {
+    if (results.length >= limit) break;
+    // Resolve art properly for the first platform, so region and revision
+    // scoring pick the same scan an add would.
+    const cover = await findCover(hit.title, hit.platforms[0], { region });
+    results.push({ title: hit.title, platforms: hit.platforms, artPlatform: cover ? hit.platforms[0] : null, cover });
+  }
+  return results;
+}
+
 /**
  * Which platforms have a keyless art source worth trying.
  *

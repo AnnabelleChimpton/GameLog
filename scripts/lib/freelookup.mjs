@@ -6,7 +6,7 @@
 // is what selects which scanned set to look in.
 
 import { searchTitles, yearFromExtract } from './wikipedia.mjs';
-import { findCover, libretroDir } from './libretro.mjs';
+import { findCover, libretroDir, searchIndexes } from './libretro.mjs';
 
 /** Trim an extract to something that reads as a blurb rather than an article. */
 function blurb(text) {
@@ -34,7 +34,7 @@ export async function searchFree(term, { platform = null, limit = 8, region = 'U
   const pages = await searchTitles(term, { limit });
   const tryPlatforms = platform ? [platform] : artPlatforms.filter(hasFreeArt).slice(0, 10);
 
-  return Promise.all(pages.map(async (page) => {
+  const results = await Promise.all(pages.map(async (page) => {
     let cover = null;
     let artPlatform = null;
     for (const candidate of tryPlatforms) {
@@ -55,7 +55,33 @@ export async function searchFree(term, { platform = null, limit = 8, region = 'U
       derivative: false,
     };
   }));
+
+  // Wikipedia only writes about games somebody wrote about. The art indexes
+  // list every game somebody scanned, which for licensed titles is the longer
+  // list -- so they are searched too, and whatever Wikipedia missed is
+  // appended: title, platforms and cover, with the rest left for the owner.
+  const already = new Set(results.map((r) => plainTitle(r.title)));
+  const scanned = await searchIndexes(term, platform ? [platform] : artPlatforms, { region });
+  for (const hit of scanned) {
+    if (already.has(plainTitle(hit.title))) continue;
+    results.push({
+      title: hit.title,
+      year: null,
+      description: null,
+      cover: hit.cover,
+      artPlatform: hit.artPlatform,
+      genres: [],
+      developer: null,
+      publisher: null,
+      wikidataId: null,
+      platforms: hit.platforms,
+      derivative: false,
+    });
+  }
+  return results;
 }
+
+const plainTitle = (t) => String(t).normalize('NFKD').toLowerCase().replace(/[^a-z0-9]/g, '');
 
 /** True when this platform has any keyless art behind it at all. */
 export const hasFreeArt = (platform) => Boolean(platform && libretroDir(platform));

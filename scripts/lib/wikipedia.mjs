@@ -148,6 +148,8 @@ export async function searchTitles(term, { limit = 8 } = {}) {
       order: page.index ?? 0,
     }))
     .filter((page) => looksRelevant(page.extract))
+    // Index pages mention games constantly without being one.
+    .filter((page) => !/^(List|Index|Category) of /i.test(page.articleTitle))
     .sort((a, b) => a.order - b.order);
 }
 
@@ -197,7 +199,7 @@ export function looksRelevant(extract) {
   // "Super Smash Bros. is a crossover fighting game series" -- the noun the
   // subject *is* comes right after "is a", within a few words. Only the
   // first sentence counts: the next may say "it is a tie-in to the film".
-  if (/\bis an? (?:[\w'-]+[ ,]+){0,6}?(series|franchise|film|novel|television)\b/i.test(firstSentence(text))) {
+  if (/\b(?:is|was) an? (?:[\w'-]+[ ,]+){0,6}?(series|franchise|film|novel|television|developer|publisher|company|studio)\b/i.test(firstSentence(text))) {
     return false;
   }
   return /\b(video game|[a-z-]+ game|game (developed|published|released|for|by|in))\b/i.test(text);
