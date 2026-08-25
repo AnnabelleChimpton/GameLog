@@ -287,6 +287,28 @@
       "boxartRatio": 1.434
     },
     {
+      "id": "nintendo-gamecube-bratz-forever-diamondz",
+      "title": "Bratz: Forever Diamondz",
+      "platform": "Nintendo GameCube",
+      "year": null,
+      "cover": "assets/covers/nintendo-gamecube-bratz-forever-diamondz.jpg",
+      "description": null,
+      "genres": [],
+      "developer": null,
+      "publisher": null,
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-25",
+      "boxart": "assets/boxart/nintendo-gamecube-bratz-forever-diamondz.jpg",
+      "boxartRatio": 0.693,
+      "igdbId": null,
+      "wikidataId": null
+    },
+    {
       "id": "nintendo-gamecube-bratz-rock-angelz",
       "title": "Bratz: Rock Angelz",
       "platform": "Nintendo GameCube",
