@@ -2771,6 +2771,31 @@
       "boxartRatio": 1.407
     },
     {
+      "id": "microsoft-xbox-ninja-gaiden-black",
+      "title": "Ninja Gaiden Black",
+      "platform": "Microsoft Xbox",
+      "year": 2005,
+      "cover": "assets/covers/microsoft-xbox-ninja-gaiden-black.jpg",
+      "description": "In Ninja Gaiden Black you can reprise the role of Ryu Hayabusa, ninja extraordinaire. This sequel to Ninja Gaiden supplies a new story and new missions, plus two more difficulty settings and cinematic cut scenes that provide background about the protagonist. Ninja Gaiden Black also incorporates the additional content from Hurricane Packs 1 and 2 and includes unlockable content such as the original arcade version of Ninja Gaiden.",
+      "genres": [
+        "Hack and slash/Beat 'em up",
+        "Adventure"
+      ],
+      "developer": "Team NINJA",
+      "publisher": "Tecmo",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 91,
+      "notes": null,
+      "added": "2026-08-26",
+      "boxart": "assets/boxart/microsoft-xbox-ninja-gaiden-black.jpg",
+      "boxartRatio": 0.714,
+      "igdbId": 18735,
+      "wikidataId": null
+    },
+    {
       "id": "3do-pebble-beach-golf-links",
       "title": "Pebble Beach Golf Links",
       "platform": "3DO",
@@ -3257,6 +3282,30 @@
       "notes": null,
       "added": "2026-08-19",
       "igdbId": 4092,
+      "wikidataId": null
+    },
+    {
+      "id": "nintendo-64-rugrats-in-paris-the-movie",
+      "title": "Rugrats in Paris: The Movie",
+      "platform": "Nintendo 64",
+      "year": 2000,
+      "cover": "assets/covers/nintendo-64-rugrats-in-paris-the-movie.jpg",
+      "description": "Tommy Pickle's father has been sent to Europe for maintenance work at Euroreptarland. The Rugrats join him on his travel to Europe. There are 16 levels and hidden bonus level to play through. The game consists of various mini-games that have to be completed in order to earn enough tickets to beat the game. Most tickets, however, can just be collected by running around the park and picking them up. Tickets can be used to buy prizes. There are ten mini games including whack-a-ninja, bumper cars and mini-golf.",
+      "genres": [
+        "Platform"
+      ],
+      "developer": "Avalanche Software, KnowWonder",
+      "publisher": "THQ, Mattel Interactive",
+      "region": null,
+      "release": null,
+      "condition": "Loose",
+      "copies": 1,
+      "metacritic": 64,
+      "notes": null,
+      "added": "2026-08-26",
+      "boxart": "assets/boxart/nintendo-64-rugrats-in-paris-the-movie.jpg",
+      "boxartRatio": 1.369,
+      "igdbId": 2792,
       "wikidataId": null
     },
     {
