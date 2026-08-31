@@ -142,6 +142,30 @@
       "igdbId": 303811
     },
     {
+      "id": "snes-super-famicom-ballz-3d",
+      "title": "Ballz 3D",
+      "platform": "SNES/Super Famicom",
+      "year": 1994,
+      "cover": "assets/covers/snes-super-famicom-ballz-3d.jpg",
+      "description": "Ballz 3D is a two player 3D action fighting game for the Sega Mega Drive/Genesis, the Super NES (SNES) and the 3DO. It was developed by PF Magic and published by Accolade in 1994. The 3DO version was released as a director's cut in 1995. Ballz offered three difficulty levels over a total of 21 matches. Its distinguishing quality was that each of the characters were composed completely of balls, with a pseudo-3D look.",
+      "genres": [
+        "Fighting"
+      ],
+      "developer": "PF Magic",
+      "publisher": "Tec Toy, Accolade, Media Rings",
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-31",
+      "boxart": null,
+      "boxartRatio": null,
+      "igdbId": 42568,
+      "wikidataId": null
+    },
+    {
       "id": "nintendo-64-banjo-kazooie",
       "title": "Banjo-Kazooie",
       "platform": "Nintendo 64",
@@ -1377,6 +1401,30 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 11156
+    },
+    {
+      "id": "snes-super-famicom-hyperzone",
+      "title": "HyperZone",
+      "platform": "SNES/Super Famicom",
+      "year": 1991,
+      "cover": "assets/covers/snes-super-famicom-hyperzone.jpg",
+      "description": "Hyper Zone plays like a cross between a racing game and shooter. The object of the game is to navigate each level while shooting enemies and earning points, until finally an encounter with a boss ends each level. After enough points are acquired, the player earns an \"extend\" and his or her ship is upgraded in the next stage. The player's ship can receive up to six upgrades.",
+      "genres": [
+        "Shooter"
+      ],
+      "developer": "HAL Laboratory",
+      "publisher": null,
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-31",
+      "boxart": "assets/boxart/snes-super-famicom-hyperzone.jpg",
+      "boxartRatio": 1.407,
+      "igdbId": 42608,
+      "wikidataId": null
     },
     {
       "id": "3do-icebreaker",
@@ -2725,6 +2773,30 @@
       "boxartRatio": 0.714
     },
     {
+      "id": "snes-super-famicom-ncaa-basketball",
+      "title": "NCAA Basketball",
+      "platform": "SNES/Super Famicom",
+      "year": 1992,
+      "cover": "assets/covers/snes-super-famicom-ncaa-basketball.jpg",
+      "description": "NCAA Basketball has unique over-the-shoulder perspective that puts you in the game like never before! Choose your team from five of the top NCAA basketball conferences and lead it through the grueling tournament to a berth in the Final Four and a national championship! Or, challenge a friend to a head-to-head exhibition game. NCAA Basketball offers more than just a super realistic viewpoint on the action. Call the play, sub in your best players and give it your best shot! Hear the crowd go wild with every shot you hit.",
+      "genres": [
+        "Sport"
+      ],
+      "developer": "Sculptured Software",
+      "publisher": "Playtronic, Nintendo",
+      "region": null,
+      "release": null,
+      "condition": "Blockbuster",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-31",
+      "boxart": "assets/boxart/snes-super-famicom-ncaa-basketball.jpg",
+      "boxartRatio": 1.407,
+      "igdbId": 42480,
+      "wikidataId": null
+    },
+    {
       "id": "microsoft-xbox-need-for-speed-carbon",
       "title": "Need for Speed: Carbon",
       "platform": "Microsoft Xbox",
@@ -3397,6 +3469,30 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 50565
+    },
+    {
+      "id": "snes-super-famicom-shaq-fu",
+      "title": "Shaq-Fu",
+      "platform": "SNES/Super Famicom",
+      "year": 1994,
+      "cover": "assets/covers/snes-super-famicom-shaq-fu.jpg",
+      "description": "Shaq brings his awesome skill and size to a multi-world fighting game. As Shaq, use your lightning-fast shuriken and other martial art techniques to prevail over 11 intensely evil warriors in the enforcement of justice. Or choose any of the 12 warriors and fight head to head. Summon Voodoo's bone shattering earthquake, rebound with Rajah's shockwave sword or lash out with Sett's terrifying mummy wrap. Scores of secret power moves to discover and master.",
+      "genres": [
+        "Fighting"
+      ],
+      "developer": "The Dome, Unexpected Development, Tiertex Design Studios, Delphine Software",
+      "publisher": "Playtronic, Electronic Arts, Ocean, Black Pearl Software",
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-31",
+      "boxart": "assets/boxart/snes-super-famicom-shaq-fu.jpg",
+      "boxartRatio": 1.407,
+      "igdbId": 8536,
+      "wikidataId": null
     },
     {
       "id": "3do-shock-wave-operation-jumpgate",
@@ -4305,6 +4401,31 @@
       "igdbId": 3005
     },
     {
+      "id": "microsoft-xbox-the-godfather",
+      "title": "The Godfather",
+      "platform": "Microsoft Xbox",
+      "year": 2006,
+      "cover": "assets/covers/microsoft-xbox-the-godfather.jpg",
+      "description": "The Godfather puts you into the action of the legendary films, while you relive the classic moments of the Corleone family. After a life of small-time jobs and petty thefts, you are accepted into the Corleone family -- America's most famous criminal organization. It will be up to you to carry out orders, earn respect and make New York City your own. Featuring the voices of James Caan and Robert Duvall and the likeness of Marlon Brando.",
+      "genres": [
+        "Shooter",
+        "Adventure"
+      ],
+      "developer": "Headgate Studios, Page 44 Studios",
+      "publisher": "Electronic Arts",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 77,
+      "notes": null,
+      "added": "2026-08-31",
+      "boxart": "assets/boxart/microsoft-xbox-the-godfather.jpg",
+      "boxartRatio": 0.714,
+      "igdbId": 2482,
+      "wikidataId": null
+    },
+    {
       "id": "nintendo-64-the-powerpuff-girls-chemical-x-traction",
       "title": "The Powerpuff Girls: Chemical X-Traction",
       "platform": "Nintendo 64",
@@ -4702,6 +4823,34 @@
       "boxartRatio": 0.713
     },
     {
+      "id": "microsoft-xbox-world-championship-poker",
+      "title": "World Championship Poker",
+      "platform": "Microsoft Xbox",
+      "year": 2004,
+      "cover": "assets/covers/microsoft-xbox-world-championship-poker.jpg",
+      "description": "World Championship Poker offers the most challenging, most realistic poker game play around. Compete against top players for a seat at the Grand Championship Table -- call their bluffs, know when to hold 'em and when to fold 'em, and try to make it to the final showdown!",
+      "genres": [
+        "Puzzle",
+        "Simulator",
+        "Strategy",
+        "Turn-based strategy (TBS)",
+        "Card & Board Game"
+      ],
+      "developer": "Coresoft, Point of View",
+      "publisher": "Crave Entertainment, 505 Games, Oxygen Games",
+      "region": null,
+      "release": null,
+      "condition": "CIB Sealed",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-08-31",
+      "boxart": "assets/boxart/microsoft-xbox-world-championship-poker.jpg",
+      "boxartRatio": 0.715,
+      "igdbId": 6237,
+      "wikidataId": null
+    },
+    {
       "id": "nintendo-gamecube-x-men-next-dimension",
       "title": "X-Men: Next Dimension",
       "platform": "Nintendo GameCube",
@@ -4794,6 +4943,30 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 4583
+    },
+    {
+      "id": "microsoft-xbox-zathura",
+      "title": "Zathura",
+      "platform": "Microsoft Xbox",
+      "year": 2005,
+      "cover": "assets/covers/microsoft-xbox-zathura.jpg",
+      "description": "The intergalactic journey begins when a mysterious board game thrusts the house of two young brothers, Walter and Danny, into outer space. Battle deadly aliens, menacing robots and other celestial hazards in this space journey filled with action-packed adventure!",
+      "genres": [
+        "Adventure"
+      ],
+      "developer": "High Voltage Software",
+      "publisher": "2K Games",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 48,
+      "notes": null,
+      "added": "2026-08-31",
+      "boxart": "assets/boxart/microsoft-xbox-zathura.jpg",
+      "boxartRatio": 0.715,
+      "igdbId": 47324,
+      "wikidataId": null
     },
     {
       "id": "3do-zhadnost-the-people-s-party",
