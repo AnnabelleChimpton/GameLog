@@ -11,7 +11,7 @@
 // to the published site, which is static files with no server behind them.
 
 import { createServer } from 'node:http';
-import { serveStatic } from './lib/static.mjs';
+import { serveStatic, hostAllowed } from './lib/static.mjs';
 import { handleApi } from './lib/manage-api.mjs';
 import { loadPlatformOverrides } from './lib/collection.mjs';
 
@@ -22,6 +22,13 @@ const port = Number(process.argv[2]) || 4321;
 await loadPlatformOverrides();
 
 const server = createServer(async (req, res) => {
+  // Binding to loopback does not stop DNS rebinding -- a hostile page can
+  // resolve its own name here and drive this server through the visitor's
+  // browser. Only the loopback names may ask, static and API alike.
+  if (!hostAllowed(req.headers.host, port)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain' }).end('Forbidden');
+    return;
+  }
   if (await handleApi(req, res, { port })) return;
   await serveStatic(req, res);
 });

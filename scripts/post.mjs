@@ -30,8 +30,16 @@ function parse(argv) {
   const rest = [];
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
-    if (a.startsWith('--')) { flags[a.slice(2)] = argv[++i] ?? true; }
-    else rest.push(a);
+    if (a.startsWith('--')) {
+      const value = argv[i + 1];
+      // Swallowing the next --flag as the value would silently misread the
+      // whole command, so a flag with nothing after it is an error instead.
+      if (value === undefined || value.startsWith('--')) {
+        throw new Error(`${a} needs a value, e.g. ${a} "…"`);
+      }
+      flags[a.slice(2)] = value;
+      i += 1;
+    } else rest.push(a);
   }
   return { flags, rest };
 }
@@ -114,4 +122,9 @@ async function main() {
   console.log(`Publish it: git add ${files} && git commit -m "Log post" && git push`);
 }
 
-main().finally(() => rl.close());
+main()
+  .catch((err) => {
+    console.error(`\n${err.message || err}`);
+    process.exitCode = 1;
+  })
+  .finally(() => rl.close());

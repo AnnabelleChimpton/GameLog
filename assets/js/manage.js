@@ -47,6 +47,9 @@ const state = {
   // Lists created this session and not yet written to disk. Their ids may still
   // follow their names; a saved list's id is frozen because links point at it.
   freshLists: new Set(),
+  // Same idea for posts: until the first save nothing links at a post's id,
+  // so it may keep tracking the title as it is typed.
+  freshPosts: new Set(),
 };
 
 /* --- Saving --------------------------------------------------------------- */
@@ -87,6 +90,7 @@ async function save() {
     }
     state.dirty.clear();
     state.freshLists.clear();
+    state.freshPosts.clear();
     $('#dirty').hidden = true;
     status(`Saved ${targets.map((t) => `data/${t}.json`).join(' and ')}.`);
   } catch (err) {
@@ -153,7 +157,11 @@ function thumb(game) {
 
 /* --- The game picker ------------------------------------------------------ */
 
-let pickerResolve = null;
+// One counter across every picker and every keystroke. A search that comes
+// back is only allowed to paint if nothing newer has started since -- neither
+// a faster later search in the same picker, nor a whole new picker reusing the
+// same #picker-results element.
+let pickerSearchSeq = 0;
 
 /**
  * Which shelves a search result could plausibly go on.
@@ -249,8 +257,15 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
   // *before* awaiting box art -- so without this guard that null would settle
   // the promise first and the real pick would be lost.
   let resolving = false;
+  // The result of this invocation, created up front so every handler below
+  // closes over its own resolver. A module-level one cross-wired two pickers:
+  // the platform step awaits box art after closing the dialog, and a picker
+  // opened during that await would steal (and be settled by) the earlier pick.
+  let resolvePick;
+  const picked = new Promise((resolve) => { resolvePick = resolve; });
   input.value = '';
   input.placeholder = title || 'Search…';
+  pickerSearchSeq += 1; // orphan any search still in flight from a previous picker
   results.replaceChildren();
   $('#picker-hint').textContent = state.igdb || !allowSearch
     ? 'Type at least two letters.'
@@ -259,6 +274,7 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
 
   let timer;
   const run = async () => {
+    const seq = ++pickerSearchSeq;
     const term = input.value.trim();
     if (term.length < 2) { results.replaceChildren(); return; }
 
@@ -273,7 +289,7 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
       for (const game of owned) {
         rows.push(h('button', {
           type: 'button', class: 'mg-result',
-          onclick: () => { dialog.close(); pickerResolve?.({ kind: 'owned', game }); },
+          onclick: () => { resolving = true; dialog.close(); resolvePick({ kind: 'owned', game }); },
         },
           thumb(game),
           h('div', { class: 'mg-result__body' },
@@ -289,13 +305,16 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
       if (platform) params.set('platform', platform);
       const res = await fetch(`/api/search?${params}`, { headers: API.headers })
         .then((r) => r.json()).catch(() => ({ results: [] }));
+      // A slower earlier search must not paint over what a newer one drew.
+      if (seq !== pickerSearchSeq) return;
       for (const found of res.results || []) {
         rows.push(h('button', {
           type: 'button', class: 'mg-result',
           onclick: () => {
             if (!needPlatform) {
+              resolving = true;
               dialog.close();
-              pickerResolve?.({ kind: 'new', game: found });
+              resolvePick({ kind: 'new', game: found });
               return;
             }
             $('#picker-hint').textContent = '';
@@ -320,7 +339,7 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
                 found.boxart = got.boxart || null;
                 found.boxartRatio = got.boxartRatio || null;
               }
-              pickerResolve?.({ kind: 'new', game: found, platform: chosenPlatform });
+              resolvePick({ kind: 'new', game: found, platform: chosenPlatform });
             }, { allowAny: allowAnyPlatform });
           },
         },
@@ -345,12 +364,10 @@ function openPicker({ title, allowOwned = true, allowSearch = true, platform = n
   dialog.showModal();
   input.focus();
 
-  return new Promise((resolve) => {
-    pickerResolve = resolve;
-    // Only a dismissal resolves null; a committed choice (resolving) closes the
-    // dialog itself and resolves with the real value a moment later.
-    dialog.addEventListener('close', () => { if (!resolving) resolve(null); }, { once: true });
-  });
+  // Only a dismissal resolves null; a committed choice (resolving) closes the
+  // dialog itself and resolves with the real value a moment later.
+  dialog.addEventListener('close', () => { if (!resolving) resolvePick(null); }, { once: true });
+  return picked;
 }
 
 /* --- Lists tab ------------------------------------------------------------ */
@@ -377,7 +394,11 @@ function renderLists() {
       type: 'button', class: 'pillbutton pillbutton--accent',
       onclick: () => {
         const name = `New list ${lists.length + 1}`;
-        const list = { id: slug(name), name, description: null, items: [] };
+        // Deleting "New list 1" leaves "New list 2" holding the count at 2, so
+        // the next create would mint a second "new-list-2" -- and two lists
+        // sharing an id share a deep link. Dedup here, the way a rename does.
+        const taken = new Set(lists.map((l) => l.id));
+        const list = { id: uniqueId(slug(name), taken), name, description: null, items: [] };
         lists.push(list);
         state.freshLists.add(list);
         state.selectedList = list.id;
@@ -839,8 +860,10 @@ function renderGames() {
   const wrap = $('#tab-games');
   const term = state.gameQuery.trim().toLowerCase();
   const games = term
+    // A platform can legitimately be missing (the row below renders it as
+    // "⚠ no platform"), so the filter has to tolerate it too.
     ? state.collection.games.filter((g) =>
-        g.title.toLowerCase().includes(term) || g.platform.toLowerCase().includes(term))
+        g.title.toLowerCase().includes(term) || (g.platform || '').toLowerCase().includes(term))
     : state.collection.games;
 
   const search = h('div', { class: 'mg-listbar mg-listbar--sticky' },
@@ -889,7 +912,7 @@ function renderGames() {
         markDirty('collection');
         renderGames();
         revealGame(game.id);
-        status(`Added ${game.title}: ${game.platform}.`)
+        status(`Added ${game.title}: ${game.platform}.`);
       },
     }, h('span', { text: '+ Add a game' })));
 
@@ -1104,9 +1127,13 @@ async function backupArt(button) {
   if (state.dirty.size) await save();
   if (state.dirty.size) return; // The save failed and already said so.
 
+  // Disabling has to hit the <button>, not its label span -- a span's
+  // `disabled` is a no-op, and a double-click here launches a second
+  // long-running download job on the server. The text lives on the span.
   button.disabled = true;
-  const previous = button.textContent;
-  button.textContent = `Downloading ${linked}…`;
+  const label = button.querySelector('span') || button;
+  const previous = label.textContent;
+  label.textContent = `Downloading ${linked}…`;
   status(`Downloading ${plural(linked, 'image')}. This can take a minute.`);
 
   try {
@@ -1120,17 +1147,20 @@ async function backupArt(button) {
     state.collection.hardware = state.collection.hardware || [];
 
     const stored = `Stored ${plural(json.stored, 'image')}, ${(json.bytes / 1024 / 1024).toFixed(1)} MB.`;
-    status(json.failed.length
-      ? `${stored} ${plural(json.failed.length, 'image')} could not be downloaded and `
+    // A success answer without a `failed` list is still a success -- reading
+    // .length off a missing field would turn it into an error toast.
+    const failed = Array.isArray(json.failed) ? json.failed.length : 0;
+    status(failed
+      ? `${stored} ${plural(failed, 'image')} could not be downloaded and `
         + 'kept the link: try again, or replace them by hand.'
       : `${stored} Your art is all in the repo now.`,
-      json.failed.length ? 'warn' : 'info');
+      failed ? 'warn' : 'info');
     renderTab();
   } catch (err) {
     status(err.message, 'error');
   } finally {
     button.disabled = false;
-    button.textContent = previous;
+    label.textContent = previous;
   }
 }
 
@@ -1142,9 +1172,11 @@ async function shrinkArt(button) {
   if (state.dirty.size) await save();
   if (state.dirty.size) return;
 
+  // Same as backupArt: the <button> is what disables, the span is what reads.
   button.disabled = true;
-  const previous = button.textContent;
-  button.textContent = 'Shrinking…';
+  const label = button.querySelector('span') || button;
+  const previous = label.textContent;
+  label.textContent = 'Shrinking…';
   status('Re-encoding the stored pictures. A few hundred take about a minute.');
 
   try {
@@ -1166,24 +1198,24 @@ async function shrinkArt(button) {
     status(err.message, 'error');
   } finally {
     button.disabled = false;
-    button.textContent = previous;
+    label.textContent = previous;
   }
 }
 
 function artCard() {
   const { total, linked } = artCounts();
-  const shrinkLabel = h('span', { text: 'Shrink stored pictures' });
-  const shrink = h('button', {
-    type: 'button', class: 'pillbutton', onclick: () => shrinkArt(shrinkLabel),
-  }, shrinkLabel);
+  // Each handler gets its own <button>: that is the element whose `disabled`
+  // actually stops the double-click that used to start two server jobs.
+  const shrink = h('button', { type: 'button', class: 'pillbutton' },
+    h('span', { text: 'Shrink stored pictures' }));
+  shrink.addEventListener('click', () => shrinkArt(shrink));
   shrink.disabled = !total;
-  const button = h('span', {
-    text: linked ? `Download ${plural(linked, 'image')}` : 'Nothing to download',
-  });
   const go = h('button', {
     type: 'button', class: linked ? 'pillbutton pillbutton--accent' : 'pillbutton',
-    onclick: () => backupArt(button),
-  }, button);
+  }, h('span', {
+    text: linked ? `Download ${plural(linked, 'image')}` : 'Nothing to download',
+  }));
+  go.addEventListener('click', () => backupArt(go));
   go.disabled = !linked;
 
   return h('div', { class: 'mg-card' },
@@ -1215,7 +1247,10 @@ function downloadCsv(text, name) {
   const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
   const link = h('a', { href: URL.createObjectURL(blob), download: name });
   link.click();
-  URL.revokeObjectURL(link.href);
+  // click() only queues the download; revoking synchronously can pull the url
+  // out from under it in some browsers. A minute is far longer than any
+  // browser needs to open the blob, and the memory is pennies.
+  setTimeout(() => URL.revokeObjectURL(link.href), 60_000);
 }
 
 function exportCard() {
@@ -1577,10 +1612,19 @@ function postId(post, taken) {
   return `${base}-${n}`;
 }
 
-/** Freeze an id once the post has a title, the way a saved list's id is frozen. */
+/**
+ * Keep a post's id in step with its title, the way a fresh list's id follows
+ * its name. A published post's id is a deep link target (feed.xml, other
+ * shelves' rivers point at it), so an id that already existed when the manager
+ * loaded is frozen and never regenerated. Freezing any earlier than that --
+ * this used to freeze on the first keystroke -- filed every post as
+ * "2026-09-02-f".
+ */
 function ensurePostId(post) {
-  if (post.id || !post.title.trim()) return;
-  const taken = new Set(state.feed.posts.map((p) => p.id).filter(Boolean));
+  if (post.id && !state.freshPosts.has(post)) return;
+  if (!post.title.trim()) { post.id = null; return; }
+  const taken = new Set(
+    state.feed.posts.filter((p) => p !== post).map((p) => p.id).filter(Boolean));
   post.id = postId(post, taken);
 }
 
@@ -1592,7 +1636,9 @@ function renderUpdates() {
   const add = h('button', {
     type: 'button', class: 'mg-mini mg-mini--add',
     onclick: () => {
-      posts.unshift({ id: null, date: todayIso(), title: '', body: '', ref: null });
+      const post = { id: null, date: todayIso(), title: '', body: '', ref: null };
+      posts.unshift(post);
+      state.freshPosts.add(post);
       markDirty('feed');
       renderUpdates();
     },
@@ -1635,7 +1681,8 @@ function renderUpdates() {
         field('Title', post.title, (v) => {
           post.title = v; ensurePostId(post); markDirty('feed');
         }, { placeholder: 'Finally found a boxed Halo' }),
-        field('Date', post.date, (v) => { post.date = v; markDirty('feed'); },
+        // The date is the id's prefix, so a fresh post's id follows it too.
+        field('Date', post.date, (v) => { post.date = v; ensurePostId(post); markDirty('feed'); },
           { type: 'date' })),
       field('Body', post.body, (v) => { post.body = v; markDirty('feed'); },
         { rows: 3, placeholder: 'Blank lines make paragraphs. **bold** and [links](https://…) work.' }),

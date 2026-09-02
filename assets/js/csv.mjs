@@ -19,6 +19,19 @@ export function csvCell(value) {
 }
 
 /**
+ * A cell for a file that will be opened in a spreadsheet. Excel and Sheets
+ * treat a cell starting with = + - or @ as a formula, so a game note of
+ * "=HYPERLINK(...)" would execute on the machine of whoever opens the export.
+ * The standard defence is a leading apostrophe, which those apps display as
+ * literal text. Export-only: nothing here parses CSV back in, and the guard
+ * must never touch imported data.
+ */
+export function csvExportCell(value) {
+  const text = value == null ? '' : String(value);
+  return csvCell(/^[=+\-@]/.test(text) ? `'${text}` : text);
+}
+
+/**
  * Rows under a header, as one CSV string.
  *
  * Starts with a UTF-8 byte-order mark: without it Excel assumes a legacy
@@ -28,7 +41,7 @@ export function csvCell(value) {
 function toCsv(columns, records) {
   const rows = [columns.map(([name]) => name).join(',')];
   for (const record of records) {
-    rows.push(columns.map(([, get]) => csvCell(get(record))).join(','));
+    rows.push(columns.map(([, get]) => csvExportCell(get(record))).join(','));
   }
   return '\uFEFF' + rows.join('\r\n') + '\r\n';
 }

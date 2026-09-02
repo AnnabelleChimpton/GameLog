@@ -366,24 +366,34 @@ export function h(tag, props = {}, ...children) {
  * its own prose.
  */
 export function richText(text, { paraClass = 'prose__p' } = {}) {
-  return String(text ?? '').split(/\n{2,}/).map((para) => {
-    const node = h('p', { class: paraClass });
-    const pattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|\*\*([^*]+)\*\*/g;
-    let last = 0;
-    let match;
-    while ((match = pattern.exec(para))) {
-      if (match.index > last) node.append(para.slice(last, match.index));
-      if (match[2]) {
-        node.append(h('a', { href: match[2], target: '_blank',
-          rel: 'noopener noreferrer', text: match[1] }));
-      } else {
-        node.append(h('strong', { text: match[3] }));
-      }
-      last = pattern.lastIndex;
+  return String(text ?? '').split(/\n{2,}/)
+    .map((para) => h('p', { class: paraClass }, inlineText(para)));
+}
+
+/**
+ * The inline half of richText -- links and bold as nodes, no paragraphs --
+ * for the one-line places (the footer) that want the same restrained markdown
+ * without wrapping everything in a <p>. One implementation, so the footer and
+ * the log can never drift apart on what is interpreted.
+ */
+export function inlineText(text) {
+  const out = [];
+  const source = String(text ?? '');
+  const pattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|\*\*([^*]+)\*\*/g;
+  let last = 0;
+  let match;
+  while ((match = pattern.exec(source))) {
+    if (match.index > last) out.push(source.slice(last, match.index));
+    if (match[2]) {
+      out.push(h('a', { href: match[2], target: '_blank',
+        rel: 'noopener noreferrer', text: match[1] }));
+    } else {
+      out.push(h('strong', { text: match[3] }));
     }
-    if (last < para.length) node.append(para.slice(last));
-    return node;
-  });
+    last = pattern.lastIndex;
+  }
+  if (last < source.length) out.push(source.slice(last));
+  return out;
 }
 
 /** Count occurrences, returning [value, count] sorted by count descending. */

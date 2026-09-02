@@ -69,25 +69,33 @@ export async function getToken({ id, secret }) {
 
 export function createClient({ id, token }) {
   return async function query(endpoint, body) {
-    await throttle();
-    const res = await fetch(`${API}/${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Client-ID': id,
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
-      body,
-    });
-    if (res.status === 429) {
-      // Backed off harder than the throttle expected; wait and retry once.
-      await new Promise((r) => setTimeout(r, 1500));
-      return query(endpoint, body);
+    // A 429 despite the throttle means IGDB wants a harder back-off; a few
+    // waits are worth it, but retrying forever would hang a whole enrich run
+    // on one bad stretch, so after that the limit becomes an honest error.
+    for (let attempt = 0; ; attempt++) {
+      await throttle();
+      const res = await fetch(`${API}/${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Client-ID': id,
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+        },
+        body,
+      });
+      if (res.status === 429 && attempt < 3) {
+        await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
+        continue;
+      }
+      if (res.status === 429) {
+        throw new Error(`IGDB is rate-limiting harder than expected (${endpoint}). `
+          + 'Wait a minute and run this again.');
+      }
+      if (!res.ok) {
+        throw new Error(`IGDB ${endpoint} failed (HTTP ${res.status}): ${await res.text()}`);
+      }
+      return res.json();
     }
-    if (!res.ok) {
-      throw new Error(`IGDB ${endpoint} failed (HTTP ${res.status}): ${await res.text()}`);
-    }
-    return res.json();
   };
 }
 
@@ -112,7 +120,9 @@ export function companies(game) {
 }
 
 function escapeQuotes(s) {
-  return String(s).replace(/"/g, '\\"');
+  // Backslashes first, or a title ending in one turns the closing quote into
+  // an escaped quote and the whole query into a 400.
+  return String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
 /** Edition wording that catalogues carry but IGDB's game titles do not. */

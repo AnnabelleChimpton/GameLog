@@ -117,20 +117,22 @@ export async function loadIndex(system) {
   if (cache.has(system)) return cache.get(system);
 
   const url = `${BASE}/${encodeURIComponent(system)}/Named_Boxarts/`;
-  let entries = [];
   try {
-    const res = await fetch(url, { headers: { 'User-Agent': UA } });
-    if (res.ok) {
-      const html = await res.text();
-      entries = [...html.matchAll(/href="([^"]+\.png)"/gi)]
-        .map((m) => parseEntry(decodeHref(m[1])));
-    }
+    const res = await fetch(url, {
+      headers: { 'User-Agent': UA },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) return []; // Not cached: a 5xx now may be a listing later.
+    const html = await res.text();
+    const entries = [...html.matchAll(/href="([^"]+\.png)"/gi)]
+      .map((m) => parseEntry(decodeHref(m[1])));
+    cache.set(system, entries);
+    return entries;
   } catch {
-    entries = []; // Offline or unreachable: treated as "no art available".
+    // Offline or unreachable: answer "no art" for this call, but never cache
+    // it -- one transient blip must not kill a console's art until restart.
+    return [];
   }
-
-  cache.set(system, entries);
-  return entries;
 }
 
 /**

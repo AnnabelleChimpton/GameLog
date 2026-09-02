@@ -11,7 +11,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import {
-  isRemote, usableId, artInventory, artSummary, vendorArt, vendorEntry, ART_FIELDS,
+  isRemote, isDataUrl, usableId, artInventory, artSummary, vendorArt, vendorEntry,
+  mergeArtChanges, ART_FIELDS,
 } from '../scripts/lib/vendor.mjs';
 
 /* --- What counts as somebody else's server -------------------------------- */
@@ -24,6 +25,19 @@ test('a link is remote and a repo path is not', () => {
   for (const value of [null, undefined, '', '   ', 'data:image/png;base64,AAA']) {
     assert.equal(isRemote(value), false, `${JSON.stringify(value)} is not a link`);
   }
+});
+
+test('a data: url is self-contained: not remote, not a file that can go missing', () => {
+  assert.equal(isDataUrl('data:image/png;base64,AAA'), true);
+  assert.equal(isDataUrl('assets/covers/x.png'), false);
+  assert.equal(isDataUrl('https://cdn.test/x.png'), false);
+  // check.mjs once walked these as repo paths and reported every inline cover
+  // as "not in the repo"; the inventory leaves them out entirely instead.
+  const items = artInventory({
+    games: [{ id: 'x', title: 'X', cover: 'data:image/png;base64,AAA' }],
+    hardware: [],
+  });
+  assert.deepEqual(items, []);
 });
 
 test('an id has to be an id, because it becomes a filename', () => {
@@ -175,6 +189,24 @@ test('a private address is refused, so this cannot be pointed at your network', 
 
   assert.equal(result.done.length, 0);
   assert.match(result.failed[0].error, /private network|this machine/);
+});
+
+test('a finished run merges only its own changes into a fresher collection', async () => {
+  // The server routes re-read the file after a long run and lay the run's art
+  // over it, so an edit saved in the manager meanwhile survives.
+  const { fields } = await tempFields();
+  const collection = sample();
+  const result = await withFetch(ok, () => vendorArt(collection, { fields }));
+
+  const fresh = sample();
+  fresh.games[0].notes = 'edited while the run was going';
+  fresh.games = fresh.games.filter((g) => g.id !== 'n64-b'); // and one deleted
+
+  mergeArtChanges(fresh, result.done);
+  assert.equal(fresh.games[0].cover, 'tmp/covers/n64-a.png', 'the run\'s art landed');
+  assert.equal(fresh.games[0].boxart, 'tmp/box/n64-a.png');
+  assert.equal(fresh.games[0].notes, 'edited while the run was going', 'the edit survived');
+  assert.equal(fresh.games.length, 2, 'the deleted game was not resurrected');
 });
 
 /* --- One entry at a time -------------------------------------------------- */

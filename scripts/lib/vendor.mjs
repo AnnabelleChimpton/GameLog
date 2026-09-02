@@ -31,6 +31,9 @@ export const ART_FIELDS = [
 /** A link to somebody else's server, as opposed to a path inside this repo. */
 export const isRemote = (url) => /^https?:\/\//i.test(String(url ?? '').trim());
 
+/** A picture carried inline in the JSON: nothing to download, nothing on disk. */
+export const isDataUrl = (url) => /^data:/i.test(String(url ?? '').trim());
+
 /** An id becomes a filename, so it may only ever be an id. */
 export const usableId = (id) => /^[a-z0-9][a-z0-9-]*$/i.test(String(id ?? ''));
 
@@ -44,7 +47,9 @@ export function artInventory(collection, fields = ART_FIELDS) {
   for (const spec of fields) {
     for (const entry of collection[spec.list] || []) {
       const url = entry[spec.field];
-      if (!url) continue;
+      // A data: url is self-contained -- neither a link to back up nor a repo
+      // path a file could be missing from -- so it is no one's job here.
+      if (!url || isDataUrl(url)) continue;
       items.push({
         entry,
         spec,
@@ -160,6 +165,23 @@ export async function shrinkArt(collection, { dryRun = false, fields = ART_FIELD
     onItem({ ...item, ...result });
   }
   return { done, before, after };
+}
+
+/**
+ * Copy the art changes of a finished run onto a freshly loaded collection.
+ *
+ * vendorArt and shrinkArt hold a collection in memory while they work, which
+ * can be minutes -- long enough for the manager to save an edit. Writing the
+ * held copy back wholesale would undo that edit, so the caller re-reads the
+ * file and lays only the run's own changes over it: the one art field of each
+ * entry the run touched, found again by id.
+ */
+export function mergeArtChanges(fresh, done) {
+  for (const item of done) {
+    const entry = (fresh[item.spec.list] || []).find((e) => e.id === item.id);
+    if (entry) entry[item.spec.field] = item.entry[item.spec.field];
+  }
+  return fresh;
 }
 
 const TYPE_OF_EXT = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' };

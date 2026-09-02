@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   resolveCollectionUrl, resolveFeedUrl, diff, loadCollection, loadFeed, loadConfig,
-  loadDirectory, discover,
+  loadDirectory, discover, shelfLabel,
 } from '../assets/js/compare.js';
 
 /** Stand in for the network for one call, then put the real fetch back. */
@@ -52,6 +52,28 @@ test('resolveFeedUrl points at feed.json alongside the collection', () => {
     'https://someone.github.io/GameLog/data/feed.json');
   assert.equal(resolveFeedUrl('https://someone.github.io/GameLog/'),
     'https://someone.github.io/GameLog/data/feed.json');
+});
+
+test('resolveFeedUrl swaps the filename of a pasted direct .json address', () => {
+  // A collection can be named anything; the feed sits alongside it. Returning
+  // the collection itself back (the old behaviour) just fetched the same file
+  // twice.
+  assert.equal(resolveFeedUrl('https://x.dev/c.json'), 'https://x.dev/feed.json');
+  assert.equal(resolveFeedUrl('https://x.dev/data/collection.json'),
+    'https://x.dev/data/feed.json');
+});
+
+test('a fragment on a .json address is dropped, like everywhere else', () => {
+  assert.equal(resolveCollectionUrl('https://x.dev/c.json#frag'), 'https://x.dev/c.json');
+  assert.equal(resolveFeedUrl('https://x.dev/c.json#frag'), 'https://x.dev/feed.json');
+});
+
+test('shelfLabel only trusts a non-empty string, everything else falls back', () => {
+  assert.equal(shelfLabel('  Mel  ', 'fallback'), 'Mel');
+  for (const hostile of [42, null, undefined, '', '   ', { name: 'x' }, ['x'], true]) {
+    assert.equal(shelfLabel(hostile, 'fallback'), 'fallback',
+      `${JSON.stringify(hostile)} is not a name`);
+  }
 });
 
 test('loadFeed reads posts, and treats a missing feed as simply empty', async () => {
@@ -115,6 +137,19 @@ test('discover folds in directory listings, keeping provenance and ranking warmt
   assert.deepEqual(found[0].listedIn, ['The Ring']);
   assert.deepEqual(found[1].followedBy, []);
   assert.deepEqual(found[1].listedIn, ['The Ring']);
+});
+
+test('discover survives a non-string name in a foreign friends list', () => {
+  // `?.` only guards nullish: a number here used to throw and wedge the whole
+  // Following view. The url-derived label stands in instead.
+  const found = discover({
+    shelves: [{ friend: { name: 'Sam' }, friends: [
+      { name: 42, url: 'mel.github.io/GameLog' },
+      { name: { deep: 1 }, url: 'chris.github.io/GameLog' },
+    ] }],
+  });
+  assert.deepEqual(found.map((c) => c.name).sort(),
+    ['https://chris.github.io/GameLog', 'https://mel.github.io/GameLog']);
 });
 
 test('discover drops a hostile url from either source', () => {

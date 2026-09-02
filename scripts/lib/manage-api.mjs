@@ -14,11 +14,12 @@
 //   * writes go to a temp file and are renamed, so an interrupted save cannot
 //     leave a half-written collection behind
 
-import { writeFile, rename, readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { execFile } from 'node:child_process';
 import { join } from 'node:path';
 import {
-  ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH, FEED_PATH, SCHEMA_VERSION,
+  ROOT, COLLECTION_PATH, CONFIG_PATH, LISTS_PATH, FEED_PATH, SCHEMA_VERSION, writeAtomic,
 } from './collection.mjs';
 import { loadEnv, getToken, createClient, searchGames, coverUrl, tidySummary, releaseYear, companies } from './igdb.mjs';
 import { searchFree, coverFor } from './freelookup.mjs';
@@ -27,7 +28,7 @@ import { scoreFor } from './scores.mjs';
 import {
   PHOTO_DIR, COVER_DIR, BOXART_DIR, MAX_IMAGE_BYTES, writeImage, fetchImageAsDataUrl,
 } from './images.mjs';
-import { vendorArt, artSummary, usableId, shrinkArt } from './vendor.mjs';
+import { vendorArt, artSummary, usableId, shrinkArt, mergeArtChanges } from './vendor.mjs';
 import { writeFeedXml } from './rss.mjs';
 import { loadCollection as loadCollectionForVendor, saveCollection as saveCollectionFromVendor }
   from './collection.mjs';
@@ -140,6 +141,36 @@ function githubUser(remote) {
   return m ? m[1].replace(/^.*@/, '') : null;
 }
 
+/**
+ * Undo git's C-style quoting of paths with spaces or non-ASCII in them.
+ * Octal escapes are the utf-8 bytes one at a time, so they are collected as
+ * bytes and decoded together -- character by character would produce mojibake.
+ */
+function unquoteGitPath(path) {
+  if (!/^".*"$/.test(path)) return path;
+  const inner = path.slice(1, -1);
+  const bytes = [];
+  for (let i = 0; i < inner.length; i += 1) {
+    if (inner[i] !== '\\') { bytes.push(...Buffer.from(inner[i], 'utf8')); continue; }
+    const octal = /^[0-7]{3}/.exec(inner.slice(i + 1));
+    if (octal) { bytes.push(parseInt(octal[0], 8)); i += 3; continue; }
+    const esc = inner[++i];
+    bytes.push(...Buffer.from({ n: '\n', t: '\t', r: '\r' }[esc] ?? esc ?? '', 'utf8'));
+  }
+  return Buffer.from(bytes).toString('utf8');
+}
+
+/**
+ * One `git status --porcelain` line. A rename reads `R  old -> new`, and the
+ * new name is where the change lives now, so that is the path reported.
+ */
+export function parseStatusLine(line) {
+  let path = line.slice(3);
+  const arrow = path.indexOf(' -> ');
+  if (arrow !== -1) path = path.slice(arrow + 4);
+  return { state: line.slice(0, 2).trim(), path: unquoteGitPath(path) };
+}
+
 /** Run git without a shell, so nothing here can be interpolated into one. */
 function git(args, { cwd = ROOT } = {}) {
   return new Promise((resolve) => {
@@ -149,6 +180,10 @@ function git(args, { cwd = ROOT } = {}) {
         missing: error?.code === 'ENOENT',
         code: error?.code ?? 0,
         stdout: String(stdout || '').trim(),
+        // Porcelain output is column-aligned, and its first line can start
+        // with a meaningful space -- trimming it shifted every field over and
+        // ate the first character of the path.
+        raw: String(stdout || ''),
         stderr: String(stderr || '').trim(),
       });
     });
@@ -167,10 +202,7 @@ async function gitStatus() {
     git(['status', '--porcelain']),
   ]);
 
-  const changes = porcelain.stdout.split('\n').filter(Boolean).map((line) => ({
-    state: line.slice(0, 2).trim(),
-    path: line.slice(3).replace(/^"|"$/g, ''),
-  }));
+  const changes = porcelain.raw.split('\n').filter(Boolean).map(parseStatusLine);
 
   const isOurs = (p) => PUBLISHABLE.some((base) => p === base || p.startsWith(`${base}/`));
 
@@ -190,6 +222,18 @@ async function gitStatus() {
     mine: changes.filter((c) => isOurs(c.path)),
     others: changes.filter((c) => !isOurs(c.path)),
   };
+}
+
+/**
+ * The publishable paths git can actually be asked to stage. On a fresh fork
+ * some of them do not exist yet -- no boxart directory, no feed.xml -- and
+ * `git add` exits 128 on a pathspec that neither exists nor matches anything
+ * tracked. A tracked path deleted from disk still counts: its deletion has to
+ * be staged for the removal to publish.
+ */
+export function filterPublishable(bases, { onDisk, tracked }) {
+  const isTracked = (base) => tracked.some((t) => t === base || t.startsWith(`${base}/`));
+  return bases.filter((base) => onDisk(base) || isTracked(base));
 }
 
 /** Stage the manager's files, commit, and push. */
@@ -213,7 +257,12 @@ async function gitPublish(message) {
   const summary = [];
 
   if (status.mine.length) {
-    const add = await git(['add', '--', ...PUBLISHABLE]);
+    const known = await git(['ls-files', '--', ...PUBLISHABLE]);
+    const paths = filterPublishable(PUBLISHABLE, {
+      onDisk: (base) => existsSync(join(ROOT, base)),
+      tracked: known.stdout.split('\n').filter(Boolean).map(unquoteGitPath),
+    });
+    const add = await git(['add', '--', ...paths]);
     if (!add.ok) throw new Error(`git add failed: ${add.stderr}`);
 
     const subject = String(message || '').trim() || 'Update collection';
@@ -334,13 +383,6 @@ async function syncMeta(config) {
   await writeAtomic(INDEX_PATH, updated);
 }
 
-/** Write via a temp file so an interrupted save can't truncate the real one. */
-async function writeAtomic(path, contents) {
-  const tmp = `${path}.tmp`;
-  await writeFile(tmp, contents, 'utf8');
-  await rename(tmp, path);
-}
-
 function send(res, status, payload) {
   const body = JSON.stringify(payload);
   res.writeHead(status, {
@@ -361,11 +403,30 @@ async function readJsonBody(req) {
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
 
-async function readJsonFile(path, fallback) {
+/**
+ * A missing file and a broken one are opposite situations. Missing means a
+ * fresh GameLog, and the fallback is the honest empty state. But a file that
+ * exists and will not parse is somebody's real collection with a stray comma
+ * in it -- handing back the fallback there would show an empty manager, and
+ * the very next save would overwrite the recoverable data with nothing.
+ */
+export async function readJsonFile(path, fallback) {
+  let raw;
   try {
-    return JSON.parse(await readFile(path, 'utf8'));
-  } catch {
-    return fallback;
+    raw = await readFile(path, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return fallback;
+    throw err;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    const name = path.replace(ROOT + '/', '');
+    const broken = new Error(`${name} exists but is not valid JSON (${err.message}). `
+      + 'Fix it by hand (or restore it from git) before using the manager, '
+      + 'so a save cannot overwrite it.');
+    broken.status = 500;
+    throw broken;
   }
 }
 
@@ -375,7 +436,7 @@ async function readJsonFile(path, fallback) {
  * Requiring the header is therefore what stops a random site in another tab
  * from rewriting your collection.
  */
-function guard(req, port) {
+export function guard(req, port) {
   if (req.headers['x-gamelog-manage'] !== '1') {
     return 'This endpoint needs the manager UI.';
   }
@@ -562,7 +623,13 @@ export async function handleApi(req, res, { port }) {
       // owns the file during the run and answers once with the totals.
       const collection = await loadCollectionForVendor();
       const result = await shrinkArt(collection);
-      if (result.done.length) await saveCollectionFromVendor(collection);
+      // The run held this copy for a while, and a save made in the manager
+      // meanwhile would be clobbered by writing it back wholesale. Re-read the
+      // file and lay only the art this run changed over what is on disk now.
+      if (result.done.length) {
+        await saveCollectionFromVendor(
+          mergeArtChanges(await loadCollectionForVendor(), result.done));
+      }
       send(res, 200, {
         ok: true, shrunk: result.done.length, before: result.before, after: result.after,
       });
@@ -575,7 +642,13 @@ export async function handleApi(req, res, { port }) {
       // doing and the counts come back at the end.
       const collection = await loadCollectionForVendor();
       const result = await vendorArt(collection);
-      if (result.done.length) await saveCollectionFromVendor(collection);
+      // Minutes can pass downloading a whole collection's art, and any PUT
+      // /api/collection made meanwhile must survive. Re-read the file and lay
+      // only the art this run changed over what is on disk now.
+      if (result.done.length) {
+        await saveCollectionFromVendor(
+          mergeArtChanges(await loadCollectionForVendor(), result.done));
+      }
       send(res, 200, {
         ok: true,
         stored: result.done.length,
@@ -604,7 +677,9 @@ export async function handleApi(req, res, { port }) {
 
     send(res, 404, { error: `No such endpoint: ${req.method} ${url.pathname}` });
   } catch (err) {
-    send(res, 400, { error: err.message || String(err) });
+    // 400 is "your payload was wrong"; a broken file on disk is the server's
+    // problem and carries its own status so the UI can tell the difference.
+    send(res, err.status || 400, { error: err.message || String(err) });
   }
   return true;
 }

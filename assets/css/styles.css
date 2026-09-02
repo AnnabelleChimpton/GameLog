@@ -2532,11 +2532,14 @@ a.logentry__thumb { display: block; }
      it the whole page, scrolled sideways by the width of the last two tabs. */
   .masthead__bar > * { min-width: 0; max-width: 100%; }
 
-  /* Five tabs do not fit; scrolling them is fine, scrolling the page is not. */
+  /* Five tabs do not fit; scrolling them is fine, scrolling the page is not.
+     The fade is the affordance that more tabs live off-screen -- the same one
+     the platform chips use -- and, being an alpha mask, reads in both themes. */
   .views {
     overflow-x: auto;
     scrollbar-width: none;
     justify-content: flex-start;
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
   }
   .views::-webkit-scrollbar { display: none; }
   .viewtab { flex: 0 0 auto; }

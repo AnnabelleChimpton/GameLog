@@ -244,10 +244,19 @@ async function main() {
   const argv = process.argv.slice(2);
   const opts = { wanted: argv.includes('--wanted') };
   if (argv.includes('--owned')) opts.wanted = false;
-  const platformIdx = argv.indexOf('--platform');
-  if (platformIdx !== -1) opts.platform = argv[platformIdx + 1];
-  const noteIdx = argv.indexOf('--note');
-  if (noteIdx !== -1) opts.note = argv[noteIdx + 1];
+  // Swallowing the next --flag as the value would silently misread the whole
+  // command, so a flag with nothing after it is an error instead.
+  const valueFor = (flag) => {
+    const idx = argv.indexOf(flag);
+    if (idx === -1) return undefined;
+    const value = argv[idx + 1];
+    if (value === undefined || value.startsWith('--')) {
+      throw new Error(`${flag} needs a value, e.g. ${flag} "…"`);
+    }
+    return value;
+  };
+  opts.platform = valueFor('--platform');
+  opts.note = valueFor('--note');
 
   const positional = [];
   for (let i = 0; i < argv.length; i += 1) {

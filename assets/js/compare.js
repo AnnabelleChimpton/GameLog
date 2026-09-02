@@ -112,11 +112,35 @@ export function resolveCollectionUrl(input) {
     if (user && repo) return `https://${user}.github.io/${repo}/data/collection.json`;
   }
 
+  // The hash goes for a direct .json address too: a fragment is a page-level
+  // thing, and keeping it made the derived feed/config urls carry it around.
+  url.hash = '';
   if (url.pathname.endsWith('.json')) return url.href;
 
   url.pathname = url.pathname.replace(/\/+$/, '') + '/data/collection.json';
-  url.hash = '';
   return url.href;
+}
+
+/**
+ * The url of a file that sits alongside a shelf's collection.json. Swapping the
+ * filename rather than matching "collection.json" means a pasted direct .json
+ * address -- which may name the collection anything -- still yields its
+ * neighbour instead of pointlessly fetching the same file twice.
+ */
+function siblingUrl(input, filename) {
+  const url = new URL(resolveCollectionUrl(input));
+  url.pathname = url.pathname.replace(/[^/]*$/, filename);
+  return url.href;
+}
+
+/**
+ * A display name out of someone else's file. Only a non-empty string is taken
+ * -- a foreign friends entry can put a number or an object where the name
+ * belongs, and `name?.trim()` only guards nullish, so anything else used to
+ * throw and take the whole Following view down with it.
+ */
+export function shelfLabel(name, fallback) {
+  return typeof name === 'string' && name.trim() ? name.trim() : fallback;
 }
 
 /** Fetch and sanity-check somebody else's collection. */
@@ -174,7 +198,7 @@ export async function loadCollection(input) {
 
 /** Where a shelf's feed.json lives, derived from the same address a collection is. */
 export function resolveFeedUrl(input) {
-  return resolveCollectionUrl(input).replace(/\/collection\.json(\?.*)?$/, '/feed.json$1');
+  return siblingUrl(input, 'feed.json');
 }
 
 /**
@@ -225,7 +249,7 @@ export async function loadFeed(input) {
  * where it is used.
  */
 export async function loadConfig(input) {
-  const url = resolveCollectionUrl(input).replace(/\/collection\.json(\?.*)?$/, '/config.json$1');
+  const url = siblingUrl(input, 'config.json');
 
   let response;
   try {
@@ -322,7 +346,7 @@ export async function loadDirectory(input) {
     .slice(0, MAX_DIR_SHELVES);
   return {
     url: url.href,
-    name: typeof data.name === 'string' && data.name.trim() ? data.name.trim() : url.hostname,
+    name: shelfLabel(data.name, url.hostname),
     shelves,
   };
 }
@@ -348,7 +372,7 @@ export function discover({ shelves = [], directories = [], exclude = [] } = {}) 
     if (!base || skip.has(base)) return null;
     if (!found.has(base)) {
       found.set(base, {
-        name: name?.trim() || base, url: base, followedBy: new Set(), listedIn: new Set(),
+        name: shelfLabel(name, base), url: base, followedBy: new Set(), listedIn: new Set(),
       });
     }
     return found.get(base);

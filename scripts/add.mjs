@@ -28,8 +28,16 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
     if (a === '--no-lookup') opts.noLookup = true;
-    else if (a.startsWith('--')) { opts[a.slice(2)] = argv[i + 1]; i += 1; }
-    else opts.positional.push(a);
+    else if (a.startsWith('--')) {
+      const value = argv[i + 1];
+      // Swallowing the next --flag as the value would silently misread the
+      // whole command, so a flag with nothing after it is an error instead.
+      if (value === undefined || value.startsWith('--')) {
+        throw new Error(`${a} needs a value, e.g. ${a} "…"`);
+      }
+      opts[a.slice(2)] = value;
+      i += 1;
+    } else opts.positional.push(a);
   }
   return opts;
 }

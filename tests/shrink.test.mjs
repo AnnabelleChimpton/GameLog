@@ -107,6 +107,25 @@ test('decodePng refuses what is not a PNG rather than guessing', () => {
   assert.equal(decodePng(Buffer.alloc(0)), null);
 });
 
+test('absurd declared dimensions are refused before anything is allocated', () => {
+  // The header's numbers are a claim: a 33-byte file can declare itself four
+  // gigapixels, and buffers would be sized from that claim.
+  const claiming = (width, height) => {
+    const ihdr = Buffer.alloc(13);
+    ihdr.writeUInt32BE(width, 0); ihdr.writeUInt32BE(height, 4);
+    ihdr[8] = 8; ihdr[9] = 6;
+    return Buffer.concat([
+      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+      chunk('IHDR', ihdr), chunk('IEND', Buffer.alloc(0)),
+    ]);
+  };
+  assert.throws(() => decodePng(claiming(60000, 60000)), /larger/);
+  assert.throws(() => decodePng(claiming(7000, 7000)), /larger/, 'the pixel-count cap holds too');
+  // A sane claim gets past the cap and fails quietly on the missing pixel
+  // data instead -- null, the usual "leave the file alone".
+  assert.equal(decodePng(claiming(100, 100)), null);
+});
+
 /* --- JPEG writing --------------------------------------------------------- */
 
 /** Walk the marker segments of a JPEG and return them by marker byte. */

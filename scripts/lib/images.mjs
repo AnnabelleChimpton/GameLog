@@ -58,6 +58,8 @@ export function isPrivateIp(ip) {
       || (a === 169 && b === 254)          // link-local + cloud metadata
       || (a === 192 && b === 168)
       || (a === 172 && b >= 16 && b <= 31)
+      || (a === 100 && b >= 64 && b <= 127) // CGNAT (100.64.0.0/10)
+      || (a === 198 && (b === 18 || b === 19)) // benchmarking (198.18.0.0/15)
       || a >= 224;                         // multicast / reserved
   }
   if (v === 6) {
@@ -172,9 +174,29 @@ export async function fetchImage(url) {
     throw new Error(`That link is ${type || 'not an image'}, not a jpg, png, webp or gif.`);
   }
 
-  const bytes = Buffer.from(await res.arrayBuffer());
+  // The declared size is checked first as a courtesy, but the cap is enforced
+  // while the bytes arrive: a server that lies about Content-Length (or omits
+  // it) must not be able to make this buffer an arbitrarily large body.
+  const declared = Number(res.headers.get('content-length'));
+  if (declared > MAX_IMAGE_BYTES) throw new Error('That image is larger than 3 MB.');
+
+  const chunks = [];
+  let size = 0;
+  if (res.body) {
+    const reader = res.body.getReader();
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.length;
+      if (size > MAX_IMAGE_BYTES) {
+        await reader.cancel().catch(() => {});
+        throw new Error('That image is larger than 3 MB.');
+      }
+      chunks.push(value);
+    }
+  }
+  const bytes = Buffer.concat(chunks);
   if (!bytes.length) throw new Error('That image is empty.');
-  if (bytes.length > MAX_IMAGE_BYTES) throw new Error('That image is larger than 3 MB.');
   return { type, bytes };
 }
 
@@ -198,13 +220,18 @@ export async function storeImage(image, dir, basename) {
   const ext = IMAGE_TYPES[type];
 
   await mkdir(dir, { recursive: true });
+  const tmp = join(dir, `${basename}.${ext}.tmp`);
+  await writeFile(tmp, bytes);
+  await rename(tmp, join(dir, `${basename}.${ext}`));
+
+  // Only once the replacement is safely on disk do the stale sibling
+  // extensions go. The other order deleted a game's only picture whenever the
+  // write after it failed -- a png-to-jpg conversion that died mid-way took
+  // the original png with it while the collection still pointed there.
   await Promise.all(Object.values(IMAGE_TYPES)
     .filter((other) => other !== ext)
     .map((other) => rm(join(dir, `${basename}.${other}`), { force: true })));
 
-  const tmp = join(dir, `${basename}.${ext}.tmp`);
-  await writeFile(tmp, bytes);
-  await rename(tmp, join(dir, `${basename}.${ext}`));
   return { ext, bytes: bytes.length, shrunk: Boolean(shrunk), from: from ?? bytes.length };
 }
 

@@ -10,7 +10,7 @@
 import { platformChipLabel, platformInfo, platformSortIndex, registerPlatforms } from './platforms.mjs';
 import {
   fold, sortKey, conditionGroup, CONDITION_ORDER, coverImage, placeholderCover,
-  safeImageUrl, h, plural, playStatus, STATUS_LABEL, episodeNumbers, progressOf, isLocal,
+  safeImageUrl, h, plural, playStatus, STATUS_LABEL, episodeNumbers, progressOf, isLocal, inlineText,
   hardwareKind, hardwareQuantity, HARDWARE_KINDS, KIND_LABEL,
   shelfShape, boxTile, boxHeight,
 } from './lib.js';
@@ -298,8 +298,11 @@ function renderCount() {
 }
 
 function renderHardware() {
+  // Hardware doesn't answer any game filter, so any active one hides the
+  // section -- status included, which used to leave consoles under a shelf of
+  // "unplayed" games as if they were part of the answer.
   if (!state.hardware.length || state.config.showHardware === false || state.query
-      || state.notesOnly || state.condition !== 'all') {
+      || state.notesOnly || state.condition !== 'all' || state.status !== 'all') {
     el.hardwareSection.hidden = true;
     return;
   }
@@ -665,7 +668,7 @@ async function fetchShelf(f) {
   try { theirFriends = (await compare.loadConfig(f.url)).friends; } catch { theirFriends = []; }
   const base = collUrl.replace(/\/data\/collection\.json.*$/, '');
   return {
-    friend: { name: (f.name && f.name.trim()) || base, url: base },
+    friend: { name: compare.shelfLabel(f.name, base), url: base },
     posts, games, friends: theirFriends,
   };
 }
@@ -684,29 +687,42 @@ async function runFollowing(friends, directories) {
   if (directories.length) reading.push(plural(directories.length, 'directory', 'directories'));
   folStatus(`Reading ${reading.join(' and ')}…`);
 
-  const [shelfResults, dirResults] = await Promise.all([
-    Promise.all(friends.map(fetchShelf)),
-    Promise.all(directories.map((u) => compare.loadDirectory(u).catch(() => null))),
-  ]);
+  try {
+    // Every shelf is somebody else's file, so any one of them can fail in a
+    // way fetchShelf didn't anticipate. The per-shelf catch keeps one bad
+    // shelf from rejecting the whole Promise.all -- which used to leave the
+    // status wedged on "Reading N shelves…" forever.
+    const [shelfResults, dirResults] = await Promise.all([
+      Promise.all(friends.map((f) => fetchShelf(f).catch(() => null))),
+      Promise.all(directories.map((u) => compare.loadDirectory(u).catch(() => null))),
+    ]);
 
-  const ok = shelfResults.filter(Boolean);
-  const dirs = dirResults.filter(Boolean);
-  const total = friends.length + directories.length;
-  const missed = total - ok.length - dirs.length;
+    const ok = shelfResults.filter(Boolean);
+    const dirs = dirResults.filter(Boolean);
+    const failed = [
+      ...friends.filter((f, i) => !shelfResults[i])
+        .map((f) => compare.shelfLabel(f.name, f.url)),
+      ...directories.filter((u, i) => !dirResults[i]),
+    ];
 
-  followingLoading = false;
-  followingLoaded = true;
-  state.river = buildRiver(ok);
+    followingLoaded = true;
+    state.river = buildRiver(ok);
 
-  // Shelves to suggest, minus the ones you already follow and you.
-  const exclude = friends.map((f) => f.url);
-  if (typeof state.config.siteUrl === 'string' && state.config.siteUrl.trim()) {
-    exclude.push(state.config.siteUrl);
+    // Shelves to suggest, minus the ones you already follow and you.
+    const exclude = friends.map((f) => f.url);
+    if (typeof state.config.siteUrl === 'string' && state.config.siteUrl.trim()) {
+      exclude.push(state.config.siteUrl);
+    }
+    state.discover = compare.discover({ shelves: ok, directories: dirs, exclude });
+
+    folStatus(failed.length ? `Couldn't read ${failed.join(', ')}.` : '',
+      failed.length ? 'warn' : 'info');
+    paintFollowing();
+  } catch (err) {
+    folStatus(err?.message || 'Something went wrong reading those shelves.', 'error');
+  } finally {
+    followingLoading = false;
   }
-  state.discover = compare.discover({ shelves: ok, directories: dirs, exclude });
-
-  folStatus(missed ? `${missed} of ${total} couldn't be read.` : '', missed ? 'warn' : 'info');
-  paintFollowing();
 }
 
 /** Put every filter back to its default. */
@@ -936,7 +952,13 @@ async function boot() {
     ]);
     if (!collectionRes.ok) throw new Error(`HTTP ${collectionRes.status}`);
     collection = await collectionRes.json();
-    if (configRes?.ok) config = await configRes.json();
+    // Config is optional chrome, so a broken or non-object one (a bad hand
+    // edit, a literal `null`) degrades to the defaults -- it must never take
+    // the collection down with it the way an uncaught parse here used to.
+    if (configRes?.ok) {
+      const parsed = await configRes.json().catch(() => null);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) config = parsed;
+    }
     // Optional platform overrides, merged into the registry before anything is
     // drawn -- so a custom console gets its badge, colour and box shape too.
     if (platformsRes?.ok) {
@@ -993,7 +1015,7 @@ async function boot() {
   el.hero.replaceChildren(renderHero(config, {
     games: state.games, hardware: state.hardware,
   }));
-  if (config.footer) el.colophon.replaceChildren(...miniMarkdown(config.footer));
+  if (config.footer) el.colophon.replaceChildren(...inlineText(config.footer));
 
   readUrl();
   pruneDeadSorts();
@@ -1032,9 +1054,18 @@ async function boot() {
   render();
   attachEvents();
 
-  // A #game-id in the url opens that game straight away.
-  const wanted = decodeURIComponent(location.hash.slice(1));
-  if (wanted) {
+  // A #game-id in the url opens that game straight away; a #log-id (the shape
+  // another shelf's river links with) lands on that entry in the log. A
+  // malformed escape like "#%zz" makes decodeURIComponent throw, and a hash is
+  // whatever someone pasted -- it must not be able to halt boot here.
+  let wanted = '';
+  try { wanted = decodeURIComponent(location.hash.slice(1)); } catch { /* not ours */ }
+  if (wanted.startsWith('log-')) {
+    // Log entries only exist once the log view has rendered, so switch first.
+    // A stale or foreign id degrades to just showing the log.
+    if (state.view !== 'log') { state.view = 'log'; render(); }
+    document.getElementById(wanted)?.scrollIntoView({ block: 'start' });
+  } else if (wanted) {
     const index = state.visible.findIndex((g) => g.id === wanted);
     if (index !== -1) detail.open(index);
   }
@@ -1043,26 +1074,6 @@ async function boot() {
   if (withParam && state.view === 'compare') {
     promptComparison(withParam);
   }
-}
-
-/** Links and bold only, built as nodes so nothing is ever parsed as html. */
-function miniMarkdown(text) {
-  const out = [];
-  const pattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|\*\*([^*]+)\*\*/g;
-  let last = 0;
-  let match;
-  while ((match = pattern.exec(text))) {
-    if (match.index > last) out.push(document.createTextNode(text.slice(last, match.index)));
-    if (match[2]) {
-      out.push(h('a', { href: match[2], target: '_blank', rel: 'noopener noreferrer',
-        text: match[1] }));
-    } else {
-      out.push(h('strong', { text: match[3] }));
-    }
-    last = pattern.lastIndex;
-  }
-  if (last < text.length) out.push(document.createTextNode(text.slice(last)));
-  return out;
 }
 
 boot();

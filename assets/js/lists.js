@@ -105,19 +105,23 @@ function listTile(entry, { onOpen }) {
   if (!game.cover) classes.push('tile--noart');
   if (!owned) classes.push('tile--wanted');
 
+  // A platformless entry ("any version will do") drops the platform from the
+  // label rather than announcing a literal "null".
+  const named = (suffix) => [game.title, game.platform, suffix].filter(Boolean).join(', ');
+
   // Only owned games have a detail entry to open.
   if (owned) {
     return h('button', {
       type: 'button',
       class: classes.join(' '),
-      'aria-label': `${game.title}, ${game.platform}, in your collection`,
+      'aria-label': named('in your collection'),
       onclick: () => onOpen(game),
     }, children);
   }
   return h('div', {
     class: classes.join(' '),
     role: 'listitem',
-    'aria-label': `${game.title}, ${game.platform}, not owned`,
+    'aria-label': named('not owned'),
     title: note || `${game.title}: not in your collection`,
   }, children);
 }

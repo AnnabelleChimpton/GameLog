@@ -18,9 +18,26 @@ export function slug(s) {
     .replace(/^-+|-+$/g, '');
 }
 
+/**
+ * A short, stable fingerprint of the raw text (djb2-xor, base36), for names
+ * whose every character slugs away. Deterministic on the input, so re-saving
+ * the same game reproduces the same id.
+ */
+function fingerprint(s) {
+  let hash = 5381;
+  for (let i = 0; i < s.length; i += 1) hash = ((hash * 33) ^ s.charCodeAt(i)) >>> 0;
+  return hash.toString(36);
+}
+
 /** A stable, readable, URL-safe id like "nintendo-64-goldeneye-007". */
 export function makeId(platform, title) {
-  return `${slug(platform)}-${slug(title)}`.replace(/-{2,}/g, '-').replace(/^-+|-+$/g, '');
+  const id = `${slug(platform)}-${slug(title)}`.replace(/-{2,}/g, '-').replace(/^-+|-+$/g, '');
+  if (id) return id;
+  // A fully non-ASCII name ("ファイナルファンタジー") slugs to nothing, and an
+  // empty id fails every downstream check: art can't be vendored under it and
+  // a re-save just mints the same broken id again. Any id that survives the
+  // slug is kept exactly as it always was; only the degenerate case falls back.
+  return `game-${fingerprint(`${String(platform ?? '')} ${String(title ?? '')}`)}`;
 }
 
 /** Ensure an id is unique within the collection by suffixing -2, -3, ... */

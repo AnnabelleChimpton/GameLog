@@ -27,6 +27,15 @@ export const QUALITY = 85;
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 
 /**
+ * The header's dimensions are a claim, not a fact, and buffers get allocated
+ * off them before a single pixel is proven to exist. A 3 MB file declaring
+ * itself four gigapixels would ask for gigabytes; no real box scan comes
+ * anywhere near these.
+ */
+export const MAX_DECODE_SIDE = 10000;
+export const MAX_DECODE_PIXELS = 40 * 1000 * 1000;
+
+/**
  * Decode a PNG to 8-bit RGBA. Returns null for anything this reader does not
  * handle (interlaced or sub-byte-depth images), which the caller treats as
  * "leave the file alone" rather than an error.
@@ -62,21 +71,27 @@ export function decodePng(bytes) {
   }
 
   if (!width || !height || interlace !== 0) return null;
+  if (width > MAX_DECODE_SIDE || height > MAX_DECODE_SIDE
+      || width * height > MAX_DECODE_PIXELS) {
+    throw new Error(`This PNG declares itself ${width}x${height}, `
+      + 'far larger than any picture this decodes. Refusing it.');
+  }
   if (depth !== 8 && depth !== 16) return null;
   const channels = { 0: 1, 2: 3, 3: 1, 4: 2, 6: 4 }[colorType];
   if (!channels) return null;
   if (colorType === 3 && (!palette || depth !== 8)) return null;
 
-  let raw;
-  try {
-    raw = inflateSync(Buffer.concat(idat));
-  } catch {
-    return null;
-  }
-
   const bytesPerSample = depth / 8;
   const bpp = channels * bytesPerSample;
   const stride = width * bpp;
+  let raw;
+  try {
+    // Capped at what the declared dimensions could possibly need, so a small
+    // file cannot be a decompression bomb either.
+    raw = inflateSync(Buffer.concat(idat), { maxOutputLength: (stride + 1) * height });
+  } catch {
+    return null;
+  }
   if (raw.length < (stride + 1) * height) return null;
 
   // Undo the per-scanline filters in place; each line's filter byte says how
@@ -453,7 +468,9 @@ export function encodeJpeg({ width, height, data }, quality = QUALITY) {
  * A PNG becomes a JPEG when that is smaller, which for a photograph of a box
  * is always. An oversized picture of any decodable kind is scaled down first.
  * Anything this cannot read, or that would not get smaller, is returned
- * untouched, so storing never fails because of this step.
+ * untouched, so storing never fails because of this step -- with one
+ * exception: a PNG whose header declares absurd dimensions is refused with an
+ * error, because even reading it would mean allocating what it claims.
  */
 export function shrinkImage({ type, bytes }, { quality = QUALITY, maxSide = MAX_SIDE } = {}) {
   const keep = { type, bytes, shrunk: false };

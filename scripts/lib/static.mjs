@@ -19,6 +19,25 @@ const TYPES = {
   '.woff2': 'font/woff2',
 };
 
+/**
+ * Whether a request's Host header is this very server.
+ *
+ * Both local servers bind to 127.0.0.1, but DNS rebinding gets around that: a
+ * page you visit resolves its own hostname to 127.0.0.1 and the browser
+ * happily sends the request -- with the attacker's name in Host. Requiring the
+ * loopback names (with the bound port, or bare on the default http port, which
+ * is the only case a browser sends them without one) shuts that door.
+ */
+export function hostAllowed(host, port) {
+  const names = ['localhost', '127.0.0.1'];
+  const allowed = names.map((name) => `${name}:${port}`);
+  if (port === 80) allowed.push(...names);
+  return allowed.includes(String(host || '').toLowerCase());
+}
+
+/** A path with a dot-prefixed segment: .env, .git/config, .claude/… */
+const DOTFILE = new RegExp(`(^|\\${sep})\\.`);
+
 export async function serveStatic(req, res) {
   try {
     const url = new URL(req.url, 'http://localhost');
@@ -27,6 +46,13 @@ export async function serveStatic(req, res) {
     let path = normalize(join(ROOT, decodeURIComponent(url.pathname)));
     if (path !== ROOT && !path.startsWith(ROOT + sep)) {
       res.writeHead(403).end('Forbidden');
+      return;
+    }
+    // Nothing dot-prefixed is ever served: .env holds live IGDB secrets and
+    // .git/config the remote, and neither belongs to the published site.
+    // 404 rather than 403, so probes learn nothing about what exists.
+    if (DOTFILE.test(path.slice(ROOT.length))) {
+      res.writeHead(404, { 'Content-Type': 'text/plain' }).end('Not found');
       return;
     }
 

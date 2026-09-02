@@ -4,7 +4,7 @@
 // ordering and two-space indentation. Editing it by hand and editing it with the
 // scripts should produce the same shape.
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, rename } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -32,6 +32,17 @@ export async function loadPlatformOverrides() {
     const data = JSON.parse(await readFile(PLATFORMS_PATH, 'utf8'));
     registerPlatforms(Array.isArray(data) ? data : data.platforms);
   } catch { /* leave the built-ins as they are */ }
+}
+
+/**
+ * Write via a temp file and rename, so an interrupted save -- Ctrl+C mid-run,
+ * a full disk, a crash -- can never leave a truncated collection where the
+ * real one was. Every save path goes through this, CLI and manager alike.
+ */
+export async function writeAtomic(path, contents) {
+  const tmp = `${path}.tmp`;
+  await writeFile(tmp, contents, 'utf8');
+  await rename(tmp, path);
 }
 
 /** Field order used when writing entries back out, so diffs stay readable. */
@@ -86,7 +97,7 @@ export async function saveCollection(collection) {
     games: collection.games.map((g) => orderKeys(g, GAME_KEYS)),
     hardware: collection.hardware.map((h) => orderKeys(h, HARDWARE_KEYS)),
   };
-  await writeFile(COLLECTION_PATH, JSON.stringify(out, null, 2) + '\n', 'utf8');
+  await writeAtomic(COLLECTION_PATH, JSON.stringify(out, null, 2) + '\n');
 }
 
 /* --- Lists ---------------------------------------------------------------- */
@@ -109,7 +120,7 @@ export async function saveLists(data) {
       return ordered;
     }),
   };
-  await writeFile(LISTS_PATH, JSON.stringify(out, null, 2) + '\n', 'utf8');
+  await writeAtomic(LISTS_PATH, JSON.stringify(out, null, 2) + '\n');
 }
 
 // Ids are made in one place for the scripts and the browser manager alike.
@@ -130,7 +141,7 @@ export async function saveFeed(data) {
     gamelog: SCHEMA_VERSION,
     posts: (data.posts || []).map((post) => orderKeys(post, POST_KEYS)),
   };
-  await writeFile(FEED_PATH, JSON.stringify(out, null, 2) + '\n', 'utf8');
+  await writeAtomic(FEED_PATH, JSON.stringify(out, null, 2) + '\n');
 }
 
 /**

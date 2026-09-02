@@ -50,6 +50,11 @@ export function candidates(title, platform, year = null, { round = 0 } = {}) {
  * `pick` turns a returned page into a result, or null to skip it.
  */
 async function queryTitles(titles, props, pick) {
+  // The batch is pipe-joined, and "|" is the one character a Wikipedia title
+  // can never contain -- a shelf title carrying one would corrupt the whole
+  // batch into garbage lookups, so it is dropped rather than sent.
+  titles = titles.filter((t) => !t.includes('|'));
+  if (!titles.length) return { found: new Map(), alias: new Map() };
   const params = new URLSearchParams({
     action: 'query',
     format: 'json',

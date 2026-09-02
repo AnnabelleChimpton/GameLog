@@ -5,7 +5,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { csvCell, collectionCsv, hardwareCsv, listsCsv } from '../assets/js/csv.mjs';
+import { csvCell, csvExportCell, collectionCsv, hardwareCsv, listsCsv } from '../assets/js/csv.mjs';
 
 test('cells only quote when they must, and escape what they quote', () => {
   assert.equal(csvCell('Chrono Trigger'), 'Chrono Trigger');
@@ -14,6 +14,26 @@ test('cells only quote when they must, and escape what they quote', () => {
   assert.equal(csvCell('Beaten, twice'), '"Beaten, twice"');
   assert.equal(csvCell('the "gold" cart'), '"the ""gold"" cart"');
   assert.equal(csvCell('line one\nline two'), '"line one\nline two"');
+});
+
+test('exported cells defuse spreadsheet formulas, plain quoting does not', () => {
+  // Excel and Sheets execute = + - @ leads as formulas; the export prefixes
+  // an apostrophe, which they display as literal text.
+  assert.equal(csvExportCell('=HYPERLINK("http://evil")'),
+    '"\'=HYPERLINK(""http://evil"")"');
+  assert.equal(csvExportCell('+1 to this game'), "'+1 to this game");
+  assert.equal(csvExportCell('-30 hours in'), "'-30 hours in");
+  assert.equal(csvExportCell('@ the flea market'), "'@ the flea market");
+  // Mid-cell characters are not formulas, and csvCell itself stays a plain
+  // quoter so nothing on any import path is ever mangled.
+  assert.equal(csvExportCell('1 + 1'), '1 + 1');
+  assert.equal(csvCell('=SUM(A1)'), '=SUM(A1)');
+});
+
+test('a note that leads with a dash exports defused end to end', () => {
+  const csv = collectionCsv([{ id: 'x', title: 'X', platform: 'PC', notes: '-2 discs' }]);
+  const cells = csv.split('\r\n')[1].split(',');
+  assert.equal(cells[12], "'-2 discs");
 });
 
 test('the file starts with a BOM and a header row', () => {
