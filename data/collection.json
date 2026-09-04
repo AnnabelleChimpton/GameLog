@@ -73,6 +73,30 @@
       "boxartRatio": 0.527
     },
     {
+      "id": "nintendo-wii-america-s-next-top-model",
+      "title": "America's Next Top Model",
+      "platform": "Nintendo Wii",
+      "year": 2010,
+      "cover": "assets/covers/nintendo-wii-america-s-next-top-model.jpg",
+      "description": "You take control of one of 10 aspiring models that compete in a variety of different categories including: 'Make Up', 'Fashion', 'Catwalk' and 'Photoshoot'. Following the same successful formula as the TV series, one model is dismissed each week following a special challenge; just make sure it's not you! Choose your outfits in a variety of ways to live out the model lifestyle; be it striking a pose for a photographer, keeping your walk timed perfectly on the catwalk, or making sure your make-up is a match for the occasion.",
+      "genres": [
+        "Simulator"
+      ],
+      "developer": null,
+      "publisher": "Eidos Interactive",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-america-s-next-top-model.jpg",
+      "boxartRatio": 0.708,
+      "igdbId": 50613,
+      "wikidataId": null
+    },
+    {
       "id": "nintendo-gamecube-animal-crossing",
       "title": "Animal Crossing",
       "platform": "Nintendo GameCube",
@@ -192,6 +216,32 @@
       "boxartRatio": 1.434
     },
     {
+      "id": "nintendo-wii-barbie-groom-and-glam-pups",
+      "title": "Barbie: Groom and Glam Pups",
+      "platform": "Nintendo Wii",
+      "year": 2010,
+      "cover": "assets/covers/nintendo-wii-barbie-groom-and-glam-pups.jpg",
+      "description": "Barbie Groom & Glam Pups is an all-new, fun and engaging game that lets players choose a pup from one of six adorable breeds, then groom it, train it, and dress it up. Finally, players show off their glam pup in a fabulous dance sequence, runway show and photo shoot.",
+      "genres": [
+        "Simulator",
+        "Strategy",
+        "Adventure"
+      ],
+      "developer": "Game Machine Studios",
+      "publisher": "THQ",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-barbie-groom-and-glam-pups.jpg",
+      "boxartRatio": 0.714,
+      "igdbId": 3316,
+      "wikidataId": null
+    },
+    {
       "id": "snes-super-famicom-bass-masters-classic",
       "title": "Bass Masters Classic",
       "platform": "SNES/Super Famicom",
@@ -237,6 +287,30 @@
       "igdbId": 3420,
       "boxart": "assets/boxart/nintendo-64-bassmasters-2000.jpg",
       "boxartRatio": 1.369
+    },
+    {
+      "id": "nintendo-wii-ben-10-protector-of-earth",
+      "title": "Ben 10: Protector of Earth",
+      "platform": "Nintendo Wii",
+      "year": 2007,
+      "cover": "assets/covers/nintendo-wii-ben-10-protector-of-earth.jpg",
+      "description": "Players will take on the role of Cartoon Network's popular everyday-kid-turned-alien-hero, Ben Tennyson. Using the power of the Omnitrix which has embedded itself on Ben's wrist, players will be able to battle as one of five popular alien heroes from the show. By taking on these amazing powers, players can battle to save the world through the game's diverse challenges, puzzles and skirmishes.",
+      "genres": [
+        "Adventure"
+      ],
+      "developer": "High Voltage Software",
+      "publisher": "D3Publisher",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 63,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-ben-10-protector-of-earth.jpg",
+      "boxartRatio": 0.715,
+      "igdbId": 2799,
+      "wikidataId": null
     },
     {
       "id": "microsoft-xbox-big-mutha-truckers",
@@ -1357,6 +1431,30 @@
       "boxartRatio": 0.491
     },
     {
+      "id": "nintendo-wii-hell-s-kitchen-the-game",
+      "title": "Hell's Kitchen: The Game",
+      "platform": "Nintendo Wii",
+      "year": 2008,
+      "cover": "assets/covers/nintendo-wii-hell-s-kitchen-the-game.jpg",
+      "description": "Experience the thrill of Hell's Kitchen as you prove yourself to Chef Ramsay. Each day is a new challenge as you work your way towards a 5-star chef, unlocking real recipes as you progress. Master service, preparation and cooking while Gordon Ramsay watches over you- yelling and praising based on your performance. Be careful - if he gets too frustrated, he'll shut down the kitchen!",
+      "genres": [
+        "Simulator"
+      ],
+      "developer": "Ludia, Inc., Ludia, Inc.",
+      "publisher": "Ubisoft Entertainment",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 57,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-hell-s-kitchen-the-game.jpg",
+      "boxartRatio": 0.711,
+      "igdbId": 21358,
+      "wikidataId": null
+    },
+    {
       "id": "nintendo-64-hey-you-pikachu",
       "title": "Hey You, Pikachu!",
       "platform": "Nintendo 64",
@@ -1498,6 +1596,30 @@
       "boxartRatio": 1.407
     },
     {
+      "id": "nintendo-wii-iron-chef-america-supreme-cuisine",
+      "title": "Iron Chef America: Supreme Cuisine",
+      "platform": "Nintendo Wii",
+      "year": 2008,
+      "cover": "assets/covers/nintendo-wii-iron-chef-america-supreme-cuisine.jpg",
+      "description": "Prepare for Battle! Chop, mix and stir against the greatest chefs the world has ever known in a lightning-paced cooking competition. Iron Chef America: Supreme Cuisine challenges players to take up the role of master chef in a battle for culinary supremacy. Iron Chef America: Supreme Cuisine - take part in epic culinary battles centered on 15 theme ingredients and hundreds of dish variations.",
+      "genres": [
+        "Simulator"
+      ],
+      "developer": "Black Lantern Studios",
+      "publisher": "Destineer",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 42,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-iron-chef-america-supreme-cuisine.jpg",
+      "boxartRatio": 0.715,
+      "igdbId": 4934,
+      "wikidataId": null
+    },
+    {
       "id": "microsoft-xbox-jet-set-radio-future",
       "title": "Jet Set Radio Future",
       "platform": "Microsoft Xbox",
@@ -1610,6 +1732,30 @@
       "boxartRatio": 0.706
     },
     {
+      "id": "nintendo-wii-just-dance-2017",
+      "title": "Just Dance 2017",
+      "platform": "Nintendo Wii",
+      "year": 2016,
+      "cover": "assets/covers/nintendo-wii-just-dance-2017.jpg",
+      "description": "Grab your friends and family: it’s time to dance! Just Dance is back with over 40 new tracks, 6 games modes, and ever more songs through Just Dance Unlimited subscription service! Featuring the ultimate tracklist including Cheap Thrills by Sia Ft. Sean Paul, Sorry by Justin Bieber and many more!",
+      "genres": [
+        "Music"
+      ],
+      "developer": "Ubisoft Milan, Ubisoft Pune, Ubisoft Paris",
+      "publisher": "Ubisoft Entertainment",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-just-dance-2017.jpg",
+      "boxartRatio": 0.715,
+      "igdbId": 19550,
+      "wikidataId": null
+    },
+    {
       "id": "nintendo-wii-just-dance-3",
       "title": "Just Dance 3",
       "platform": "Nintendo Wii",
@@ -1653,6 +1799,30 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 109458
+    },
+    {
+      "id": "nintendo-wii-kawasaki-quad-bikes",
+      "title": "Kawasaki Quad Bikes",
+      "platform": "Nintendo Wii",
+      "year": 2007,
+      "cover": "assets/covers/nintendo-wii-kawasaki-quad-bikes.jpg",
+      "description": "Tear around offroad tracks in Kawasaki Quad Bikes for Nintendo Wii. This racer is the ultimate quad biking experience, putting you in the driver's seat of these awesome All Terrain Vehicles. Feel the thrill of overtaking your opponents at high speeds and catch crazy air to make the whole arena roar. • Pick Up and Play: Intuitive motion-based controls mean players of all skill levels can pick up the Wii Remote and dive right into the fun!",
+      "genres": [
+        "Racing"
+      ],
+      "developer": "Data Design Interactive",
+      "publisher": "Bold Games, Popcorn Arcade",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-kawasaki-quad-bikes.jpg",
+      "boxartRatio": 0.708,
+      "igdbId": 4951,
+      "wikidataId": null
     },
     {
       "id": "nintendo-gamecube-kelly-slater-s-pro-surfer",
@@ -1989,6 +2159,32 @@
       "boxartRatio": 0.714
     },
     {
+      "id": "microsoft-xbox-leisure-suit-larry-magna-cum-laude",
+      "title": "Leisure Suit Larry: Magna Cum Laude",
+      "platform": "Microsoft Xbox",
+      "year": 2004,
+      "cover": "assets/covers/microsoft-xbox-leisure-suit-larry-magna-cum-laude.jpg",
+      "description": "Leisure Suit Larry: Magna Cum Laude is a 2004 video game, part of the Leisure Suit Larry series. The game introduces a new main character, 'Larry Lovage', as Larry Laffer's nephew. This is the 7th game in the series.",
+      "genres": [
+        "Point-and-click",
+        "Simulator",
+        "Adventure"
+      ],
+      "developer": "High Voltage Software",
+      "publisher": "Sierra Entertainment",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 62,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/microsoft-xbox-leisure-suit-larry-magna-cum-laude.jpg",
+      "boxartRatio": 0.714,
+      "igdbId": 2913,
+      "wikidataId": null
+    },
+    {
       "id": "microsoft-xbox-lord-of-the-rings-the-fellowship-of-the-ring",
       "title": "Lord of the Rings: The Fellowship of the Ring",
       "platform": "Microsoft Xbox",
@@ -2152,6 +2348,31 @@
       "igdbId": 2485,
       "boxart": "assets/boxart/nintendo-gamecube-luigi-s-mansion-player-s-choice.jpg",
       "boxartRatio": 0.711
+    },
+    {
+      "id": "nintendo-wii-man-vs-wild-with-bear-grylls",
+      "title": "Man vs. Wild With Bear Grylls",
+      "platform": "Nintendo Wii",
+      "year": 2011,
+      "cover": "assets/covers/nintendo-wii-man-vs-wild-with-bear-grylls.jpg",
+      "description": "Based on the Discovery Channel series of the same name, Man vs. Wild follows former commando Bear Grylls into remote areas as he demonstrates how to survive harsh weather, hostile animals, and other natural dangers.",
+      "genres": [
+        "Role-playing (RPG)",
+        "Adventure"
+      ],
+      "developer": "Floor 84 Studio, Scientifically Proven",
+      "publisher": "Crave Entertainment",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-man-vs-wild-with-bear-grylls.jpg",
+      "boxartRatio": 0.711,
+      "igdbId": 4995,
+      "wikidataId": null
     },
     {
       "id": "nintendo-switch-mario-golf-super-rush",
@@ -2498,6 +2719,30 @@
       "boxartRatio": 0.634
     },
     {
+      "id": "nintendo-wii-minute-to-win-it",
+      "title": "Minute to Win It",
+      "platform": "Nintendo Wii",
+      "year": 2010,
+      "cover": "assets/covers/nintendo-wii-minute-to-win-it.jpg",
+      "description": "A Wii game based on the television game show. It features the likeness of host Guy Fieri.",
+      "genres": [
+        "Arcade"
+      ],
+      "developer": "Smack Down Productions",
+      "publisher": "Zoo Publishing",
+      "region": null,
+      "release": null,
+      "condition": "New",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-minute-to-win-it.jpg",
+      "boxartRatio": 0.714,
+      "igdbId": 20162,
+      "wikidataId": null
+    },
+    {
       "id": "nintendo-64-mission-impossible",
       "title": "Mission: Impossible",
       "platform": "Nintendo 64",
@@ -2568,6 +2813,30 @@
       "igdbId": 122241,
       "boxart": "assets/boxart/snes-super-famicom-monopoly.jpg",
       "boxartRatio": 1.407
+    },
+    {
+      "id": "nintendo-wii-monster-4x4-world-circuit",
+      "title": "Monster 4x4: World Circuit",
+      "platform": "Nintendo Wii",
+      "year": 2006,
+      "cover": "assets/covers/nintendo-wii-monster-4x4-world-circuit.jpg",
+      "description": "This game has over 20 monster trucks and 30 circuits that take you all over the world. Race on circuits in the U.S., Europe, Asia, and even Antarctica. Drive trucks that have different car frames like a taxi, a mini cooper, an ambulance, a school bus, the original truck frame and much more. All of these can be customized with vinyls, paint jobs and performance parts. While racing you can score points to unlock hidden cars and tracks, by hitting barrels that can hurt opponents, and hitting tires, crates and buildings.",
+      "genres": [
+        "Racing"
+      ],
+      "developer": "Ubisoft Barcelona",
+      "publisher": null,
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 51,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-monster-4x4-world-circuit.jpg",
+      "boxartRatio": 0.705,
+      "igdbId": 5014,
+      "wikidataId": null
     },
     {
       "id": "nintendo-switch-monster-hunter-generations-ultimate",
@@ -2939,6 +3208,56 @@
       "boxartRatio": 0.491
     },
     {
+      "id": "nintendo-wii-pimp-my-ride",
+      "title": "Pimp My Ride",
+      "platform": "Nintendo Wii",
+      "year": 2006,
+      "cover": "assets/covers/nintendo-wii-pimp-my-ride.jpg",
+      "description": "Pimp My Ride is a simulation/racing game published by Activision. This game is based on the popular MTV show. It was released in 2006 for the Wii, Xbox 360, PlayStation Portable and PlayStation 2 consoles. In the game, players are challenged to pimp out their friends' cars by Xzibit, transforming something old and rusty into something worthy of displaying on the streets. Cars can be redesigned from bumper to bumper and it will be players’ responsibilities to capture the styles, likes and interests of their clients.",
+      "genres": [
+        "Racing",
+        "Simulator"
+      ],
+      "developer": "Eutechnyx",
+      "publisher": "Activision",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 26,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-pimp-my-ride.jpg",
+      "boxartRatio": 0.714,
+      "igdbId": 5098,
+      "wikidataId": null
+    },
+    {
+      "id": "microsoft-xbox-playboy-the-mansion",
+      "title": "Playboy: The Mansion",
+      "platform": "Microsoft Xbox",
+      "year": 2005,
+      "cover": "assets/covers/microsoft-xbox-playboy-the-mansion.jpg",
+      "description": "Play as Hugh Hefner and build the Playboy publishing empire while throwing parties, hanging out with celebrities, and, of course, inviting beautiful models into your mansion. Playboy: The Mansion is a social strategy game that calls on players to build a virtual empire of wealth, celebrity, and freedom from puritanical repression and intolerance. This is accomplished by developing a fully functioning Playboy mansion, to attract and accommodate influential celebrities and beautiful young models who are willing to strike the right poses.",
+      "genres": [
+        "Simulator",
+        "Strategy"
+      ],
+      "developer": "Cyberlore Studios",
+      "publisher": "Arush Entertainment, Groove Games",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 61,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/microsoft-xbox-playboy-the-mansion.jpg",
+      "boxartRatio": 0.714,
+      "igdbId": 2161,
+      "wikidataId": null
+    },
+    {
       "id": "3do-plumbers-don-t-wear-ties",
       "title": "Plumbers Don't Wear Ties",
       "platform": "3DO",
@@ -3075,6 +3394,54 @@
       "notes": null,
       "added": "2024-10-09",
       "igdbId": 25877
+    },
+    {
+      "id": "nintendo-wii-professional-bull-riding-out-of-the-chute",
+      "title": "Professional Bull Riding: Out of the Chute",
+      "platform": "Nintendo Wii",
+      "year": 2008,
+      "cover": "assets/covers/nintendo-wii-professional-bull-riding-out-of-the-chute.jpg",
+      "description": "Rider or Bull? Pick one, press start and hang on! The Toughest Sport on Dirt is finally the Toughest Game on Gaming Console. Climb on the back of the most notorious, fearsome and nastiest bucking bulls on the planet for the wildest ride in any arena. Or become 2000 pounds of fury and play as the bull and turn your agressions toward that cowboy on your back. Justin McBride or Little Yellow Jacket? Get in the Chute... Features • Play as 12 real pro bull riders or 12 real raging bulls • Compete against a friend in Rider vs.",
+      "genres": [
+        "Sport"
+      ],
+      "developer": "Totally Games",
+      "publisher": "Crave Entertainment, D2C Games",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": null,
+      "boxartRatio": null,
+      "igdbId": 51113,
+      "wikidataId": null
+    },
+    {
+      "id": "nintendo-wii-project-runway",
+      "title": "Project Runway",
+      "platform": "Nintendo Wii",
+      "year": 2010,
+      "cover": "assets/covers/nintendo-wii-project-runway.jpg",
+      "description": "A must have \"accessory\" for series fans, Project Runway the videogame will put players in the role of aspiring fashion designer. Similar to the show, players will be presented with a range of theme challenges as they create designs and adorn models with hair, make-up, and accessories. Players can then become the model and strut their creations down the runway using the Wii Balance Board accessory.",
+      "genres": [
+        "Simulator"
+      ],
+      "developer": "Tornado Studios",
+      "publisher": "Atari, Inc.",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-project-runway.jpg",
+      "boxartRatio": 0.712,
+      "igdbId": 25171,
+      "wikidataId": null
     },
     {
       "id": "3do-psychic-detective",
@@ -3492,6 +3859,30 @@
       "boxart": "assets/boxart/snes-super-famicom-shaq-fu.jpg",
       "boxartRatio": 1.407,
       "igdbId": 8536,
+      "wikidataId": null
+    },
+    {
+      "id": "nintendo-wii-shawn-johnson-gymnastics",
+      "title": "Shawn Johnson Gymnastics",
+      "platform": "Nintendo Wii",
+      "year": 2010,
+      "cover": "assets/covers/nintendo-wii-shawn-johnson-gymnastics.jpg",
+      "description": "Compatible with the Wii Balance Board, Shawn Johnson Gymnastics offers a truly realistic experience in the following gymnastics events: floor exercise, vault, balance beam and uneven parallel bars. Featuring the guidance and voice of Olympic gold medalist, all-round champion and \"Dancing with the Stars\" winner Shawn Johnson, the game invites up to eight players to train and compete in the exciting world of professional gymnastics.",
+      "genres": [
+        "Sport"
+      ],
+      "developer": null,
+      "publisher": "Zoo Games",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-shawn-johnson-gymnastics.jpg",
+      "boxartRatio": 0.71,
+      "igdbId": 50979,
       "wikidataId": null
     },
     {
@@ -4401,6 +4792,126 @@
       "igdbId": 3005
     },
     {
+      "id": "nintendo-wii-survivor",
+      "title": "Survivor",
+      "platform": "Nintendo Wii",
+      "year": 2010,
+      "cover": "assets/covers/nintendo-wii-survivor.jpg",
+      "description": "Survivor brings you all the elements of the hit TV show - a remote island paradise, two tribes, reward and immunity challenges and a ruthless Tribal Council. Put your endurance to the test and compete in 24 reward and immunity challenges including swimming, balancing, canoeing, javelin, long jumping and jungle targets.",
+      "genres": [
+        "Role-playing (RPG)",
+        "Adventure",
+        "Indie"
+      ],
+      "developer": "Smack Down Productions",
+      "publisher": "Valcon Games",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-survivor.jpg",
+      "boxartRatio": 0.698,
+      "igdbId": 208345,
+      "wikidataId": null
+    },
+    {
+      "id": "nintendo-wii-the-amazing-race",
+      "title": "The Amazing Race",
+      "platform": "Nintendo Wii",
+      "year": 2010,
+      "cover": "assets/covers/nintendo-wii-the-amazing-race.jpg",
+      "description": "Race around the world and experience the thrill of the hit reality series with The Amazing Race video game! Grab your clue, choose your transportation, and make your way to the pit stop! Just like in the TV show you'll overcome Detours, Road Blocks, Fast Forwards, Intersections and more as you race through exotic locations all across the globe. Don't forget to watch out for unexpected obstacles that could slow you down! And meet Phil Keoghan at every pit stop as he reads your clues, introduces challenges and gives you prizes, just like in the show!",
+      "genres": [
+        "Adventure"
+      ],
+      "developer": null,
+      "publisher": null,
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-the-amazing-race.jpg",
+      "boxartRatio": 0.71,
+      "igdbId": 51009,
+      "wikidataId": null
+    },
+    {
+      "id": "nintendo-wii-the-bachelor-the-videogame",
+      "title": "The Bachelor: The Videogame",
+      "platform": "Nintendo Wii",
+      "year": 2010,
+      "cover": "assets/covers/nintendo-wii-the-bachelor-the-videogame.jpg",
+      "description": "The quest for love doesn't have to end after the show's final rose. Now, you can experience the excitement of the TV show in your very own adventure and compete for the affections of The Bachelor or The Bachelorette! It's up to you to make an impression that will leave your suitor with only one option...to offer you the final rose!",
+      "genres": [
+        "Simulator"
+      ],
+      "developer": "Ludia, Inc.",
+      "publisher": "WB Games",
+      "region": null,
+      "release": null,
+      "condition": "Manual + Game",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-the-bachelor-the-videogame.jpg",
+      "boxartRatio": 0.705,
+      "igdbId": 6571,
+      "wikidataId": null
+    },
+    {
+      "id": "nintendo-wii-the-biggest-loser",
+      "title": "The Biggest Loser",
+      "platform": "Nintendo Wii",
+      "year": 2009,
+      "cover": "assets/covers/nintendo-wii-the-biggest-loser.jpg",
+      "description": "Now you can become \"The Biggest Loser\" in the comforts of your own home! Shape and tone your body with our interactive fitness video game. Our amazing trainers Bob Harper and Jillian Michaels guide you along the way with their expert advice and their unique motivation styles. Choose a 4, 8 or 12 weeks program and The Biggest Loser fitness game builds a workout and nutrition plan for you so you can reach your fitness goals. Trust us: it's not just a workout for the thumbs, it's a workout for the entire body - and the entire family.",
+      "genres": [
+        "Simulator"
+      ],
+      "developer": null,
+      "publisher": null,
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-the-biggest-loser.jpg",
+      "boxartRatio": 0.715,
+      "igdbId": 48035,
+      "wikidataId": null
+    },
+    {
+      "id": "nintendo-wii-the-biggest-loser-challenge",
+      "title": "The Biggest Loser Challenge",
+      "platform": "Nintendo Wii",
+      "year": 2010,
+      "cover": "assets/covers/nintendo-wii-the-biggest-loser-challenge.jpg",
+      "description": "You've watched the show... now it's your turn. One of the leading interactive health and fitness video games is back with The Biggest Loser Challenge.",
+      "genres": [],
+      "developer": null,
+      "publisher": null,
+      "region": null,
+      "release": null,
+      "condition": null,
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-the-biggest-loser-challenge.jpg",
+      "boxartRatio": 0.715,
+      "igdbId": 51003,
+      "wikidataId": null
+    },
+    {
       "id": "microsoft-xbox-the-godfather",
       "title": "The Godfather",
       "platform": "Microsoft Xbox",
@@ -4449,6 +4960,57 @@
       "wikidataId": null,
       "boxart": "assets/boxart/nintendo-64-the-powerpuff-girls-chemical-x-traction.jpg",
       "boxartRatio": 1.369
+    },
+    {
+      "id": "nintendo-wii-the-sims-2-castaway",
+      "title": "The Sims 2: Castaway",
+      "platform": "Nintendo Wii",
+      "year": 2007,
+      "cover": "assets/covers/nintendo-wii-the-sims-2-castaway.jpg",
+      "description": "Castaway is the third console spin-off of the video game The Sims 2. The Sims Castaway Stories is a similar game created for personal computers. It is the final game in the series released for the PlayStation 2 and the final game in the Sims 2 series for console. Help your Sims build a life from scratch after washing ashore on a deserted tropical island. Overcome the forces of nature to help them become the ultimate survivors and thrive in this undiscovered paradise while unearthing clues that will lead them back to civilization.",
+      "genres": [
+        "Simulator",
+        "Strategy",
+        "Adventure"
+      ],
+      "developer": "The Sims Division",
+      "publisher": "Electronic Arts",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 73,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-the-sims-2-castaway.jpg",
+      "boxartRatio": 0.712,
+      "igdbId": 5156,
+      "wikidataId": null
+    },
+    {
+      "id": "microsoft-xbox-the-urbz-sims-in-the-city",
+      "title": "The Urbz: Sims in the City",
+      "platform": "Microsoft Xbox",
+      "year": 2004,
+      "cover": "assets/covers/microsoft-xbox-the-urbz-sims-in-the-city.jpg",
+      "description": "The Sims have moved to the City where there's always action and where reputation means everything. In the Urbz: Sims in the City, you can go to work at such locations as the Sushi Bar, Chop Shop, or Bootleg Fireworks, Inc. Success at work brings promotions, access to new power socials, and gear to influence your new lifestyle. Flaunt your attitude by styling your Urbz, and then cross the velvet ropes of an uptown night club, or explore the subway to earn new skills and items.",
+      "genres": [
+        "Simulator",
+        "Strategy"
+      ],
+      "developer": "Maxis",
+      "publisher": "Electronic Arts",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 70,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/microsoft-xbox-the-urbz-sims-in-the-city.jpg",
+      "boxartRatio": 0.714,
+      "igdbId": 2158,
+      "wikidataId": null
     },
     {
       "id": "3do-theme-park",
@@ -4800,6 +5362,54 @@
       "boxartRatio": 1.407
     },
     {
+      "id": "nintendo-wii-wii-fit-plus",
+      "title": "Wii Fit Plus",
+      "platform": "Nintendo Wii",
+      "year": 2009,
+      "cover": "assets/covers/nintendo-wii-wii-fit-plus.jpg",
+      "description": "Wii Fit Plus provides all of the original activities in Wii Fit in addition to fifteen Balance/Aerobics games (in a separate category called \"Training Plus\") and six Yoga and Strength-Training exercises unique to the game.",
+      "genres": [
+        "Sport"
+      ],
+      "developer": "Nintendo EAD Software Development Group No.5",
+      "publisher": "Nintendo",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 80,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-wii-fit-plus.jpg",
+      "boxartRatio": 0.709,
+      "igdbId": 2187,
+      "wikidataId": null
+    },
+    {
+      "id": "nintendo-wii-wii-music",
+      "title": "Wii Music",
+      "platform": "Nintendo Wii",
+      "year": 2008,
+      "cover": "assets/covers/nintendo-wii-wii-music.jpg",
+      "description": "Create a musical masterpiece with up to four players. Anyone can play the huge selection of instruments in Wii Music with simple motions. Play faster. Play slower. Skip a beat, or throw in 10 more. No matter what you do, Wii Music automatically transforms your improv stylings into great music. There are no mistakes - just playing for the pure joy of playing.",
+      "genres": [
+        "Music"
+      ],
+      "developer": "Nintendo EAD Software Development Group No.2",
+      "publisher": "Nintendo",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 63,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-wii-music.jpg",
+      "boxartRatio": 0.719,
+      "igdbId": 3244,
+      "wikidataId": null
+    },
+    {
       "id": "nintendo-wii-wii-play",
       "title": "Wii Play",
       "platform": "Nintendo Wii",
@@ -4821,6 +5431,31 @@
       "igdbId": 2185,
       "boxart": "assets/boxart/nintendo-wii-wii-play.jpg",
       "boxartRatio": 0.713
+    },
+    {
+      "id": "nintendo-wii-wipeout-the-game",
+      "title": "Wipeout: The Game",
+      "platform": "Nintendo Wii",
+      "year": 2010,
+      "cover": "assets/covers/nintendo-wii-wipeout-the-game.jpg",
+      "description": "Based on the hit ABC TV show, Wipeout: The Game challenges fans to master speed, balance, and precision to overcome the world's largest obstacle course while enduring the inevitable hilarious falls, sometimes at the hands of your friends and family! In Wipeout: The Game, players will prove they have what it takes to make it to the grand finale \"Wipeout Zone\" for their chance to be proclaimed champion. Four players can compete at the same time, even allowing players to hurl objects at and taunt their opponents.",
+      "genres": [
+        "Platform",
+        "Strategy"
+      ],
+      "developer": "Activision",
+      "publisher": "Activision",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/nintendo-wii-wipeout-the-game.jpg",
+      "boxartRatio": 0.711,
+      "igdbId": 47821,
+      "wikidataId": null
     },
     {
       "id": "microsoft-xbox-world-championship-poker",
@@ -4846,6 +5481,34 @@
       "notes": null,
       "added": "2026-08-31",
       "boxart": "assets/boxart/microsoft-xbox-world-championship-poker.jpg",
+      "boxartRatio": 0.715,
+      "igdbId": 6237,
+      "wikidataId": null
+    },
+    {
+      "id": "microsoft-xbox-world-championship-poker-2",
+      "title": "World Championship Poker",
+      "platform": "Microsoft Xbox",
+      "year": 2004,
+      "cover": "assets/covers/microsoft-xbox-world-championship-poker-2.jpg",
+      "description": "World Championship Poker offers the most challenging, most realistic poker game play around. Compete against top players for a seat at the Grand Championship Table -- call their bluffs, know when to hold 'em and when to fold 'em, and try to make it to the final showdown!",
+      "genres": [
+        "Puzzle",
+        "Simulator",
+        "Strategy",
+        "Turn-based strategy (TBS)",
+        "Card & Board Game"
+      ],
+      "developer": "Coresoft, Point of View",
+      "publisher": "Crave Entertainment, 505 Games, Oxygen Games",
+      "region": null,
+      "release": null,
+      "condition": "New",
+      "copies": 1,
+      "metacritic": null,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/microsoft-xbox-world-championship-poker-2.jpg",
       "boxartRatio": 0.715,
       "igdbId": 6237,
       "wikidataId": null
@@ -4895,6 +5558,32 @@
       "igdbId": 3647,
       "boxart": "assets/boxart/nintendo-64-xena-warrior-princess-the-talisman-of-fate.jpg",
       "boxartRatio": 1.369
+    },
+    {
+      "id": "microsoft-xbox-yu-gi-oh-the-dawn-of-destiny",
+      "title": "Yu-Gi-Oh! The Dawn of Destiny",
+      "platform": "Microsoft Xbox",
+      "year": 2004,
+      "cover": "assets/covers/microsoft-xbox-yu-gi-oh-the-dawn-of-destiny.jpg",
+      "description": "Yu-Gi-Oh! The Dawn of Destiny is a strategy video game with over 1,000 Yu-Gi-Oh! cards that integrates the trading card gameplay and rules with 3D monster battles. Players engage in strategic duels against AI opponents, exploring various game modes including Link Duel and Triple Duel modes, which offer fresh challenges and test players' skills against multiple opponents simultaneously.",
+      "genres": [
+        "Strategy",
+        "Turn-based strategy (TBS)",
+        "Card & Board Game"
+      ],
+      "developer": "Konami Computer Entertainment Japan",
+      "publisher": "Konami",
+      "region": null,
+      "release": null,
+      "condition": "CIB",
+      "copies": 1,
+      "metacritic": 53,
+      "notes": null,
+      "added": "2026-09-03",
+      "boxart": "assets/boxart/microsoft-xbox-yu-gi-oh-the-dawn-of-destiny.jpg",
+      "boxartRatio": 0.714,
+      "igdbId": 6257,
+      "wikidataId": null
     },
     {
       "id": "nintendo-gamecube-yu-gi-oh-the-falsebound-kingdom",
